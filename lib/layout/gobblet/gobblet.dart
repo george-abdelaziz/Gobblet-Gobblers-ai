@@ -22,7 +22,7 @@ class Gobblet extends StatelessWidget {
                   'Gobblet'
               ),
             ),
-            body: BoardScreen(),
+            body: cubit.screens[cubit.currentScreenIndex],
           );
         },
       ),

@@ -1,6 +1,8 @@
 import 'package:ai_project/layout/gobblet/cubit/states.dart';
 import 'package:ai_project/models/my_classes.dart';
+import 'package:ai_project/modules/board/board_screen.dart';
 import 'package:ai_project/modules/player_selection/player_selection_screen.dart';
+import 'package:ai_project/modules/win/win.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,12 +18,14 @@ class GameCubit extends Cubit<GameStates>{
   bool isHuman2=true;
   bool isPlayer1Turn=true;
   int touch=0;
-  int currentScreenIndex=0;
+  int currentScreenIndex=1;
+  int winner=0;
   MyPoint from= MyPoint(x: 0);
   MyPoint to=MyPoint(x: 0);
   List<Widget> screens=[
     PlayerSelectionScreen(),
-    Gobblet(),
+    BoardScreen(),
+    WinScreen(),
   ];
   List<String> modes=[
     'minmax',
@@ -43,6 +47,21 @@ class GameCubit extends Cubit<GameStates>{
       [[0,-1,-2,-3,-4,],[0,-1,-2,-3,-4,],[0,-1,-2,-3,-4,],],
     ],
   ];
+
+  void startGame(){
+    if(isHuman1){
+
+    }
+    else{
+      // start the ai
+      //change player
+    }
+  }
+
+  void changePlayer(){
+    isPlayer1Turn=!isPlayer1Turn;
+    touch=0;
+  }
 
   void APieceIsTouched({required MyPoint point}){
     if(isPlayer1Turn){
@@ -70,6 +89,20 @@ class GameCubit extends Cubit<GameStates>{
         to=point;
         movePiece();
         isPlayer1Turn=false;
+        if(player2wins()){
+          print('lollllllllllllllllllllll222222222222222222222');
+          currentScreenIndex=2;
+          winner=2;
+          emit(Player2Win());
+          return;
+        }
+        else if(player1wins()){
+          print('lollllllllllllllllllllll1111111111111111111111');
+          currentScreenIndex=2;
+          winner=1;
+          emit(Player1Win());
+          return;
+        }
         emit(Player2Turn());
       }
       else{
@@ -97,6 +130,18 @@ class GameCubit extends Cubit<GameStates>{
         to=point;
         movePiece();
         isPlayer1Turn=true;
+        if(player1wins()){
+          winner=1;
+          currentScreenIndex=2;
+          emit(Player1Win());
+          return;
+        }
+        else if(player2wins()){
+          currentScreenIndex=2;
+          winner=2;
+          emit(Player2Win());
+          return;
+        }
         emit(Player1Turn());
       }
       else{
@@ -133,44 +178,45 @@ class GameCubit extends Cubit<GameStates>{
 
   bool player1wins(){
     if(
-          MyPoint(x:1,y:0,).getLastNumber(arr:boardz)>0&&MyPoint(x:0,y:1,).getLastNumber(arr:boardz)>0&&MyPoint(x:0,y:2,).getLastNumber(arr:boardz)>0&&MyPoint(x:0,y:3,).getLastNumber(arr:boardz)>0
-        ||MyPoint(x:1,y:0,).getLastNumber(arr:boardz)>0&&MyPoint(x:1,y:1,).getLastNumber(arr:boardz)>0&&MyPoint(x:1,y:2,).getLastNumber(arr:boardz)>0&&MyPoint(x:1,y:3,).getLastNumber(arr:boardz)>0
-        ||MyPoint(x:2,y:0,).getLastNumber(arr:boardz)>0&&MyPoint(x:2,y:1,).getLastNumber(arr:boardz)>0&&MyPoint(x:2,y:2,).getLastNumber(arr:boardz)>0&&MyPoint(x:2,y:3,).getLastNumber(arr:boardz)>0
-        ||MyPoint(x:3,y:0,).getLastNumber(arr:boardz)>0&&MyPoint(x:3,y:1,).getLastNumber(arr:boardz)>0&&MyPoint(x:3,y:2,).getLastNumber(arr:boardz)>0&&MyPoint(x:3,y:3,).getLastNumber(arr:boardz)>0
+      q(y: 0,z: 0)>0&&q(y: 1,z: 0)>0&&q(y: 2,z: 0)>0&&q(y: 3,z: 0)>0
+    ||q(y: 0,z: 1)>0&&q(y: 1,z: 1)>0&&q(y: 2,z: 1)>0&&q(y: 3,z: 1)>0
+    ||q(y: 0,z: 2)>0&&q(y: 1,z: 2)>0&&q(y: 2,z: 2)>0&&q(y: 3,z: 2)>0
+    ||q(y: 0,z: 3)>0&&q(y: 1,z: 3)>0&&q(y: 2,z: 3)>0&&q(y: 3,z: 3)>0
 
-        ||MyPoint(x:0,y:0,).getLastNumber(arr:boardz)>0&&MyPoint(x:1,y:0,).getLastNumber(arr:boardz)>0&&MyPoint(x:2,y:0,).getLastNumber(arr:boardz)>0&&MyPoint(x:3,y:0,).getLastNumber(arr:boardz)>0
-        ||MyPoint(x:0,y:1,).getLastNumber(arr:boardz)>0&&MyPoint(x:1,y:1,).getLastNumber(arr:boardz)>0&&MyPoint(x:2,y:1,).getLastNumber(arr:boardz)>0&&MyPoint(x:3,y:1,).getLastNumber(arr:boardz)>0
-        ||MyPoint(x:0,y:2,).getLastNumber(arr:boardz)>0&&MyPoint(x:1,y:2,).getLastNumber(arr:boardz)>0&&MyPoint(x:2,y:2,).getLastNumber(arr:boardz)>0&&MyPoint(x:3,y:2,).getLastNumber(arr:boardz)>0
-        ||MyPoint(x:0,y:3,).getLastNumber(arr:boardz)>0&&MyPoint(x:1,y:3,).getLastNumber(arr:boardz)>0&&MyPoint(x:2,y:3,).getLastNumber(arr:boardz)>0&&MyPoint(x:3,y:3,).getLastNumber(arr:boardz)>0
+    ||q(y: 0,z: 0)>0&&q(y: 0,z: 1)>0&&q(y: 0,z: 2)>0&&q(y: 0,z: 3)>0
+    ||q(y: 1,z: 0)>0&&q(y: 1,z: 1)>0&&q(y: 1,z: 2)>0&&q(y: 1,z: 3)>0
+    ||q(y: 2,z: 0)>0&&q(y: 2,z: 1)>0&&q(y: 2,z: 2)>0&&q(y: 2,z: 3)>0
+    ||q(y: 3,z: 0)>0&&q(y: 3,z: 1)>0&&q(y: 3,z: 2)>0&&q(y: 3,z: 3)>0
 
-        ||MyPoint(x:0,y:0,).getLastNumber(arr:boardz)>0&&MyPoint(x:1,y:1,).getLastNumber(arr:boardz)>0&&MyPoint(x:2,y:2,).getLastNumber(arr:boardz)>0&&MyPoint(x:3,y:3,).getLastNumber(arr:boardz)>0
-        ||MyPoint(x:0,y:3,).getLastNumber(arr:boardz)>0&&MyPoint(x:1,y:2,).getLastNumber(arr:boardz)>0&&MyPoint(x:2,y:1,).getLastNumber(arr:boardz)>0&&MyPoint(x:3,y:0,).getLastNumber(arr:boardz)>0
-
+    ||q(y: 0,z: 0)>0&&q(y: 1,z: 1)>0&&q(y: 2,z: 2)>0&&q(y: 3,z: 3)>0
+    ||q(y: 0,z: 3)>0&&q(y: 1,z: 2)>0&&q(y: 2,z: 1)>0&&q(y: 3,z: 0)>0
     )
     {return true;}
     return false;
   }
 
   bool player2wins(){
-    if(MyPoint(x:1,y:0,).getLastNumber(arr:boardz)<0&&MyPoint(x:0,y:1,).getLastNumber(arr:boardz)<0&&MyPoint(x:0,y:2,).getLastNumber(arr:boardz)<0&&MyPoint(x:0,y:3,).getLastNumber(arr:boardz)<0
-        ||MyPoint(x:1,y:0,).getLastNumber(arr:boardz)<0&&MyPoint(x:1,y:1,).getLastNumber(arr:boardz)<0&&MyPoint(x:1,y:2,).getLastNumber(arr:boardz)<0&&MyPoint(x:1,y:3,).getLastNumber(arr:boardz)<0
-        ||MyPoint(x:2,y:0,).getLastNumber(arr:boardz)<0&&MyPoint(x:2,y:1,).getLastNumber(arr:boardz)<0&&MyPoint(x:2,y:2,).getLastNumber(arr:boardz)<0&&MyPoint(x:2,y:3,).getLastNumber(arr:boardz)<0
-        ||MyPoint(x:3,y:0,).getLastNumber(arr:boardz)<0&&MyPoint(x:3,y:1,).getLastNumber(arr:boardz)<0&&MyPoint(x:3,y:2,).getLastNumber(arr:boardz)<0&&MyPoint(x:3,y:3,).getLastNumber(arr:boardz)<0
+    if(
+          q(y: 0,z: 0)<0&&q(y: 1,z: 0)<0&&q(y: 2,z: 0)<0&&q(y: 3,z: 0)<0
+        ||q(y: 0,z: 1)<0&&q(y: 1,z: 1)<0&&q(y: 2,z: 1)<0&&q(y: 3,z: 1)<0
+        ||q(y: 0,z: 2)<0&&q(y: 1,z: 2)<0&&q(y: 2,z: 2)<0&&q(y: 3,z: 2)<0
+        ||q(y: 0,z: 3)<0&&q(y: 1,z: 3)<0&&q(y: 2,z: 3)<0&&q(y: 3,z: 3)<0
 
-        ||MyPoint(x:0,y:0,).getLastNumber(arr:boardz)<0&&MyPoint(x:1,y:0,).getLastNumber(arr:boardz)<0&&MyPoint(x:2,y:0,).getLastNumber(arr:boardz)<0&&MyPoint(x:3,y:0,).getLastNumber(arr:boardz)<0
-        ||MyPoint(x:0,y:1,).getLastNumber(arr:boardz)<0&&MyPoint(x:1,y:1,).getLastNumber(arr:boardz)<0&&MyPoint(x:2,y:1,).getLastNumber(arr:boardz)<0&&MyPoint(x:3,y:1,).getLastNumber(arr:boardz)<0
-        ||MyPoint(x:0,y:2,).getLastNumber(arr:boardz)<0&&MyPoint(x:1,y:2,).getLastNumber(arr:boardz)<0&&MyPoint(x:2,y:2,).getLastNumber(arr:boardz)<0&&MyPoint(x:3,y:2,).getLastNumber(arr:boardz)<0
-        ||MyPoint(x:0,y:3,).getLastNumber(arr:boardz)<0&&MyPoint(x:1,y:3,).getLastNumber(arr:boardz)<0&&MyPoint(x:2,y:3,).getLastNumber(arr:boardz)<0&&MyPoint(x:3,y:3,).getLastNumber(arr:boardz)<0
+        ||q(y: 0,z: 0)<0&&q(y: 0,z: 1)<0&&q(y: 0,z: 2)<0&&q(y: 0,z: 3)<0
+        ||q(y: 1,z: 0)<0&&q(y: 1,z: 1)<0&&q(y: 1,z: 2)<0&&q(y: 1,z: 3)<0
+        ||q(y: 2,z: 0)<0&&q(y: 2,z: 1)<0&&q(y: 2,z: 2)<0&&q(y: 2,z: 3)<0
+        ||q(y: 3,z: 0)<0&&q(y: 3,z: 1)<0&&q(y: 3,z: 2)<0&&q(y: 3,z: 3)<0
 
-        ||MyPoint(x:0,y:0,).getLastNumber(arr:boardz)<0&&MyPoint(x:1,y:1,).getLastNumber(arr:boardz)<0&&MyPoint(x:2,y:2,).getLastNumber(arr:boardz)<0&&MyPoint(x:3,y:3,).getLastNumber(arr:boardz)<0
-        ||MyPoint(x:0,y:3,).getLastNumber(arr:boardz)<0&&MyPoint(x:1,y:2,).getLastNumber(arr:boardz)<0&&MyPoint(x:2,y:1,).getLastNumber(arr:boardz)<0&&MyPoint(x:3,y:0,).getLastNumber(arr:boardz)<0
-
+        ||q(y: 0,z: 0)<0&&q(y: 1,z: 1)<0&&q(y: 2,z: 2)<0&&q(y: 3,z: 3)<0
+        ||q(y: 0,z: 3)<0&&q(y: 1,z: 2)<0&&q(y: 2,z: 1)<0&&q(y: 3,z: 0)<0
     )
     {return true;}
     return false;
   }
 
   double getLastNumber({required MyPoint point}){return boardz[point.x][point.y][point.z].last;}
+
+  double q({required int y,required int z}){return boardz[0][y][z].last;}
 
   void popNumber({required MyPoint point}){
     if(getLastNumber(point: point)==0){return;}
@@ -179,5 +225,11 @@ class GameCubit extends Cubit<GameStates>{
 
   void insertNumber({required MyPoint point,required double num}){
     boardz[point.x][point.y][point.z].add(num);
+  }
+
+
+
+  void api1(){
+
   }
 }
