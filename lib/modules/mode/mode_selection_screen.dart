@@ -9,7 +9,12 @@ class ModeSelectionScreen extends StatelessWidget {
     return BlocConsumer<GameCubit, GameStates>(
       listener: (context, state) {},
       builder: (context, state) {
-        return Text('Mode Selection Screen');
+        return Column(
+          children: [
+            Text('Mode Selection Screen'),
+            TextFormField(),
+          ],
+        );
       },
     );
   }

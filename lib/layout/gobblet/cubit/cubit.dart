@@ -6,6 +6,7 @@ import 'package:ai_project/modules/win/win.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../modules/mode/mode_selection_screen.dart';
 import '../gobblet.dart';
 
 class GameCubit extends Cubit<GameStates>{
@@ -18,12 +19,25 @@ class GameCubit extends Cubit<GameStates>{
   bool isHuman2=true;
   bool isPlayer1Turn=true;
   int touch=0;
+<<<<<<< HEAD
+  int currentScreenIndex=0;
+  int winner=0;
+  String? player1;
+  String? player2;
+=======
   int currentScreenIndex=1;
   int winner=0;
+>>>>>>> dcf5e5f6ba40d64490494de546665759a578e46d
   MyPoint from= MyPoint(x: 0);
   MyPoint to=MyPoint(x: 0);
   List<Widget> screens=[
     PlayerSelectionScreen(),
+<<<<<<< HEAD
+    ModeSelectionScreen(),
+    ModeSelectionScreen(),
+    BoardScreen(),
+    WinScreen(),
+=======
     BoardScreen(),
     WinScreen(),
   ];
@@ -31,6 +45,7 @@ class GameCubit extends Cubit<GameStates>{
     'minmax',
     'alpha-beta pruning',
     'alpha-beta pruning with iterative deepening '
+>>>>>>> dcf5e5f6ba40d64490494de546665759a578e46d
   ];
   //boardz[which board][vertical height of the board][horizontal width of the board][n/height of the stack]=double;
   List<List<List<List<double>>>> boardz=[
@@ -48,6 +63,21 @@ class GameCubit extends Cubit<GameStates>{
     ],
   ];
 
+<<<<<<< HEAD
+  void goToGame(){
+    if(player1!=null&&player2!=null){
+      if(player1=='3'){
+        currentScreenIndex++;
+      }
+      emit(GameStarted());
+    }
+    else{
+      emit(PlayersNotSelected());
+    }
+  }
+
+=======
+>>>>>>> dcf5e5f6ba40d64490494de546665759a578e46d
   void startGame(){
     if(isHuman1){
 
@@ -58,6 +88,17 @@ class GameCubit extends Cubit<GameStates>{
     }
   }
 
+<<<<<<< HEAD
+  void selectPlayer1(String value){
+    player1=value;
+  }
+
+  void selectPlayer2(String value){
+    player2=value;
+  }
+
+=======
+>>>>>>> dcf5e5f6ba40d64490494de546665759a578e46d
   void changePlayer(){
     isPlayer1Turn=!isPlayer1Turn;
     touch=0;

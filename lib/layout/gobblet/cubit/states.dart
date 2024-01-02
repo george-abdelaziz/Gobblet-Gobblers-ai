@@ -4,6 +4,8 @@ class GameInitialState extends GameStates {}
 
 class SquareClicked extends GameStates {}
 
+class PlayersNotSelected extends GameStates {}
+
 //indicates that the game haz started
 class GameStarted extends GameStates {}
 

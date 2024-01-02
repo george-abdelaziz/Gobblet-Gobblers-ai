@@ -2,6 +2,8 @@ import 'package:ai_project/layout/gobblet/cubit/cubit.dart';
 import 'package:ai_project/models/my_classes.dart';
 import 'package:flutter/material.dart';
 
+
+
 Widget? piece({
   required BuildContext context,
   required MyPoint point,
