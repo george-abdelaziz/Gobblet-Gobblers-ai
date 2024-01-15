@@ -4,6 +4,8 @@ import '../../layout/gobblet/cubit/cubit.dart';
 import '../../layout/gobblet/cubit/states.dart';
 
 class ModeSelectionScreen extends StatelessWidget {
+  const ModeSelectionScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<GameCubit, GameStates>(
@@ -11,7 +13,7 @@ class ModeSelectionScreen extends StatelessWidget {
       builder: (context, state) {
         return Column(
           children: [
-            Text('Mode Selection Screen'),
+            const Text('Mode Selection Screen'),
             TextFormField(),
           ],
         );

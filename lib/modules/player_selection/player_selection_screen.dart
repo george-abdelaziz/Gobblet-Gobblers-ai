@@ -6,11 +6,13 @@ import '../../layout/gobblet/cubit/states.dart';
 class PlayerSelectionScreen extends StatelessWidget {
   //GameCubit cubit=GameCubit.get(context);
   List<DropdownMenuEntry> temp1=[
-      DropdownMenuEntry<String>(label: '1',value: '0'),
-      DropdownMenuEntry<String>(label: '2',value: '1'),
-      DropdownMenuEntry<String>(label: 'alpha-beta pruning',value: '2'),
-      DropdownMenuEntry<String>(label: 'alpha-beta pruning with iterative deepening',value: '3'),
+      const DropdownMenuEntry<String>(label: '1',value: '0'),
+      const DropdownMenuEntry<String>(label: '2',value: '1'),
+      const DropdownMenuEntry<String>(label: 'alpha-beta pruning',value: '2'),
+      const DropdownMenuEntry<String>(label: 'alpha-beta pruning with iterative deepening',value: '3'),
     ];
+
+  PlayerSelectionScreen({super.key});
   //if()
   @override
   Widget build(BuildContext context) {
@@ -22,16 +24,16 @@ class PlayerSelectionScreen extends StatelessWidget {
           child: Center(
             child: Column(
               children: [
-                Text(
+                const Text(
                     'Player Selection Screen',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                SizedBox(height: 20,),
+                const SizedBox(height: 20,),
                 DropdownMenu(
-                  dropdownMenuEntries: [
+                  dropdownMenuEntries: const [
                     DropdownMenuEntry<String>(label: 'Human',value: '0'),
                     DropdownMenuEntry<String>(label: 'minmax',value: '1'),
                     DropdownMenuEntry<String>(label: 'alpha-beta pruning',value: '2'),
@@ -45,9 +47,9 @@ class PlayerSelectionScreen extends StatelessWidget {
                   },
                 ),
                 //DropdownMenu(dropdownMenuEntries:(cubit.player1=='3')?temp1:[],),
-                SizedBox(height: 20,),
+                const SizedBox(height: 20,),
                 DropdownMenu(
-                  dropdownMenuEntries: [
+                  dropdownMenuEntries: const [
                     DropdownMenuEntry<String>(label: 'Human',value: '0'),
                     DropdownMenuEntry<String>(label: 'minmax',value: '1'),
                     DropdownMenuEntry<String>(label: 'alpha-beta pruning',value: '2'),
@@ -59,9 +61,8 @@ class PlayerSelectionScreen extends StatelessWidget {
                     cubit.player2=value;
                   },
                 ),
-                SizedBox(height: 20,),
+                const SizedBox(height: 20,),
                 MaterialButton(
-                  child: Text('Next'),
                   color: Colors.deepPurpleAccent,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -69,6 +70,7 @@ class PlayerSelectionScreen extends StatelessWidget {
                   onPressed: (){
                     cubit.goToGame();
                   },
+                  child: const Text('Next'),
                 )
               ],
             ),

@@ -1,10 +1,11 @@
-import 'package:ai_project/modules/board/board_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'cubit/cubit.dart';
 import 'cubit/states.dart';
 
 class Gobblet extends StatelessWidget {
+  const Gobblet({super.key});
+
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +19,7 @@ class Gobblet extends StatelessWidget {
           var cubit = GameCubit.get(context);
           return Scaffold(
             appBar: AppBar(
-              title: Text(
+              title: const Text(
                   'Gobblet'
               ),
             ),

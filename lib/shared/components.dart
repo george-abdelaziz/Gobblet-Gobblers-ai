@@ -28,7 +28,7 @@ Widget? piece({
         height: size,
         color: color,
         textColor: Colors.white,
-        shape: CircleBorder(),
+        shape: const CircleBorder(),
         onPressed: (){
           var cubit=GameCubit.get(context);
           cubit.APieceIsTouched(point: point);
@@ -130,12 +130,12 @@ Widget player1(BuildContext context,){
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text('Player 1',
+          const Text('Player 1',
             style: TextStyle(
               fontSize: 30
             ),
           ),
-          SizedBox(height: 20,),
+          const SizedBox(height: 20,),
           Container(
             decoration: BoxDecoration(
               border: Border.all(
@@ -229,8 +229,8 @@ Widget player2(BuildContext context,){
               ],
             ),
           ),
-          SizedBox(height: 20,),
-          Text('Player 2',
+          const SizedBox(height: 20,),
+          const Text('Player 2',
             style: TextStyle(
                 fontSize: 30
             ),

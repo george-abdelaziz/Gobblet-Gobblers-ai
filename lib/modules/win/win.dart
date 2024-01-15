@@ -4,6 +4,8 @@ import '../../layout/gobblet/cubit/cubit.dart';
 import '../../layout/gobblet/cubit/states.dart';
 
 class WinScreen extends StatelessWidget {
+  const WinScreen({super.key});
+
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +19,7 @@ class WinScreen extends StatelessWidget {
               children: [
                 Text(
                   'Player ${cubit.winner} Wins',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 30,
                   ),
                 ),
