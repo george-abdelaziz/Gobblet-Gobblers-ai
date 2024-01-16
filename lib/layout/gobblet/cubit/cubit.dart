@@ -5,15 +5,18 @@ import 'package:ai_project/modules/player_selection/player_selection_screen.dart
 import 'package:ai_project/modules/win/win.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../modules/mode/mode_selection_screen.dart';
+import '../../../modules/mode/mode_selection_screen1.dart';
+import '../../../modules/mode/mode_selection_screen2.dart';
 
 class GameCubit extends Cubit<GameStates> {
   GameCubit() : super(GameStarted());
   static GameCubit get(context) {
     return BlocProvider.of(context);
   }
-
+/*
+function moves
+evaluate
+*/
   init() {}
 
   bool isHuman1 = true;
@@ -22,18 +25,19 @@ class GameCubit extends Cubit<GameStates> {
   int touch = 0;
   int currentScreenIndex = 0;
   int winner = 0;
+  int ai1def = 0;
+  int ai2def = 0;
   String? player1;
   String? player2;
   MyPoint from = MyPoint(x: 0);
   MyPoint to = MyPoint(x: 0);
   List<Widget> screens = [
     PlayerSelectionScreen(),
-    const ModeSelectionScreen(),
-    const ModeSelectionScreen(),
-    const BoardScreen(),
-    const WinScreen(),
+    ModeSelectionScreen1(),
+    ModeSelectionScreen2(),
+    BoardScreen(),
+    WinScreen(),
   ];
-  //boardz[which board][vertical height of the board][horizontal width of the board][n/height of the stack]=double;
   List<List<List<List<double>>>> boardz = [
     [
       [
@@ -112,23 +116,31 @@ class GameCubit extends Cubit<GameStates> {
       ],
     ],
   ];
-
-  void goToGame() {
-    if (player1 != null && player2 != null) {
-      if (player1 == '3') {
-        currentScreenIndex++;
-      }
-      emit(GameStarted());
-    } else {
-      emit(PlayersNotSelected());
-    }
-  }
+  //boardz[which board][vertical height of the board][horizontal width of the board][n/height of the stack]=double;
 
   void startGame() {
     if (isHuman1) {
     } else {
       // start the ai
       //change player
+    }
+  }
+
+  void playerSelectionDone() {
+    if (player1 != null && player2 != null) {
+      if (player1 == '3') {
+        currentScreenIndex = 1;
+        return;
+      } else if (player2 == '3') {
+        currentScreenIndex = 2;
+        return;
+      } else {
+        currentScreenIndex = 3;
+      }
+      emit(GameStarted());
+      print('${currentScreenIndex}');
+    } else {
+      emit(PlayersNotSelected());
     }
   }
 
@@ -173,14 +185,12 @@ class GameCubit extends Cubit<GameStates> {
         movePiece();
         isPlayer1Turn = false;
         if (player2wins()) {
-          print('lollllllllllllllllllllll222222222222222222222');
-          currentScreenIndex = 2;
+          currentScreenIndex = 4;
           winner = 2;
           emit(Player2Win());
           return;
         } else if (player1wins()) {
-          print('lollllllllllllllllllllll1111111111111111111111');
-          currentScreenIndex = 2;
+          currentScreenIndex = 4;
           winner = 1;
           emit(Player1Win());
           return;
