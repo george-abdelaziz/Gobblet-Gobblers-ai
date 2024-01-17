@@ -31,7 +31,7 @@ Widget? piece({
         shape: const CircleBorder(),
         onPressed: (){
           var cubit=GameCubit.get(context);
-          cubit.APieceIsTouched(point: point);
+          cubit.plays(point: point);
         },
       ),
   );
@@ -53,7 +53,7 @@ Widget square({
   return InkWell(
     onTap: (){
       GameCubit cubit=GameCubit.get(context);
-      cubit.APieceIsTouched(point: point);
+      cubit.plays(point: point);
     },
     child: Center(
       child: Container(

@@ -6,19 +6,19 @@ import 'package:ai_project/modules/win/win.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+/*
+last rulezzzzzzzzzzzzzzzzzz
+*/
+
 class GameCubit extends Cubit<GameStates> {
 
   GameCubit() : super(GameInitialState());
   static GameCubit get(context) {return BlocProvider.of(context);}
 
-  bool isHuman1 = true;
-  bool isHuman2 = true;
   bool isPlayer1Turn = true;
-  int touch = 0;
+  int aPieceIsToushed = 0;
   int currentScreenIndex = 0;
   int winner = 0;
-  int ai1def = 0;
-  int ai2def = 0;
   String player1='';
   String player2='';
   String difficultyPlayer1='';
@@ -110,137 +110,89 @@ class GameCubit extends Cubit<GameStates> {
   ];
   //boardz[which board][vertical height of the board][horizontal width of the board][n/height of the stack]=double;
 
-  void startGame() {
-    while(true){
-        if(isPlayer1Turn==true){
-          if (isHuman1) {
-
-          }
-          else {
-
-            // start the ai
-            //change player
-          }
-        }
-        else{
-          if (isHuman1) {
-
-          }
-          else {
-            // start the ai
-            //change player
-          }
-          isPlayer1Turn=!isPlayer1Turn;
-        }
-    }
-  }
-
   void playerSelectionDone() {
     if(player1!=''&&player2!='!'){
       if(player1!='0'&&difficultyPlayer1==''){return;}
       if(player2!='0'&&difficultyPlayer2==''){return;}
-      emit(GameStarted());
       currentScreenIndex=1;
+      emit(GameStarted());
     }
     else {
       emit(PlayersNotSelected());
     }
   }
 
-  void selectPlayer1(String value) {
-    player1 = value;
-  }
-
-  void selectPlayer2(String value) {
-    player2 = value;
-  }
-
   void changePlayer() {
     isPlayer1Turn = !isPlayer1Turn;
-    touch = 0;
+    aPieceIsToushed = 0;
   }
 
-  void APieceIsTouched({required MyPoint point}) {
+  void plays({required MyPoint point}) {
     if (isPlayer1Turn) {
-      player1Turn(point: point);
-    } else {
-      player2Turn(point: point);
+      if(player1!='0'){
+        //AI1 Control
+        changePlayer();
+      }
+      else{
+        player1Turn(point: point);
+      }
+    }
+    else {
+      if(player2!='0'){
+        //AI2 Control
+        changePlayer();
+      }
+      else {
+        player2Turn(point: point);
+      }
     }
   }
 
   void player1Turn({required MyPoint point}) {
-    if (touch == 0) {
-      if (point.x == 2 || getLastNumber(point: point) <= 0) {
-        touch = 0;
-        emit(Player1SelectWrongSquare());
+    if (aPieceIsToushed == 0) {
+      if (getLastNumber(point: point) <= 0) {
         return;
       }
       from = point;
-      touch = 1;
+      aPieceIsToushed = 1;
       emit(Player1Frist());
-    } else {
-      touch = 0;
-      if (isValidMove(
-        start: from,
-        end: point,
-      )) {
+    }
+    else {
+      aPieceIsToushed = 0;
+      if (isValidMove(start: from, end: point,)) {
         to = point;
         movePiece();
         isPlayer1Turn = false;
-        if (player2wins()) {
-          currentScreenIndex++;
-          winner = 2;
-          emit(Player2Win());
-          return;
-        } else if (player1wins()) {
-          currentScreenIndex++;
-          winner = 1;
-          emit(Player1Win());
-          return;
-        }
+        player2wins();
+        player1wins();
         emit(Player2Turn());
-      } else {
-        emit(Player1SelectWrongSquare());
       }
+      else {emit(Player1SelectWrongSquare());}
       from.nagOne();
       to.nagOne();
     }
   }
 
   void player2Turn({required MyPoint point}) {
-    if (touch == 0) {
-      if (point.x == 1 || getLastNumber(point: point) >= 0) {
-        touch = 0;
-        emit(Player2SelectWrongSquare());
+    if (aPieceIsToushed == 0) {
+      if (getLastNumber(point: point) >= 0) {
         return;
       }
       from = point;
-      touch = 1;
+      aPieceIsToushed = 1;
       emit(Player2Frist());
-    } else {
-      touch = 0;
-      if (isValidMove(
-        start: from,
-        end: point,
-      )) {
+    }
+    else {
+      aPieceIsToushed = 0;
+      if (isValidMove(start: from, end: point,)) {
         to = point;
         movePiece();
         isPlayer1Turn = true;
-        if (player1wins()) {
-          winner = 1;
-          currentScreenIndex++;
-          emit(Player1Win());
-          return;
-        } else if (player2wins()) {
-          currentScreenIndex++;
-          winner = 2;
-          emit(Player2Win());
-          return;
-        }
+        player1wins();
+        player2wins();
         emit(Player1Turn());
-      } else {
-        emit(Player2SelectWrongSquare());
       }
+      else {emit(Player2SelectWrongSquare());}
       from.nagOne();
       to.nagOne();
     }
@@ -276,104 +228,106 @@ class GameCubit extends Cubit<GameStates> {
     }
   }
 
-  bool player1wins() {
-    if (q(y: 0, z: 0) > 0 &&
-            q(y: 1, z: 0) > 0 &&
-            q(y: 2, z: 0) > 0 &&
-            q(y: 3, z: 0) > 0 ||
-        q(y: 0, z: 1) > 0 &&
-            q(y: 1, z: 1) > 0 &&
-            q(y: 2, z: 1) > 0 &&
-            q(y: 3, z: 1) > 0 ||
-        q(y: 0, z: 2) > 0 &&
-            q(y: 1, z: 2) > 0 &&
-            q(y: 2, z: 2) > 0 &&
-            q(y: 3, z: 2) > 0 ||
-        q(y: 0, z: 3) > 0 &&
-            q(y: 1, z: 3) > 0 &&
-            q(y: 2, z: 3) > 0 &&
-            q(y: 3, z: 3) > 0 ||
-        q(y: 0, z: 0) > 0 &&
-            q(y: 0, z: 1) > 0 &&
-            q(y: 0, z: 2) > 0 &&
-            q(y: 0, z: 3) > 0 ||
-        q(y: 1, z: 0) > 0 &&
-            q(y: 1, z: 1) > 0 &&
-            q(y: 1, z: 2) > 0 &&
-            q(y: 1, z: 3) > 0 ||
-        q(y: 2, z: 0) > 0 &&
-            q(y: 2, z: 1) > 0 &&
-            q(y: 2, z: 2) > 0 &&
-            q(y: 2, z: 3) > 0 ||
-        q(y: 3, z: 0) > 0 &&
-            q(y: 3, z: 1) > 0 &&
-            q(y: 3, z: 2) > 0 &&
-            q(y: 3, z: 3) > 0 ||
-        q(y: 0, z: 0) > 0 &&
-            q(y: 1, z: 1) > 0 &&
-            q(y: 2, z: 2) > 0 &&
-            q(y: 3, z: 3) > 0 ||
-        q(y: 0, z: 3) > 0 &&
-            q(y: 1, z: 2) > 0 &&
-            q(y: 2, z: 1) > 0 &&
-            q(y: 3, z: 0) > 0) {
-      return true;
+  void player1wins() {
+    if (getLastItemInTheBoard(y: 0, z: 0) > 0 &&
+            getLastItemInTheBoard(y: 1, z: 0) > 0 &&
+            getLastItemInTheBoard(y: 2, z: 0) > 0 &&
+            getLastItemInTheBoard(y: 3, z: 0) > 0 ||
+        getLastItemInTheBoard(y: 0, z: 1) > 0 &&
+            getLastItemInTheBoard(y: 1, z: 1) > 0 &&
+            getLastItemInTheBoard(y: 2, z: 1) > 0 &&
+            getLastItemInTheBoard(y: 3, z: 1) > 0 ||
+        getLastItemInTheBoard(y: 0, z: 2) > 0 &&
+            getLastItemInTheBoard(y: 1, z: 2) > 0 &&
+            getLastItemInTheBoard(y: 2, z: 2) > 0 &&
+            getLastItemInTheBoard(y: 3, z: 2) > 0 ||
+        getLastItemInTheBoard(y: 0, z: 3) > 0 &&
+            getLastItemInTheBoard(y: 1, z: 3) > 0 &&
+            getLastItemInTheBoard(y: 2, z: 3) > 0 &&
+            getLastItemInTheBoard(y: 3, z: 3) > 0 ||
+        getLastItemInTheBoard(y: 0, z: 0) > 0 &&
+            getLastItemInTheBoard(y: 0, z: 1) > 0 &&
+            getLastItemInTheBoard(y: 0, z: 2) > 0 &&
+            getLastItemInTheBoard(y: 0, z: 3) > 0 ||
+        getLastItemInTheBoard(y: 1, z: 0) > 0 &&
+            getLastItemInTheBoard(y: 1, z: 1) > 0 &&
+            getLastItemInTheBoard(y: 1, z: 2) > 0 &&
+            getLastItemInTheBoard(y: 1, z: 3) > 0 ||
+        getLastItemInTheBoard(y: 2, z: 0) > 0 &&
+            getLastItemInTheBoard(y: 2, z: 1) > 0 &&
+            getLastItemInTheBoard(y: 2, z: 2) > 0 &&
+            getLastItemInTheBoard(y: 2, z: 3) > 0 ||
+        getLastItemInTheBoard(y: 3, z: 0) > 0 &&
+            getLastItemInTheBoard(y: 3, z: 1) > 0 &&
+            getLastItemInTheBoard(y: 3, z: 2) > 0 &&
+            getLastItemInTheBoard(y: 3, z: 3) > 0 ||
+        getLastItemInTheBoard(y: 0, z: 0) > 0 &&
+            getLastItemInTheBoard(y: 1, z: 1) > 0 &&
+            getLastItemInTheBoard(y: 2, z: 2) > 0 &&
+            getLastItemInTheBoard(y: 3, z: 3) > 0 ||
+        getLastItemInTheBoard(y: 0, z: 3) > 0 &&
+            getLastItemInTheBoard(y: 1, z: 2) > 0 &&
+            getLastItemInTheBoard(y: 2, z: 1) > 0 &&
+            getLastItemInTheBoard(y: 3, z: 0) > 0) {
+      winner = 1;
+      currentScreenIndex=2;
+      emit(Player1Win());
     }
-    return false;
   }
 
-  bool player2wins() {
-    if (q(y: 0, z: 0) < 0 &&
-            q(y: 1, z: 0) < 0 &&
-            q(y: 2, z: 0) < 0 &&
-            q(y: 3, z: 0) < 0 ||
-        q(y: 0, z: 1) < 0 &&
-            q(y: 1, z: 1) < 0 &&
-            q(y: 2, z: 1) < 0 &&
-            q(y: 3, z: 1) < 0 ||
-        q(y: 0, z: 2) < 0 &&
-            q(y: 1, z: 2) < 0 &&
-            q(y: 2, z: 2) < 0 &&
-            q(y: 3, z: 2) < 0 ||
-        q(y: 0, z: 3) < 0 &&
-            q(y: 1, z: 3) < 0 &&
-            q(y: 2, z: 3) < 0 &&
-            q(y: 3, z: 3) < 0 ||
-        q(y: 0, z: 0) < 0 &&
-            q(y: 0, z: 1) < 0 &&
-            q(y: 0, z: 2) < 0 &&
-            q(y: 0, z: 3) < 0 ||
-        q(y: 1, z: 0) < 0 &&
-            q(y: 1, z: 1) < 0 &&
-            q(y: 1, z: 2) < 0 &&
-            q(y: 1, z: 3) < 0 ||
-        q(y: 2, z: 0) < 0 &&
-            q(y: 2, z: 1) < 0 &&
-            q(y: 2, z: 2) < 0 &&
-            q(y: 2, z: 3) < 0 ||
-        q(y: 3, z: 0) < 0 &&
-            q(y: 3, z: 1) < 0 &&
-            q(y: 3, z: 2) < 0 &&
-            q(y: 3, z: 3) < 0 ||
-        q(y: 0, z: 0) < 0 &&
-            q(y: 1, z: 1) < 0 &&
-            q(y: 2, z: 2) < 0 &&
-            q(y: 3, z: 3) < 0 ||
-        q(y: 0, z: 3) < 0 &&
-            q(y: 1, z: 2) < 0 &&
-            q(y: 2, z: 1) < 0 &&
-            q(y: 3, z: 0) < 0) {
-      return true;
+  void player2wins() {
+    if (getLastItemInTheBoard(y: 0, z: 0) < 0 &&
+            getLastItemInTheBoard(y: 1, z: 0) < 0 &&
+            getLastItemInTheBoard(y: 2, z: 0) < 0 &&
+            getLastItemInTheBoard(y: 3, z: 0) < 0 ||
+        getLastItemInTheBoard(y: 0, z: 1) < 0 &&
+            getLastItemInTheBoard(y: 1, z: 1) < 0 &&
+            getLastItemInTheBoard(y: 2, z: 1) < 0 &&
+            getLastItemInTheBoard(y: 3, z: 1) < 0 ||
+        getLastItemInTheBoard(y: 0, z: 2) < 0 &&
+            getLastItemInTheBoard(y: 1, z: 2) < 0 &&
+            getLastItemInTheBoard(y: 2, z: 2) < 0 &&
+            getLastItemInTheBoard(y: 3, z: 2) < 0 ||
+        getLastItemInTheBoard(y: 0, z: 3) < 0 &&
+            getLastItemInTheBoard(y: 1, z: 3) < 0 &&
+            getLastItemInTheBoard(y: 2, z: 3) < 0 &&
+            getLastItemInTheBoard(y: 3, z: 3) < 0 ||
+        getLastItemInTheBoard(y: 0, z: 0) < 0 &&
+            getLastItemInTheBoard(y: 0, z: 1) < 0 &&
+            getLastItemInTheBoard(y: 0, z: 2) < 0 &&
+            getLastItemInTheBoard(y: 0, z: 3) < 0 ||
+        getLastItemInTheBoard(y: 1, z: 0) < 0 &&
+            getLastItemInTheBoard(y: 1, z: 1) < 0 &&
+            getLastItemInTheBoard(y: 1, z: 2) < 0 &&
+            getLastItemInTheBoard(y: 1, z: 3) < 0 ||
+        getLastItemInTheBoard(y: 2, z: 0) < 0 &&
+            getLastItemInTheBoard(y: 2, z: 1) < 0 &&
+            getLastItemInTheBoard(y: 2, z: 2) < 0 &&
+            getLastItemInTheBoard(y: 2, z: 3) < 0 ||
+        getLastItemInTheBoard(y: 3, z: 0) < 0 &&
+            getLastItemInTheBoard(y: 3, z: 1) < 0 &&
+            getLastItemInTheBoard(y: 3, z: 2) < 0 &&
+            getLastItemInTheBoard(y: 3, z: 3) < 0 ||
+        getLastItemInTheBoard(y: 0, z: 0) < 0 &&
+            getLastItemInTheBoard(y: 1, z: 1) < 0 &&
+            getLastItemInTheBoard(y: 2, z: 2) < 0 &&
+            getLastItemInTheBoard(y: 3, z: 3) < 0 ||
+        getLastItemInTheBoard(y: 0, z: 3) < 0 &&
+            getLastItemInTheBoard(y: 1, z: 2) < 0 &&
+            getLastItemInTheBoard(y: 2, z: 1) < 0 &&
+            getLastItemInTheBoard(y: 3, z: 0) < 0) {
+      winner = 2;
+      currentScreenIndex=2;
+      emit(Player2Win());
     }
-    return false;
+  }
+
+  double getLastItemInTheBoard({required int y, required int z}) {
+    return boardz[0][y][z].last;
   }
 
   double getLastNumber({required MyPoint point}) {
     return boardz[point.x][point.y][point.z].last;
-  }
-
-  double q({required int y, required int z}) {
-    return boardz[0][y][z].last;
   }
 
   void popNumber({required MyPoint point}) {
@@ -387,5 +341,12 @@ class GameCubit extends Cubit<GameStates> {
     boardz[point.x][point.y][point.z].add(num);
   }
 
-  void api1() {}
+  void selectPlayer1(String value) {
+    player1 = value;
+  }
+
+  void selectPlayer2(String value) {
+    player2 = value;
+  }
+
 }

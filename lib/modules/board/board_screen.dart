@@ -5,9 +5,6 @@ import '../../layout/gobblet/cubit/cubit.dart';
 import '../../layout/gobblet/cubit/states.dart';
 
 class BoardScreen extends StatelessWidget {
-  const BoardScreen({super.key});
-
-
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<GameCubit, GameStates>(
