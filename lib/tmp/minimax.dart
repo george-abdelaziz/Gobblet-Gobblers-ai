@@ -10,12 +10,73 @@ import 'dart:math';
 
 // fromRow, fromCol, toRow, toCol
 final File file = File("temp.txt");
-
-double evaluate() {
-  return Random(DateTime.now().second.toInt()).nextDouble() * 50;
+printBoard(board) async {
+  await file.writeAsString("========================\n", mode: FileMode.append);
+  for (var row in board) {
+    for (var col in row) {
+      await file.writeAsString("${col.last}, ", mode: FileMode.append);
+    }
+    await file.writeAsString("\n", mode: FileMode.append);
+  }
 }
 
-void applyMove() {}
+int evaluate(Map gametstate, int player) {
+  List<List<List>> board = gametstate["board"];
+  List<List> p1 = gametstate["p1"];
+  List<List> p2 = gametstate["p2"];
+  var squareDomination = 0;
+  if (player == 1) {
+    for (List<List> row in board) {
+      for (List col in row) {
+        if (col[col.length - 1] > 0) {
+          squareDomination += col[col.length - 1] as int;
+        }
+      }
+    }
+  } else {
+    for (List<List> row in board) {
+      for (List col in row) {
+        if (col[col.length - 1] < 0) {
+          squareDomination += (col[col.length - 1] as int) * -1;
+        }
+      }
+    }
+  }
+  return squareDomination;
+  // return Random(DateTime.now().second.toInt()).nextDouble() * 50;
+}
+
+void pop(List list) {
+  list.removeLast();
+}
+
+Map<String, dynamic> applyMove(gamestate, player, move) {
+  Map<String, dynamic> newGameState =
+      getGameState(gamestate["board"], gamestate["p1"], gamestate["p2"]);
+  switch (move["type"]) {
+    case "play":
+      // pop @ index
+      // move the piece
+      // create a new state
+      // return it
+      if (player == 1) {
+        newGameState["board"][move["toRow"]][move["toCol"]] =
+            newGameState["p1"][move["index"]];
+        newGameState["p1"][move["index"]].removeLast();
+      } else {
+        newGameState["board"][move["toRow"]][move["toCol"]]
+            .add(newGameState["p2"][move["index"]].last);
+        ;
+        newGameState["p2"][move["index"]].removeLast();
+      }
+      return newGameState;
+    case "move":
+      break;
+    default:
+      print("applymove error");
+  }
+  return {};
+}
 
 Map<String, List> getGameState(
     List<List<List>> board, List<List> p1, List<List> p2) {
@@ -54,7 +115,7 @@ List genMoves(int player, gamestate) {
           for (int col2 = 0; col2 < 4; col2++) {
             if (validateMove()) {
               candidateMoves.add({
-                "typw": "move",
+                "type": "move",
                 "fromRow": row,
                 "fromCol": col,
                 "toRow": row2,
@@ -73,32 +134,34 @@ bool validateMove() {
   return true;
 }
 
-Future<double> minimax(gamestate, bool maximizer, int depth) async {
+Future<int> minimax(gamestate, bool maximizer, int depth) async {
+  await printBoard(gamestate["board"]);
   if (depth == 0) {
-    return evaluate();
+    return evaluate(gamestate, maximizer ? 2 : 1);
   }
   List candiateMoves = genMoves(1, gamestate);
-  double score;
-  var move;
+  dynamic currBest;
+  int score = evaluate(gamestate, maximizer ? 2 : 1);
+
   if (maximizer) {
-    for (move in candiateMoves) {
-      // await file.writeAsString("$depth, $maximizer,move:$move\n",
-      //     mode: FileMode.append);
-      print(await minimax(gamestate, !maximizer, depth - 1));
+    for (var move in candiateMoves) {
+      var newgameState = applyMove(gamestate, maximizer ? 2 : 1, move);
+      int v = await minimax(newgameState, !maximizer, depth - 1);
+      score = max(v, score);
     }
   } else {
-    for (move in candiateMoves) {
-      // await file.writeAsString("$depth, $maximizer,move:$move\n",
-      //     mode: FileMode.append);
-      print(await minimax(gamestate, !maximizer, depth - 1));
+    for (var move in candiateMoves) {
+      int v = await minimax(gamestate, !maximizer, depth - 1);
+      score = max(v, score);
     }
   }
-  return 0;
+  print(score);
+  return score;
 }
 
 calcBestMove(List<List<List>> board, List<List> p1, List<List> p2) async {
   Map gameState = getGameState(board, p1, p2);
-  await minimax(gameState, true, 4);
+  minimax(gameState, true, 3);
 }
 
 List<List> copyPlayer(List<List> original) {
@@ -115,8 +178,7 @@ dynamic top(List<dynamic> g) {
   return g.isNotEmpty ? g[g.length] : null;
 }
 
-void main(List<String> args)async {
-  print('${DateTime.now()}');
+void main(List<String> args) {
   final p1 = [
     [4, 3, 2, 1],
     [4, 3, 2, 1],
@@ -128,12 +190,31 @@ void main(List<String> args)async {
     [-4, -3, -2, -1],
   ];
   final board = [
-    [[], [], [], []],
-    [[], [], [], []],
-    [[], [], [], []],
-    [[], [], [], []],
+    [
+      [0],
+      [0],
+      [0],
+      [0]
+    ],
+    [
+      [0],
+      [0],
+      [0],
+      [0]
+    ],
+    [
+      [0],
+      [0],
+      [0],
+      [0]
+    ],
+    [
+      [0],
+      [0],
+      [0],
+      [0]
+    ]
   ];
   calcBestMove(board, p1, p2);
-  print('${DateTime.now()}');
   return;
 }
