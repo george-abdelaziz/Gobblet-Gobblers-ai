@@ -5,19 +5,11 @@ import 'package:ai_project/modules/player_selection/player_selection_screen.dart
 import 'package:ai_project/modules/win/win.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../modules/mode/mode_selection_screen1.dart';
-import '../../../modules/mode/mode_selection_screen2.dart';
 
 class GameCubit extends Cubit<GameStates> {
-  GameCubit() : super(GameStarted());
-  static GameCubit get(context) {
-    return BlocProvider.of(context);
-  }
-/*
-function moves
-evaluate
-*/
-  init() {}
+
+  GameCubit() : super(GameInitialState());
+  static GameCubit get(context) {return BlocProvider.of(context);}
 
   bool isHuman1 = true;
   bool isHuman2 = true;
@@ -27,14 +19,14 @@ evaluate
   int winner = 0;
   int ai1def = 0;
   int ai2def = 0;
-  String? player1;
-  String? player2;
+  String player1='';
+  String player2='';
+  String difficultyPlayer1='';
+  String difficultyPlayer2='';
   MyPoint from = MyPoint(x: 0);
   MyPoint to = MyPoint(x: 0);
   List<Widget> screens = [
     PlayerSelectionScreen(),
-    ModeSelectionScreen1(),
-    ModeSelectionScreen2(),
     BoardScreen(),
     WinScreen(),
   ];
@@ -119,27 +111,38 @@ evaluate
   //boardz[which board][vertical height of the board][horizontal width of the board][n/height of the stack]=double;
 
   void startGame() {
-    if (isHuman1) {
-    } else {
-      // start the ai
-      //change player
+    while(true){
+        if(isPlayer1Turn==true){
+          if (isHuman1) {
+
+          }
+          else {
+
+            // start the ai
+            //change player
+          }
+        }
+        else{
+          if (isHuman1) {
+
+          }
+          else {
+            // start the ai
+            //change player
+          }
+          isPlayer1Turn=!isPlayer1Turn;
+        }
     }
   }
 
   void playerSelectionDone() {
-    if (player1 != null && player2 != null) {
-      if (player1 == '3') {
-        currentScreenIndex = 1;
-        return;
-      } else if (player2 == '3') {
-        currentScreenIndex = 2;
-        return;
-      } else {
-        currentScreenIndex = 3;
-      }
+    if(player1!=''&&player2!='!'){
+      if(player1!='0'&&difficultyPlayer1==''){return;}
+      if(player2!='0'&&difficultyPlayer2==''){return;}
       emit(GameStarted());
-      print('${currentScreenIndex}');
-    } else {
+      currentScreenIndex=1;
+    }
+    else {
       emit(PlayersNotSelected());
     }
   }
@@ -185,12 +188,12 @@ evaluate
         movePiece();
         isPlayer1Turn = false;
         if (player2wins()) {
-          currentScreenIndex = 4;
+          currentScreenIndex++;
           winner = 2;
           emit(Player2Win());
           return;
         } else if (player1wins()) {
-          currentScreenIndex = 4;
+          currentScreenIndex++;
           winner = 1;
           emit(Player1Win());
           return;
@@ -225,11 +228,11 @@ evaluate
         isPlayer1Turn = true;
         if (player1wins()) {
           winner = 1;
-          currentScreenIndex = 2;
+          currentScreenIndex++;
           emit(Player1Win());
           return;
         } else if (player2wins()) {
-          currentScreenIndex = 2;
+          currentScreenIndex++;
           winner = 2;
           emit(Player2Win());
           return;

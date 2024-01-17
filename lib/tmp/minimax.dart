@@ -82,14 +82,14 @@ Future<double> minimax(gamestate, bool maximizer, int depth) async {
   var move;
   if (maximizer) {
     for (move in candiateMoves) {
-      await file.writeAsString("$depth, $maximizer,move:$move\n",
-          mode: FileMode.append);
+      // await file.writeAsString("$depth, $maximizer,move:$move\n",
+      //     mode: FileMode.append);
       print(await minimax(gamestate, !maximizer, depth - 1));
     }
   } else {
     for (move in candiateMoves) {
-      await file.writeAsString("$depth, $maximizer,move:$move\n",
-          mode: FileMode.append);
+      // await file.writeAsString("$depth, $maximizer,move:$move\n",
+      //     mode: FileMode.append);
       print(await minimax(gamestate, !maximizer, depth - 1));
     }
   }
@@ -98,7 +98,7 @@ Future<double> minimax(gamestate, bool maximizer, int depth) async {
 
 calcBestMove(List<List<List>> board, List<List> p1, List<List> p2) async {
   Map gameState = getGameState(board, p1, p2);
-  await minimax(gameState, true, 3);
+  await minimax(gameState, true, 4);
 }
 
 List<List> copyPlayer(List<List> original) {
@@ -115,7 +115,8 @@ dynamic top(List<dynamic> g) {
   return g.isNotEmpty ? g[g.length] : null;
 }
 
-void main(List<String> args) {
+void main(List<String> args)async {
+  print('${DateTime.now()}');
   final p1 = [
     [4, 3, 2, 1],
     [4, 3, 2, 1],
@@ -133,5 +134,6 @@ void main(List<String> args) {
     [[], [], [], []],
   ];
   calcBestMove(board, p1, p2);
+  print('${DateTime.now()}');
   return;
 }

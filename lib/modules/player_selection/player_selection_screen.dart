@@ -33,10 +33,28 @@ class PlayerSelectionScreen extends StatelessWidget {
                   ],
                   hintText: 'Player 1',
                   onSelected: (String? value){
-                    cubit.player1=value;
-                    // print('${cubit.player1}');
-                    cubit.emit(GameStarted());
+                    cubit.player1=value!;
+                    cubit.emit(Player1Selected());
                   },
+                ),
+                const SizedBox(height: 20,),
+                Visibility(
+                  maintainSize: false,
+                  maintainAnimation: true,
+                  maintainState: true,
+                  visible: cubit.player1!='0'&&cubit.player1!='',
+                  child: DropdownMenu(
+                    dropdownMenuEntries: const [
+                      DropdownMenuEntry<String>(label: 'Easy',value: '1'),
+                      DropdownMenuEntry<String>(label: 'Medium',value: '2'),
+                      DropdownMenuEntry<String>(label: 'Hard',value: '2'),
+                    ],
+                    hintText: 'Player 1',
+                    onSelected: (String? value){
+                      cubit.difficultyPlayer1=value!;
+                      cubit.emit(Player1DifficultySelected());
+                    },
+                  ),
                 ),
                 const SizedBox(height: 20,),
                 DropdownMenu(
@@ -48,8 +66,28 @@ class PlayerSelectionScreen extends StatelessWidget {
                   ],
                   hintText: 'Player 2',
                   onSelected: (String? value){
-                    cubit.player2=value;
+                    cubit.player2=value!;
+                    cubit.emit(Player2Selected());
                   },
+                ),
+                const SizedBox(height: 20,),
+                Visibility(
+                  maintainSize: false,
+                  maintainAnimation: true,
+                  maintainState: true,
+                  visible: cubit.player2!='0'&&cubit.player2!='',
+                  child: DropdownMenu(
+                    dropdownMenuEntries: const [
+                      DropdownMenuEntry<String>(label: 'Easy',value: '1'),
+                      DropdownMenuEntry<String>(label: 'Medium',value: '2'),
+                      DropdownMenuEntry<String>(label: 'Hard',value: '2'),
+                    ],
+                    hintText: 'Player 1',
+                    onSelected: (String? value){
+                      cubit.difficultyPlayer2=value!;
+                      cubit.emit(Player2DifficultySelected());
+                    },
+                  ),
                 ),
                 const SizedBox(height: 20,),
                 MaterialButton(
@@ -57,11 +95,11 @@ class PlayerSelectionScreen extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
+                  child: const Text('Next'),
                   onPressed: (){
                     cubit.playerSelectionDone();
                   },
-                  child: const Text('Next'),
-                )
+                ),
               ],
             ),
           ),

@@ -2,14 +2,24 @@ abstract class GameStates {}
 
 class GameInitialState extends GameStates {}
 
-class SquareClicked extends GameStates {}
+/////
+class Player1Selected extends GameStates {}
 
+class Player2Selected extends GameStates {}
+
+///
+class Player1DifficultySelected extends GameStates {}
+
+class Player2DifficultySelected extends GameStates {}
+
+///
 class PlayersNotSelected extends GameStates {}
 
 //indicates that the game haz started
 class GameStarted extends GameStates {}
 
 /////////////
+class SquareClicked extends GameStates {}
 
 class SomeoneMove extends GameStates {}
 
@@ -37,6 +47,3 @@ class Player2Win extends GameStates {}
 class AI1Played extends GameStates {}
 
 class AI2Played extends GameStates {}
-
-
-
