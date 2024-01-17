@@ -33,7 +33,7 @@ class PlayerSelectionScreen extends StatelessWidget {
                   ],
                   hintText: 'Player 1',
                   onSelected: (String? value){
-                    cubit.player1=value!;
+                    cubit.player1Type=value!;
                     cubit.emit(Player1Selected());
                   },
                 ),
@@ -42,7 +42,7 @@ class PlayerSelectionScreen extends StatelessWidget {
                   maintainSize: false,
                   maintainAnimation: true,
                   maintainState: true,
-                  visible: cubit.player1!='0'&&cubit.player1!='',
+                  visible: cubit.player1Type!='0'&&cubit.player1Type!='',
                   child: DropdownMenu(
                     dropdownMenuEntries: const [
                       DropdownMenuEntry<String>(label: 'Easy',value: '1'),
@@ -51,7 +51,7 @@ class PlayerSelectionScreen extends StatelessWidget {
                     ],
                     hintText: 'Player 1',
                     onSelected: (String? value){
-                      cubit.difficultyPlayer1=value!;
+                      cubit.difficultyLevelForAI1=value!;
                       cubit.emit(Player1DifficultySelected());
                     },
                   ),
@@ -66,7 +66,7 @@ class PlayerSelectionScreen extends StatelessWidget {
                   ],
                   hintText: 'Player 2',
                   onSelected: (String? value){
-                    cubit.player2=value!;
+                    cubit.player2Type=value!;
                     cubit.emit(Player2Selected());
                   },
                 ),
@@ -75,7 +75,7 @@ class PlayerSelectionScreen extends StatelessWidget {
                   maintainSize: false,
                   maintainAnimation: true,
                   maintainState: true,
-                  visible: cubit.player2!='0'&&cubit.player2!='',
+                  visible: cubit.player2Type!='0'&&cubit.player2Type!='',
                   child: DropdownMenu(
                     dropdownMenuEntries: const [
                       DropdownMenuEntry<String>(label: 'Easy',value: '1'),
@@ -84,7 +84,7 @@ class PlayerSelectionScreen extends StatelessWidget {
                     ],
                     hintText: 'Player 1',
                     onSelected: (String? value){
-                      cubit.difficultyPlayer2=value!;
+                      cubit.difficultyLevelForAI2=value!;
                       cubit.emit(Player2DifficultySelected());
                     },
                   ),

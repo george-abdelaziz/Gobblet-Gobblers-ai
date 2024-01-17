@@ -44,6 +44,8 @@ class Player2SelectWrongSquare extends GameStates {}
 class Player2Win extends GameStates {}
 
 //for AIz
+class AIPlayed extends GameStates {}
+
 class AI1Played extends GameStates {}
 
 class AI2Played extends GameStates {}

@@ -7,7 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /*
-last rulezzzzzzzzzzzzzzzzzz
+rulezzzzzzzzzzzzzzzzzz
+
+startup code
+edit plays
+play12
+play21
 */
 
 class GameCubit extends Cubit<GameStates> {
@@ -15,14 +20,14 @@ class GameCubit extends Cubit<GameStates> {
   GameCubit() : super(GameInitialState());
   static GameCubit get(context) {return BlocProvider.of(context);}
 
-  bool isPlayer1Turn = true;
+  int whosturn = 1;
   int aPieceIsToushed = 0;
   int currentScreenIndex = 0;
   int winner = 0;
-  String player1='';
-  String player2='';
-  String difficultyPlayer1='';
-  String difficultyPlayer2='';
+  String player1Type='';
+  String player2Type='';
+  String difficultyLevelForAI1='';
+  String difficultyLevelForAI2='';
   MyPoint from = MyPoint(x: 0);
   MyPoint to = MyPoint(x: 0);
   List<Widget> screens = [
@@ -30,7 +35,7 @@ class GameCubit extends Cubit<GameStates> {
     BoardScreen(),
     WinScreen(),
   ];
-  List<List<List<List<double>>>> boardz = [
+  List<List<List<List<double>>>> board = [
     [
       [
         [0],
@@ -111,41 +116,69 @@ class GameCubit extends Cubit<GameStates> {
   //boardz[which board][vertical height of the board][horizontal width of the board][n/height of the stack]=double;
 
   void playerSelectionDone() {
-    if(player1!=''&&player2!='!'){
-      if(player1!='0'&&difficultyPlayer1==''){return;}
-      if(player2!='0'&&difficultyPlayer2==''){return;}
+    if(player1Type!=''&&player2Type!='!'){
+      if(player1Type!='0'&&difficultyLevelForAI1==''){return;}
+      if(player2Type!='0'&&difficultyLevelForAI2==''){return;}
       currentScreenIndex=1;
+      //start up code
       emit(GameStarted());
+      if(player1Type!='0'&&player2Type!='0'){
+        whosturn=3;
+        while(true){
+          ai();
+          ai();
+        }
+      }
+      else if(player1Type!='0'){
+        whosturn=3;
+        ai();
+      }
+      else{
+        whosturn=1;
+      }
     }
     else {
       emit(PlayersNotSelected());
     }
   }
 
+  void ai(){
+    //some logic for the ai
+    changePlayer();
+    emit(AIPlayed());
+  }
+
   void changePlayer() {
-    isPlayer1Turn = !isPlayer1Turn;
+    if(whosturn==1){
+      if(player2Type=='0'){whosturn=2;}
+      else{whosturn=4;}
+    }
+    else if(whosturn==2){
+      if(player1Type=='0'){whosturn=1;}
+      else{whosturn=3;}
+    }
+    else if(whosturn==3){
+      if(player2Type=='0'){whosturn=2;}
+      else{whosturn=4;}
+    }
+    else if(whosturn==4){
+      if(player1Type=='0'){whosturn=1;}
+      else{whosturn=3;}
+    }
+    else{
+      print('qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq');
+    }
     aPieceIsToushed = 0;
   }
 
   void plays({required MyPoint point}) {
-    if (isPlayer1Turn) {
-      if(player1!='0'){
-        //AI1 Control
-        changePlayer();
-      }
-      else{
-        player1Turn(point: point);
-      }
+    if (whosturn==1) {
+      player1Turn(point: point);
     }
-    else {
-      if(player2!='0'){
-        //AI2 Control
-        changePlayer();
-      }
-      else {
-        player2Turn(point: point);
-      }
+    else if(whosturn==2){
+      player2Turn(point: point);
     }
+    else{}
   }
 
   void player1Turn({required MyPoint point}) {
@@ -162,10 +195,11 @@ class GameCubit extends Cubit<GameStates> {
       if (isValidMove(start: from, end: point,)) {
         to = point;
         movePiece();
-        isPlayer1Turn = false;
         player2wins();
         player1wins();
+        changePlayer();
         emit(Player2Turn());
+        if(player2Type!='0'){ai();}
       }
       else {emit(Player1SelectWrongSquare());}
       from.nagOne();
@@ -187,10 +221,11 @@ class GameCubit extends Cubit<GameStates> {
       if (isValidMove(start: from, end: point,)) {
         to = point;
         movePiece();
-        isPlayer1Turn = true;
         player1wins();
         player2wins();
+        changePlayer();
         emit(Player1Turn());
+        if(player1Type!='0'){ai();}
       }
       else {emit(Player2SelectWrongSquare());}
       from.nagOne();
@@ -203,8 +238,8 @@ class GameCubit extends Cubit<GameStates> {
     required MyPoint end,
   }) {
     if (end.x != 0 ||
-        abs(start.getLastNumber(arr: boardz)) <=
-            abs(end.getLastNumber(arr: boardz))) {
+        abs(start.getLastNumber(arr: board)) <=
+            abs(end.getLastNumber(arr: board))) {
       return false;
     }
 
@@ -213,18 +248,8 @@ class GameCubit extends Cubit<GameStates> {
 
   void movePiece() {
     if (isValidMove(start: from, end: to)) {
-      to.insertNumber(arr: boardz, num: from.getLastNumber(arr: boardz));
-      from.popNumber(arr: boardz);
-    }
-  }
-
-  void movePieceFromTo({
-    required MyPoint start,
-    required MyPoint end,
-  }) {
-    if (isValidMove(start: start, end: end)) {
-      end.insertNumber(arr: boardz, num: start.getLastNumber(arr: boardz));
-      start.popNumber(arr: boardz);
+      to.insertNumber(arr: board, num: from.getLastNumber(arr: board));
+      from.popNumber(arr: board);
     }
   }
 
@@ -322,31 +347,32 @@ class GameCubit extends Cubit<GameStates> {
     }
   }
 
-  double getLastItemInTheBoard({required int y, required int z}) {
-    return boardz[0][y][z].last;
-  }
+  double getLastItemInTheBoard({required int y, required int z}) {return board[0][y][z].last;}
 
-  double getLastNumber({required MyPoint point}) {
-    return boardz[point.x][point.y][point.z].last;
+  double getLastNumber({required MyPoint point}) {return board[point.x][point.y][point.z].last;}
+
+  void selectPlayer1(String value) {player1Type = value;}
+
+  void selectPlayer2(String value) {player2Type = value;}
+
+//////////////////// useless functions for now at least
+  void movePieceFromTo({
+    required MyPoint start,
+    required MyPoint end,
+  }) {
+    if (isValidMove(start: start, end: end)) {
+      end.insertNumber(arr: board, num: start.getLastNumber(arr: board));
+      start.popNumber(arr: board);
+    }
   }
 
   void popNumber({required MyPoint point}) {
     if (getLastNumber(point: point) == 0) {
       return;
     }
-    boardz[point.x][point.y][point.z].removeLast();
+    board[point.x][point.y][point.z].removeLast();
   }
 
-  void insertNumber({required MyPoint point, required double num}) {
-    boardz[point.x][point.y][point.z].add(num);
-  }
-
-  void selectPlayer1(String value) {
-    player1 = value;
-  }
-
-  void selectPlayer2(String value) {
-    player2 = value;
-  }
+  void insertNumber({required MyPoint point, required double num}) {board[point.x][point.y][point.z].add(num);}
 
 }

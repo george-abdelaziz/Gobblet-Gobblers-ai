@@ -9,7 +9,7 @@ Widget? piece({
   required MyPoint point,
 }){
   GameCubit cubit=GameCubit.get(context);
-  double size=point.getLastNumber(arr: cubit.boardz);
+  double size=point.getLastNumber(arr: cubit.board);
   if(size==0){return null;}
   Color color;
   size=20*size;
