@@ -11,6 +11,7 @@ import 'dart:math';
 // fromRow, fromCol, toRow, toCol
 final File file = File("temp.txt");
 printBoard(board) async {
+  if (board == null) return;
   await file.writeAsString("========================\n", mode: FileMode.append);
   for (var row in board) {
     for (var col in row) {
@@ -114,13 +115,13 @@ List genMoves(int player, gamestate) {
         for (int row2 = 0; row2 < 4; row2++) {
           for (int col2 = 0; col2 < 4; col2++) {
             if (validateMove()) {
-              candidateMoves.add({
-                "type": "move",
-                "fromRow": row,
-                "fromCol": col,
-                "toRow": row2,
-                "toCol": col2
-              });
+              // candidateMoves.add({
+              //   "type": "move",
+              //   "fromRow": row,
+              //   "fromCol": col,
+              //   "toRow": row2,
+              //   "toCol": col2
+              // });
             }
           }
         }
@@ -136,11 +137,16 @@ bool validateMove() {
 
 Future<int> minimax(gamestate, bool maximizer, int depth) async {
   await printBoard(gamestate["board"]);
+  print(gamestate["p1"]);
+  print(gamestate["p2"]);
+  int plr = maximizer ? 2 : 1;
+
   if (depth == 0) {
-    return evaluate(gamestate, maximizer ? 2 : 1);
+    return evaluate(gamestate, plr);
   }
-  List candiateMoves = genMoves(1, gamestate);
-  dynamic currBest;
+  List candiateMoves = genMoves(plr, gamestate);
+
+  // TODO: CheckWining
   int score = evaluate(gamestate, maximizer ? 2 : 1);
 
   if (maximizer) {
@@ -151,11 +157,12 @@ Future<int> minimax(gamestate, bool maximizer, int depth) async {
     }
   } else {
     for (var move in candiateMoves) {
-      int v = await minimax(gamestate, !maximizer, depth - 1);
-      score = max(v, score);
+      var newgameState = applyMove(gamestate, maximizer ? 2 : 1, move);
+      int v = await minimax(newgameState, !maximizer, depth - 1);
+      score = min(v, score);
     }
   }
-  print(score);
+  // print(score);
   return score;
 }
 
