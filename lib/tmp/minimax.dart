@@ -1,5 +1,8 @@
+import 'dart:ffi';
 import 'dart:io';
 import 'dart:math';
+
+import 'package:ai_project/models/my_classes.dart';
 
 // p1 : +v
 // p2 : -v
@@ -21,30 +24,24 @@ printBoard(board) async {
   }
 }
 
-int evaluate(Map gametstate, int player) {
+double evaluate(Map gametstate, int player) {
   List<List<List>> board = gametstate["board"];
   List<List> p1 = gametstate["p1"];
   List<List> p2 = gametstate["p2"];
-  var squareDomination = 0;
-  if (player == 1) {
-    for (List<List> row in board) {
-      for (List col in row) {
-        if (col[col.length - 1] > 0) {
-          squareDomination += col[col.length - 1] as int;
-        }
+  var squareDomination = 0.0;
+  var checkingCondition = player == 1 ? (x) => x > 0 : (x) => x < 0;
+  for (List<List> row in board) {
+    for (List col in row) {
+      if (col.isEmpty) continue;
+      if (checkingCondition(col[col.length - 1])) {
+        squareDomination += col[col.length - 1] as int;
       }
-    }
-  } else {
-    for (List<List> row in board) {
-      for (List col in row) {
-        if (col[col.length - 1] < 0) {
-          squareDomination += (col[col.length - 1] as int) * -1;
-        }
+      if (abs((col[col.length - 1] * 1.0)) == 4) {
+        squareDomination += 0.9;
       }
     }
   }
   return squareDomination;
-  // return Random(DateTime.now().second.toInt()).nextDouble() * 50;
 }
 
 void pop(List list) {
@@ -67,16 +64,19 @@ Map<String, dynamic> applyMove(gamestate, player, move) {
       } else {
         newGameState["board"][move["toRow"]][move["toCol"]]
             .add(newGameState["p2"][move["index"]].last);
-        ;
         newGameState["p2"][move["index"]].removeLast();
       }
       return newGameState;
     case "move":
-      break;
+      // pop form board
+      // push to board
+      newGameState["board"][move["toRow"]][move["toCol"]] =
+          newGameState["board"][move["fromRow"]][move["fromCol"]];
+      newGameState["board"][move["fromRow"]][move["fromCol"]].removeLast();
+      return newGameState;
     default:
-      print("applymove error");
+      throw Exception("move type ERR");
   }
-  return {};
 }
 
 Map<String, List> getGameState(
@@ -115,13 +115,13 @@ List genMoves(int player, gamestate) {
         for (int row2 = 0; row2 < 4; row2++) {
           for (int col2 = 0; col2 < 4; col2++) {
             if (validateMove()) {
-              // candidateMoves.add({
-              //   "type": "move",
-              //   "fromRow": row,
-              //   "fromCol": col,
-              //   "toRow": row2,
-              //   "toCol": col2
-              // });
+              candidateMoves.add({
+                "type": "move",
+                "fromRow": row,
+                "fromCol": col,
+                "toRow": row2,
+                "toCol": col2
+              });
             }
           }
         }
@@ -135,40 +135,47 @@ bool validateMove() {
   return true;
 }
 
-Future<int> minimax(gamestate, bool maximizer, int depth) async {
-  await printBoard(gamestate["board"]);
-  print(gamestate["p1"]);
-  print(gamestate["p2"]);
-  int plr = maximizer ? 2 : 1;
+bool isWinningPos() {
+  // TODO: not implemented
+  return false;
+}
+
+Map bestMove = {};
+
+double minimax(Map<String, dynamic> gamestate, bool maximizer, int depth) {
+  // printBoard(gamestate["board"]);
+  late int plr = maximizer ? 2 : 1;
 
   if (depth == 0) {
     return evaluate(gamestate, plr);
   }
-  List candiateMoves = genMoves(plr, gamestate);
+
+  List<dynamic> candidateMoves = genMoves(plr, gamestate);
 
   // TODO: CheckWining
-  int score = evaluate(gamestate, maximizer ? 2 : 1);
+  if (isWinningPos()) return 100;
+  if (candidateMoves.isEmpty) return -200; // TODO: handle this case
 
-  if (maximizer) {
-    for (var move in candiateMoves) {
-      var newgameState = applyMove(gamestate, maximizer ? 2 : 1, move);
-      int v = await minimax(newgameState, !maximizer, depth - 1);
-      score = max(v, score);
-    }
-  } else {
-    for (var move in candiateMoves) {
-      var newgameState = applyMove(gamestate, maximizer ? 2 : 1, move);
-      int v = await minimax(newgameState, !maximizer, depth - 1);
-      score = min(v, score);
+  double score = maximizer ? double.negativeInfinity : double.infinity;
+
+  for (var moveIndex = 0; moveIndex < candidateMoves.length; moveIndex++) {
+    var move = candidateMoves[moveIndex];
+    var newGameState = applyMove(gamestate, plr, move);
+    var v = minimax(newGameState, !maximizer, depth - 1);
+
+    if (maximizer) {
+      if (v > score) {
+        if (depth == 3) bestMove = move;
+        score = v;
+      }
+    } else {
+      if (v < score) {
+        if (depth == 3) bestMove = move;
+        score = v;
+      }
     }
   }
-  // print(score);
   return score;
-}
-
-calcBestMove(List<List<List>> board, List<List> p1, List<List> p2) async {
-  Map gameState = getGameState(board, p1, p2);
-  minimax(gameState, true, 3);
 }
 
 List<List> copyPlayer(List<List> original) {
@@ -185,16 +192,25 @@ dynamic top(List<dynamic> g) {
   return g.isNotEmpty ? g[g.length] : null;
 }
 
+calcBestMove(List<List<List>> board, List<List> p1, List<List> p2) async {
+  Map<String, dynamic> gameState = getGameState(board, p1, p2);
+  print(DateTime.now());
+  print(genMoves(2, gameState));
+  print(minimax(gameState, true, 3));
+  print(bestMove);
+  print(DateTime.now());
+}
+
 void main(List<String> args) {
   final p1 = [
-    [4, 3, 2, 1],
-    [4, 3, 2, 1],
-    [4, 3, 2, 1],
+    [1, 2, 3, 4],
+    [1, 2, 3, 4],
+    [1, 2, 3, 4],
   ];
   final p2 = [
-    [-4, -3, -2, -1],
-    [-4, -3, -2, -1],
-    [-4, -3, -2, -1],
+    [-1, -2, -3, -4],
+    [-1, -2, -3, -4],
+    [-1, -2, -3, -4],
   ];
   final board = [
     [
