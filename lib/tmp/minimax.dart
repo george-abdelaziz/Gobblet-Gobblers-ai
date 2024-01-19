@@ -1,6 +1,6 @@
-import 'dart:async';
+import 'package:ai_project/tmp/evaluate.dart';
 
-import 'package:ai_project/tmp/config.dart';
+import '/tmp/config.dart';
 
 import 'utils.dart';
 
@@ -12,26 +12,14 @@ import 'utils.dart';
 // 1
 
 // fromRow, fromCol, toRow, toCol
-Map bestMove = {};
 
 double evaluate(Map gametstate, int player) {
   List<List<List>> board = gametstate["board"];
-  List<List> p1 = gametstate["p1"];
-  List<List> p2 = gametstate["p2"];
-  var squareDomination = 0.0;
+  var score = 0.0;
   var checkingCondition = player == 1 ? (x) => x > 0 : (x) => x < 0;
-  for (List<List> row in board) {
-    for (List col in row) {
-      if (col.isEmpty) continue;
-      if (checkingCondition(col[col.length - 1])) {
-        squareDomination += col[col.length - 1] as int;
-      }
-      if (abs((col[col.length - 1] * 1.0)) == 4) {
-        squareDomination += 0.9;
-      }
-    }
-  }
-  return squareDomination;
+  score += evaluateRows(board, player);
+  score += evaluateColumns(board, player);
+  return score;
 }
 
 Map<String, dynamic> applyMove(gamestate, player, move) {
@@ -65,46 +53,55 @@ Map<String, dynamic> applyMove(gamestate, player, move) {
   }
 }
 
-double minimax(Map<String, dynamic> gamestate, bool maximizer, int depth) {
+Map minimax(Map<String, dynamic> gamestate, bool maximizer, int depth, mv) {
+  // printToFile(gamestate["board"]);
   late int plr = maximizer ? 2 : 1;
 
   if (depth == 0) {
-    return evaluate(gamestate, plr);
+    return {
+      "score": evaluate(gamestate, plr),
+      "status": "TheGameIsOn",
+      "move": mv
+    };
   }
 
+  Map res = {};
   List<dynamic> candidateMoves = genMoves(plr, gamestate);
 
-  if (candidateMoves.isEmpty) return -200; // TODO: handle this case
+  if (candidateMoves.isEmpty) {
+    return {"score": Config.draw, "status": "draw", "move": mv};
+  }
 
   double score = maximizer ? double.negativeInfinity : double.infinity;
 
   for (var moveIndex = 0; moveIndex < candidateMoves.length; moveIndex++) {
     var move = candidateMoves[moveIndex];
     var newGameState = applyMove(gamestate, plr, move);
-    if (isWinningPos(gamestate['board'])) return Config.winning;
-    var v = minimax(newGameState, !maximizer, depth - 1);
+    if (isWinningPos(newGameState['board'])) {
+      return {
+        "score": Config.winning,
+        "status": "player $plr Won",
+        "move": move
+      };
+    }
+    res = minimax(newGameState, !maximizer, depth - 1, move);
+    var v = res["score"];
 
     if (maximizer) {
-      if (v > score) {
-        if (depth == 3) bestMove = move;
-        score = v;
-      }
+      score = (v > score) ? v : score;
     } else {
-      if (v < score) {
-        if (depth == 3) bestMove = move;
-        score = v;
-      }
+      score = (v < score) ? v : score;
     }
   }
-  return score;
+  res["score"] = score;
+  return res;
 }
 
-calcBestMove(List<List<List>> board, List<List> p1, List<List> p2) async {
+calcBestMove(List<List<List>> board, List<List> p1, List<List> p2) {
   Map<String, dynamic> gameState = getGameState(board, p1, p2);
 
   final time = (DateTime.now());
-  kprint(minimax(gameState, !true, Config.depth));
-  kprint(bestMove);
+  kprint(minimax(gameState, !true, Config.depth, null));
 
   kprint((DateTime.now().subtract(Duration(
       minutes: time.minute,
@@ -125,8 +122,8 @@ void main(List<String> args) {
   ];
   final board = [
     [
-      [0, -4],
-      [0, -1],
+      [0, -3],
+      [0, 1],
       [0],
       [0, -2]
     ],
@@ -150,8 +147,12 @@ void main(List<String> args) {
     ]
   ];
   calcBestMove(board, p1, p2);
-  // print((isWinningPos(board)));
-  print(odd);
-  print(even);
   return;
 }
+
+  // final board = [
+  //   [ [0, -4], [0], [0], [0, -2] ],
+  //   [ [0], [0,-2], [0], [0] ],
+  //   [ [0], [0], [0,-3], [0] ],
+  //   [ [0], [0, -4], [0], [0, -1] ]
+  // ];

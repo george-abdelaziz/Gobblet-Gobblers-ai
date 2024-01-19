@@ -14,7 +14,6 @@ printToFile(board) async {
 }
 
 bool isWinningPos(List<List<List>> board) {
-  // TODO: not implemented
   // Check rows
   for (int row = 0; row < 4; row++) {
     if (board[row].every(
@@ -127,8 +126,20 @@ kprint(v) {
   print(v);
 }
 
-abs(a) {
+int abs(a) {
   if (a < 0) {
     return a * -1;
+  } else {
+    return a;
+  }
+}
+
+void printBoard(List<List<List>> board) {
+  for (int row = 0; row < 4; row++) {
+    for (int col = 0; col < 4; col++) {
+      int piece = board[row][col].last;
+      print('$piece');
+    }
+    print('\n');
   }
 }

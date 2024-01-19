@@ -1,5 +1,3 @@
-import 'package:ai_project/tmp/minimax.dart';
-
 import 'utils.dart';
 
 testWinning() {
@@ -33,5 +31,5 @@ testWinning() {
 }
 
 void main() {
-  print(testWinning());
+  kprint(testWinning());
 }
