@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:ai_project/layout/gobblet/cubit/states.dart';
 import 'package:ai_project/models/my_classes.dart';
 import 'package:ai_project/modules/board/board_screen.dart';
@@ -18,18 +16,19 @@ play21
 */
 
 class GameCubit extends Cubit<GameStates> {
-
   GameCubit() : super(GameInitialState());
-  static GameCubit get(context) {return BlocProvider.of(context);}
+  static GameCubit get(context) {
+    return BlocProvider.of(context);
+  }
 
   int whosturn = 1;
   int aPieceIsToushed = 0;
   int currentScreenIndex = 0;
   int winner = 0;
-  String player1Type='';
-  String player2Type='';
-  String difficultyLevelForAI1='';
-  String difficultyLevelForAI2='';
+  String player1Type = '';
+  String player2Type = '';
+  String difficultyLevelForAI1 = '';
+  String difficultyLevelForAI2 = '';
   MyPoint from = MyPoint(x: 0);
   MyPoint to = MyPoint(x: 0);
   List<Widget> screens = [
@@ -118,33 +117,34 @@ class GameCubit extends Cubit<GameStates> {
   //boardz[which board][vertical height of the board][horizontal width of the board][n/height of the stack]=double;
 
   void playerSelectionDone() {
-    if(player1Type!=''&&player2Type!='!'){
-      if(player1Type!='0'&&difficultyLevelForAI1==''){return;}
-      if(player2Type!='0'&&difficultyLevelForAI2==''){return;}
-      currentScreenIndex=1;
+    if (player1Type != '' && player2Type != '!') {
+      if (player1Type != '0' && difficultyLevelForAI1 == '') {
+        return;
+      }
+      if (player2Type != '0' && difficultyLevelForAI2 == '') {
+        return;
+      }
+      currentScreenIndex = 1;
       //start up code
       emit(GameStarted());
-      if(player1Type!='0'&&player2Type!='0'){
-        whosturn=3;
-        while(true){
+      if (player1Type != '0' && player2Type != '0') {
+        whosturn = 3;
+        while (true) {
           ai();
           ai();
         }
-      }
-      else if(player1Type!='0'){
-        whosturn=3;
+      } else if (player1Type != '0') {
+        whosturn = 3;
         ai();
+      } else {
+        whosturn = 1;
       }
-      else{
-        whosturn=1;
-      }
-    }
-    else {
+    } else {
       emit(PlayersNotSelected());
     }
   }
 
-  void ai(){
+  void ai() {
     //for(int i=0;i<10000000000;i++){}
     //print('qqqqqqqqqqqqqqqqqqqqqqqqqqqqqq');
     //some logic for the ai
@@ -153,36 +153,43 @@ class GameCubit extends Cubit<GameStates> {
   }
 
   void changePlayer() {
-    if(whosturn==1){
-      if(player2Type=='0'){whosturn=2;}
-      else{whosturn=4;}
-    }
-    else if(whosturn==2){
-      if(player1Type=='0'){whosturn=1;}
-      else{whosturn=3;}
-    }
-    else if(whosturn==3){
-      if(player2Type=='0'){whosturn=2;}
-      else{whosturn=4;}
-    }
-    else if(whosturn==4){
-      if(player1Type=='0'){whosturn=1;}
-      else{whosturn=3;}
-    }
-    else{
-      print('qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq');
+    if (whosturn == 1) {
+      if (player2Type == '0') {
+        whosturn = 2;
+      } else {
+        whosturn = 4;
+      }
+    } else if (whosturn == 2) {
+      if (player1Type == '0') {
+        whosturn = 1;
+      } else {
+        whosturn = 3;
+      }
+    } else if (whosturn == 3) {
+      if (player2Type == '0') {
+        whosturn = 2;
+      } else {
+        whosturn = 4;
+      }
+    } else if (whosturn == 4) {
+      if (player1Type == '0') {
+        whosturn = 1;
+      } else {
+        whosturn = 3;
+      }
+    } else {
+      print(
+          'qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq');
     }
     aPieceIsToushed = 0;
   }
 
   void plays({required MyPoint point}) {
-    if (whosturn==1) {
+    if (whosturn == 1) {
       player1Turn(point: point);
-    }
-    else if(whosturn==2){
+    } else if (whosturn == 2) {
       player2Turn(point: point);
-    }
-    else{}
+    } else {}
   }
 
   void player1Turn({required MyPoint point}) {
@@ -193,19 +200,24 @@ class GameCubit extends Cubit<GameStates> {
       from = point;
       aPieceIsToushed = 1;
       emit(Player1Frist());
-    }
-    else {
+    } else {
       aPieceIsToushed = 0;
-      if (isValidMove(start: from, end: point,)) {
+      if (isValidMove(
+        start: from,
+        end: point,
+      )) {
         to = point;
         movePiece();
         player2wins();
         player1wins();
         changePlayer();
         emit(Player2Turn());
-        if(player2Type!='0'){ai();}
+        if (player2Type != '0') {
+          ai();
+        }
+      } else {
+        emit(Player1SelectWrongSquare());
       }
-      else {emit(Player1SelectWrongSquare());}
       from.nagOne();
       to.nagOne();
     }
@@ -219,19 +231,24 @@ class GameCubit extends Cubit<GameStates> {
       from = point;
       aPieceIsToushed = 1;
       emit(Player2Frist());
-    }
-    else {
+    } else {
       aPieceIsToushed = 0;
-      if (isValidMove(start: from, end: point,)) {
+      if (isValidMove(
+        start: from,
+        end: point,
+      )) {
         to = point;
         movePiece();
         player1wins();
         player2wins();
         changePlayer();
         emit(Player1Turn());
-        if(player1Type!='0'){ai();}
+        if (player1Type != '0') {
+          ai();
+        }
+      } else {
+        emit(Player2SelectWrongSquare());
       }
-      else {emit(Player2SelectWrongSquare());}
       from.nagOne();
       to.nagOne();
     }
@@ -241,29 +258,72 @@ class GameCubit extends Cubit<GameStates> {
     required MyPoint start,
     required MyPoint end,
   }) {
-    int row=0;
-    int col=0;
-    int dia=0;
+    int row = 0;
+    int col = 0;
+    int dia = 0;
     if (end.x != 0 ||
         abs(start.getLastNumber(arr: board)) <=
             abs(end.getLastNumber(arr: board))) {
       return false;
     }
-    if(start.x==1&&end.getLastNumber(arr: board)<0){
-      for(int i=0;i<4;i++){if(board[0][end.y][i].last<0){row++;}}
-      for(int i=0;i<4;i++){if(board[0][i][end.z].last<0){col++;}}
-      if(end.y==end.z){for(int i=0;i<4;i++){if(board[0][i][i].last<0){dia++;}}}
-      else if(end.y+end.z==3){for(int i=0;i<4;i++){if(board[0][i][3-i].last<0){dia++;}}}
-      if(row==3||col==3||dia==3){return true;}
-      else {return false;}
-    }
-    else if(start.x==2&&end.getLastNumber(arr: board)>0){
-      for(int i=0;i<4;i++){if(board[0][end.y][i].last>0){row++;}}
-      for(int i=0;i<4;i++){if(board[0][i][end.z].last>0){col++;}}
-      if(end.y==end.z){for(int i=0;i<4;i++){if(board[0][i][i].last>0){dia++;}}}
-      else if(end.y+end.z==3){for(int i=0;i<4;i++){if(board[0][i][3-i].last>0){dia++;}}}
-      if(row==3||col==3||dia==3){return true;}
-      else {return false;}
+    if (start.x == 1 && end.getLastNumber(arr: board) < 0) {
+      for (int i = 0; i < 4; i++) {
+        if (board[0][end.y][i].last < 0) {
+          row++;
+        }
+      }
+      for (int i = 0; i < 4; i++) {
+        if (board[0][i][end.z].last < 0) {
+          col++;
+        }
+      }
+      if (end.y == end.z) {
+        for (int i = 0; i < 4; i++) {
+          if (board[0][i][i].last < 0) {
+            dia++;
+          }
+        }
+      } else if (end.y + end.z == 3) {
+        for (int i = 0; i < 4; i++) {
+          if (board[0][i][3 - i].last < 0) {
+            dia++;
+          }
+        }
+      }
+      if (row == 3 || col == 3 || dia == 3) {
+        return true;
+      } else {
+        return false;
+      }
+    } else if (start.x == 2 && end.getLastNumber(arr: board) > 0) {
+      for (int i = 0; i < 4; i++) {
+        if (board[0][end.y][i].last > 0) {
+          row++;
+        }
+      }
+      for (int i = 0; i < 4; i++) {
+        if (board[0][i][end.z].last > 0) {
+          col++;
+        }
+      }
+      if (end.y == end.z) {
+        for (int i = 0; i < 4; i++) {
+          if (board[0][i][i].last > 0) {
+            dia++;
+          }
+        }
+      } else if (end.y + end.z == 3) {
+        for (int i = 0; i < 4; i++) {
+          if (board[0][i][3 - i].last > 0) {
+            dia++;
+          }
+        }
+      }
+      if (row == 3 || col == 3 || dia == 3) {
+        return true;
+      } else {
+        return false;
+      }
     }
     return true;
   }
@@ -317,7 +377,7 @@ class GameCubit extends Cubit<GameStates> {
             getLastItemInTheBoard(y: 2, z: 1) > 0 &&
             getLastItemInTheBoard(y: 3, z: 0) > 0) {
       winner = 1;
-      currentScreenIndex=2;
+      currentScreenIndex = 2;
       emit(Player1Win());
     }
   }
@@ -364,18 +424,26 @@ class GameCubit extends Cubit<GameStates> {
             getLastItemInTheBoard(y: 2, z: 1) < 0 &&
             getLastItemInTheBoard(y: 3, z: 0) < 0) {
       winner = 2;
-      currentScreenIndex=2;
+      currentScreenIndex = 2;
       emit(Player2Win());
     }
   }
 
-  double getLastItemInTheBoard({required int y, required int z}) {return board[0][y][z].last;}
+  double getLastItemInTheBoard({required int y, required int z}) {
+    return board[0][y][z].last;
+  }
 
-  double getLastNumber({required MyPoint point}) {return board[point.x][point.y][point.z].last;}
+  double getLastNumber({required MyPoint point}) {
+    return board[point.x][point.y][point.z].last;
+  }
 
-  void selectPlayer1(String value) {player1Type = value;}
+  void selectPlayer1(String value) {
+    player1Type = value;
+  }
 
-  void selectPlayer2(String value) {player2Type = value;}
+  void selectPlayer2(String value) {
+    player2Type = value;
+  }
 
 //////////////////// useless functions for now at least
   void movePieceFromTo({
@@ -395,6 +463,7 @@ class GameCubit extends Cubit<GameStates> {
     board[point.x][point.y][point.z].removeLast();
   }
 
-  void insertNumber({required MyPoint point, required double num}) {board[point.x][point.y][point.z].add(num);}
-
+  void insertNumber({required MyPoint point, required double num}) {
+    board[point.x][point.y][point.z].add(num);
+  }
 }
