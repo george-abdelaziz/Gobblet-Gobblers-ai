@@ -1,7 +1,6 @@
-import 'package:ai_project/agents/agent.dart';
-import 'package:ai_project/agents/evaluate.dart';
-
+import 'agent.dart';
 import 'config.dart';
+import 'evaluate.dart';
 import 'utils.dart';
 
 // p1 : +v
@@ -12,9 +11,9 @@ import 'utils.dart';
 // 1
 
 // fromRow, fromCol, toRow, toCol
-
-class MiniMax extends Agent {
-  double minimax(Map<String, dynamic> gamestate, bool maximizer, int depth) {
+class AlphaBeta extends Agent {
+  double alphabeta(
+      Map<String, dynamic> gamestate, bool maximizer, int depth, alpha, beta) {
     final int plr = maximizer ? 2 : 1;
 
     if (depth == 0) {
@@ -37,13 +36,16 @@ class MiniMax extends Agent {
       var move = candidateMoves[i];
       var newGameState = applyMove(gamestate, plr, move);
       // var v = 0.0;
-      var v = minimax(newGameState, !maximizer, depth - 1);
+      var v = alphabeta(newGameState, !maximizer, depth - 1, alpha, beta);
 
       if (maximizer) {
         score = (v > score) ? v : score;
+        alpha = alpha > score ? alpha : score;
       } else {
         score = (v < score) ? v : score;
+        beta = beta < score ? beta : score;
       }
+      if (alpha >= beta) return score;
     }
     return score;
   }
@@ -54,18 +56,19 @@ class MiniMax extends Agent {
     double score = 0;
     Map bestMove = {};
     List<dynamic> candidateMoves = genMoves(plr, gamestate);
+    // kprint(candidateMoves);
 
     for (var i = 0; i < candidateMoves.length; i++) {
       var move = candidateMoves[i];
       var newGameState = applyMove(gamestate, plr, move);
-      var v = minimax(newGameState, !maximizer, Config.depth - 1);
+      var v = alphabeta(newGameState, !maximizer, Config.depth - 1,
+          double.negativeInfinity, double.infinity);
       if (v > score) {
         score = v;
         bestMove = move;
       }
     }
     bestMove["score"] = score;
-
     return bestMove;
   }
 }
@@ -107,9 +110,10 @@ void main(List<String> args) {
       [0, -4]
     ]
   ];
+  kprint(DateTime.now());
   Map<String, dynamic> gamestate = getGameState(board, p1, p2);
-  MiniMax miniMax = MiniMax();
-  kprint(miniMax.calcBestMove(gamestate, 1));
+  kprint(AlphaBeta().calcBestMove(gamestate, 1));
+  kprint(DateTime.now());
   return;
 }
 
