@@ -1,56 +1,34 @@
 import 'dart:io';
 
-bool isWinningPos(List<List<List>> board) {
-  // Check rows
-  for (int row = 0; row < 4; row++) {
-    if (board[row].every(
-            (element) => element.last > 0) || // All elements are positive
-        board[row].every((element) => element.last < 0)) {
-      // All elements are negative
-      return true;
-    }
+Map<String, dynamic> applyMove(gamestate, player, move) {
+  Map<String, dynamic> newGameState =
+      getGameState(gamestate["board"], gamestate["p1"], gamestate["p2"]);
+  switch (move["type"]) {
+    case "play":
+      // pop @ index from player
+      // move the piece
+      // push it to the board
+      // create a new state
+      // return it
+      final p = player == 1 ? "p1" : "p2";
+      newGameState["board"][move["toRow"]][move["toCol"]]
+          .add(newGameState[p][move["index"]].last);
+      newGameState[p][move["index"]].removeLast();
+
+      return newGameState;
+    case "move":
+      //
+      // pop form board
+      // push to board
+      //
+      newGameState["board"][move["toRow"]][move["toCol"]]
+          .add(newGameState["board"][move["fromRow"]][move["fromCol"]].last);
+      newGameState["board"][move["fromRow"]][move["fromCol"]].removeLast();
+
+      return newGameState;
+    default:
+      throw Exception("move type ERR");
   }
-
-  // Check columns
-  for (int col = 0; col < 4; col++) {
-    if (board.every((row) =>
-            row[col].last > 0) || // All elements in the column are positive
-        board.every((row) => row[col].last < 0)) {
-      // All elements in the column are negative
-      return true;
-    }
-  }
-// Check diagonals
-  if ((board[0][0].last > 0 &&
-          board[1][1].last > 0 &&
-          board[2][2].last > 0 &&
-          board[3][3].last > 0) ||
-      (board[0][3].last > 0 &&
-          board[1][2].last > 0 &&
-          board[2][1].last > 0 &&
-          board[3][0].last > 0) ||
-      (board[0][0].last < 0 &&
-          board[1][1].last < 0 &&
-          board[2][2].last < 0 &&
-          board[3][3].last < 0) ||
-      (board[0][3].last < 0 &&
-          board[1][2].last < 0 &&
-          board[2][1].last < 0 &&
-          board[3][0].last < 0)) {
-    return true;
-  }
-
-  return false;
-}
-
-List<List> copyPlayer(List<List> original) {
-  return original.map((row) => List<int>.from(row)).toList();
-}
-
-List<List<List>> copyBoard(List<List<List>> original) {
-  return original
-      .map((row) => row.map((col) => List.from(col)).toList())
-      .toList();
 }
 
 List genMoves(int player, gamestate) {
@@ -96,6 +74,49 @@ List genMoves(int player, gamestate) {
   return candidateMoves;
 }
 
+bool isWinningPos(List<List<List>> board) {
+  // Check rows
+  for (int row = 0; row < 4; row++) {
+    if (board[row].every(
+            (element) => element.last > 0) || // All elements are positive
+        board[row].every((element) => element.last < 0)) {
+      // All elements are negative
+      return true;
+    }
+  }
+
+  // Check columns
+  for (int col = 0; col < 4; col++) {
+    if (board.every((row) =>
+            row[col].last > 0) || // All elements in the column are positive
+        board.every((row) => row[col].last < 0)) {
+      // All elements in the column are negative
+      return true;
+    }
+  }
+// Check diagonals
+  if ((board[0][0].last > 0 &&
+          board[1][1].last > 0 &&
+          board[2][2].last > 0 &&
+          board[3][3].last > 0) ||
+      (board[0][3].last > 0 &&
+          board[1][2].last > 0 &&
+          board[2][1].last > 0 &&
+          board[3][0].last > 0) ||
+      (board[0][0].last < 0 &&
+          board[1][1].last < 0 &&
+          board[2][2].last < 0 &&
+          board[3][3].last < 0) ||
+      (board[0][3].last < 0 &&
+          board[1][2].last < 0 &&
+          board[2][1].last < 0 &&
+          board[3][0].last < 0)) {
+    return true;
+  }
+
+  return false;
+}
+
 Map<String, List> getGameState(
     List<List<List>> board, List<List> p1, List<List> p2) {
   return {
@@ -103,37 +124,6 @@ Map<String, List> getGameState(
     "p1": copyPlayer(p1),
     "p2": copyPlayer(p2)
   };
-}
-
-Map<String, dynamic> applyMove(gamestate, player, move) {
-  Map<String, dynamic> newGameState =
-      getGameState(gamestate["board"], gamestate["p1"], gamestate["p2"]);
-  switch (move["type"]) {
-    case "play":
-      // pop @ index from player
-      // move the piece
-      // push it to the board
-      // create a new state
-      // return it
-      final p = player == 1 ? "p1" : "p2";
-      newGameState["board"][move["toRow"]][move["toCol"]]
-          .add(newGameState[p][move["index"]].last);
-      newGameState[p][move["index"]].removeLast();
-
-      return newGameState;
-    case "move":
-      //
-      // pop form board
-      // push to board
-      //
-      newGameState["board"][move["toRow"]][move["toCol"]]
-          .add(newGameState["board"][move["fromRow"]][move["fromCol"]].last);
-      newGameState["board"][move["fromRow"]][move["fromCol"]].removeLast();
-
-      return newGameState;
-    default:
-      throw Exception("move type ERR");
-  }
 }
 
 bool validateMove(Map move, int player, Map<String, dynamic> gamestate) {
@@ -151,6 +141,16 @@ bool validateMove(Map move, int player, Map<String, dynamic> gamestate) {
   if (toBeCovered.abs() >= toBeMoved.abs()) return false;
   //TODO: handle the neighbours case
   return true;
+}
+
+List<List> copyPlayer(List<List> original) {
+  return original.map((row) => List<int>.from(row)).toList();
+}
+
+List<List<List>> copyBoard(List<List<List>> original) {
+  return original
+      .map((row) => row.map((col) => List.from(col)).toList())
+      .toList();
 }
 
 kprint(v) {

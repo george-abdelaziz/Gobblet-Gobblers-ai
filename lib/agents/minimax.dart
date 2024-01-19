@@ -1,7 +1,6 @@
-import 'package:ai_project/agents/agent.dart';
-import 'package:ai_project/agents/evaluate.dart';
-
+import 'agent.dart';
 import 'config.dart';
+import 'evaluate.dart';
 import 'utils.dart';
 
 // p1 : +v
@@ -107,9 +106,11 @@ void main(List<String> args) {
       [0, -4]
     ]
   ];
+  kprint(DateTime.now());
   Map<String, dynamic> gamestate = getGameState(board, p1, p2);
   MiniMax miniMax = MiniMax();
   kprint(miniMax.calcBestMove(gamestate, 1));
+  kprint(DateTime.now());
   return;
 }
 
