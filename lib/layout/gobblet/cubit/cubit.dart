@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:ai_project/layout/gobblet/cubit/states.dart';
 import 'package:ai_project/models/my_classes.dart';
 import 'package:ai_project/modules/board/board_screen.dart';
@@ -143,6 +145,8 @@ class GameCubit extends Cubit<GameStates> {
   }
 
   void ai(){
+    //for(int i=0;i<10000000000;i++){}
+    //print('qqqqqqqqqqqqqqqqqqqqqqqqqqqqqq');
     //some logic for the ai
     changePlayer();
     emit(AIPlayed());
