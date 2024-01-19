@@ -126,20 +126,43 @@ kprint(v) {
   print(v);
 }
 
-int abs(a) {
-  if (a < 0) {
-    return a * -1;
-  } else {
-    return a;
-  }
-}
-
 void printBoard(List<List<List>> board) {
   for (int row = 0; row < 4; row++) {
     for (int col = 0; col < 4; col++) {
       int piece = board[row][col].last;
-      print('$piece');
+      kprint('$piece');
     }
-    print('\n');
+    kprint('\n');
+  }
+}
+
+Map<String, dynamic> applyMove(gamestate, player, move) {
+  Map<String, dynamic> newGameState =
+      getGameState(gamestate["board"], gamestate["p1"], gamestate["p2"]);
+  switch (move["type"]) {
+    case "play":
+      // pop @ index from player
+      // move the piece
+      // push it to the board
+      // create a new state
+      // return it
+      final p = player == 1 ? "p1" : "p2";
+      newGameState["board"][move["toRow"]][move["toCol"]]
+          .add(newGameState[p][move["index"]].last);
+      newGameState[p][move["index"]].removeLast();
+
+      return newGameState;
+    case "move":
+      //
+      // pop form board
+      // push to board
+      //
+      newGameState["board"][move["toRow"]][move["toCol"]]
+          .add(newGameState["board"][move["fromRow"]][move["fromCol"]].last);
+      newGameState["board"][move["fromRow"]][move["fromCol"]].removeLast();
+
+      return newGameState;
+    default:
+      throw Exception("move type ERR");
   }
 }

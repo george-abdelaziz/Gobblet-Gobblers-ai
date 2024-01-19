@@ -1,6 +1,15 @@
 import 'dart:math';
 
-import '/tmp/utils.dart';
+double evaluate(Map gametstate, int player) {
+  List<List<List>> board = gametstate["board"];
+  var score = 0.0;
+
+  score += evaluateRows(board, player);
+  score += evaluateColumns(board, player);
+  score += evaluateDiagonals(board, player);
+
+  return score;
+}
 
 int evaluateRows(List<List<List>> board, int player) {
   int finalScore = 0;
@@ -19,8 +28,8 @@ int evaluateRows(List<List<List>> board, int player) {
         posPieces += piece;
         maxPieces = max(piece, maxPieces);
       } else {
-        negPieces += abs(piece);
-        minPieces = max(piece, abs(minPieces));
+        negPieces += piece.abs();
+        minPieces = max(piece, minPieces.abs());
       }
     }
     if (player == 1) {
@@ -80,7 +89,7 @@ int evaluateColumns(List<List<List>> board, int player) {
   return finalScore;
 }
 
-int evaluateDiagonals(List<List<List<int>>> board, int player) {
+int evaluateDiagonals(List<List<List>> board, int player) {
   int finalScore = 0;
 
   // Main diagonal

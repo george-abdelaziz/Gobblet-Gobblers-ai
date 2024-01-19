@@ -6,56 +6,15 @@ import 'utils.dart';
 
 // p1 : +v
 // p2 : -v
-
+// 4
 // 3
 // 2
 // 1
 
 // fromRow, fromCol, toRow, toCol
 
-double evaluate(Map gametstate, int player) {
-  List<List<List>> board = gametstate["board"];
-  var score = 0.0;
-  var checkingCondition = player == 1 ? (x) => x > 0 : (x) => x < 0;
-  score += evaluateRows(board, player);
-  score += evaluateColumns(board, player);
-  return score;
-}
-
-Map<String, dynamic> applyMove(gamestate, player, move) {
-  Map<String, dynamic> newGameState =
-      getGameState(gamestate["board"], gamestate["p1"], gamestate["p2"]);
-  switch (move["type"]) {
-    case "play":
-      // pop @ index from player
-      // move the piece
-      // push it to the board
-      // create a new state
-      // return it
-      final p = player == 1 ? "p1" : "p2";
-      newGameState["board"][move["toRow"]][move["toCol"]]
-          .add(newGameState[p][move["index"]].last);
-      newGameState[p][move["index"]].removeLast();
-
-      return newGameState;
-    case "move":
-      //
-      // pop form board
-      // push to board
-      //
-      newGameState["board"][move["toRow"]][move["toCol"]]
-          .add(newGameState["board"][move["fromRow"]][move["fromCol"]].last);
-      newGameState["board"][move["fromRow"]][move["fromCol"]].removeLast();
-
-      return newGameState;
-    default:
-      throw Exception("move type ERR");
-  }
-}
-
 Map minimax(Map<String, dynamic> gamestate, bool maximizer, int depth, mv) {
-  // printToFile(gamestate["board"]);
-  late int plr = maximizer ? 2 : 1;
+  final int plr = maximizer ? 2 : 1;
 
   if (depth == 0) {
     return {
@@ -100,13 +59,13 @@ Map minimax(Map<String, dynamic> gamestate, bool maximizer, int depth, mv) {
 calcBestMove(List<List<List>> board, List<List> p1, List<List> p2) {
   Map<String, dynamic> gameState = getGameState(board, p1, p2);
 
-  final time = (DateTime.now());
   kprint(minimax(gameState, !true, Config.depth, null));
 
-  kprint((DateTime.now().subtract(Duration(
-      minutes: time.minute,
-      seconds: time.second,
-      microseconds: time.millisecond))));
+  // final time = (DateTime.now());
+  // kprint((DateTime.now().subtract(Duration(
+  //     minutes: time.minute,
+  //     seconds: time.second,
+  //     microseconds: time.millisecond))));
 }
 
 void main(List<String> args) {
@@ -136,14 +95,14 @@ void main(List<String> args) {
     [
       [0],
       [0],
-      [0],
+      [0, -1],
       [0]
     ],
     [
       [0],
       [0],
       [0],
-      [0]
+      [0, -4]
     ]
   ];
   calcBestMove(board, p1, p2);
