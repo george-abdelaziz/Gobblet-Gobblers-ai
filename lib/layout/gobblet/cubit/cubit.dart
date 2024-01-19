@@ -241,12 +241,30 @@ class GameCubit extends Cubit<GameStates> {
     required MyPoint start,
     required MyPoint end,
   }) {
+    int row=0;
+    int col=0;
+    int dia=0;
     if (end.x != 0 ||
         abs(start.getLastNumber(arr: board)) <=
             abs(end.getLastNumber(arr: board))) {
       return false;
     }
-
+    if(start.x==1&&end.getLastNumber(arr: board)<0){
+      for(int i=0;i<4;i++){if(board[0][end.y][i].last<0){row++;}}
+      for(int i=0;i<4;i++){if(board[0][i][end.z].last<0){col++;}}
+      if(end.y==end.z){for(int i=0;i<4;i++){if(board[0][i][i].last<0){dia++;}}}
+      else if(end.y+end.z==3){for(int i=0;i<4;i++){if(board[0][i][3-i].last<0){dia++;}}}
+      if(row==3||col==3||dia==3){return true;}
+      else {return false;}
+    }
+    else if(start.x==2&&end.getLastNumber(arr: board)>0){
+      for(int i=0;i<4;i++){if(board[0][end.y][i].last>0){row++;}}
+      for(int i=0;i<4;i++){if(board[0][i][end.z].last>0){col++;}}
+      if(end.y==end.z){for(int i=0;i<4;i++){if(board[0][i][i].last>0){dia++;}}}
+      else if(end.y+end.z==3){for(int i=0;i<4;i++){if(board[0][i][3-i].last>0){dia++;}}}
+      if(row==3||col==3||dia==3){return true;}
+      else {return false;}
+    }
     return true;
   }
 
