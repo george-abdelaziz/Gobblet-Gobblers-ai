@@ -12,10 +12,8 @@ import 'utils.dart';
 
 // fromRow, fromCol, toRow, toCol
 class AlphaBeta extends Agent {
-  double alphabeta(
-      Map<String, dynamic> gamestate, bool maximizer, int depth, alpha, beta) {
-    final int plr = maximizer ? 2 : 1;
-
+  double alphabeta(Map<String, dynamic> gamestate, bool maximizer, int plr,
+      int depth, alpha, beta) {
     if (depth == 0) {
       return evaluate(gamestate, plr);
     }
@@ -35,8 +33,8 @@ class AlphaBeta extends Agent {
     for (var i = 0; i < candidateMoves.length; i++) {
       var move = candidateMoves[i];
       var newGameState = applyMove(gamestate, plr, move);
-      // var v = 0.0;
-      var v = alphabeta(newGameState, !maximizer, depth - 1, alpha, beta);
+      var v = alphabeta(
+          newGameState, !maximizer, plr == 1 ? 2 : 1, depth - 1, alpha, beta);
 
       if (maximizer) {
         score = (v > score) ? v : score;
@@ -61,7 +59,7 @@ class AlphaBeta extends Agent {
     for (var i = 0; i < candidateMoves.length; i++) {
       var move = candidateMoves[i];
       var newGameState = applyMove(gamestate, plr, move);
-      var v = alphabeta(newGameState, !maximizer, Config.depth - 1,
+      var v = alphabeta(newGameState, !maximizer, plr, 3,
           double.negativeInfinity, double.infinity);
       if (v > score) {
         score = v;

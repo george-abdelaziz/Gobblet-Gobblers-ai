@@ -13,9 +13,8 @@ import 'utils.dart';
 // fromRow, fromCol, toRow, toCol
 
 class MiniMax extends Agent {
-  double minimax(Map<String, dynamic> gamestate, bool maximizer, int depth) {
-    final int plr = maximizer ? 2 : 1;
-
+  double minimax(
+      Map<String, dynamic> gamestate, bool maximizer, int plr, int depth) {
     if (depth == 0) {
       return evaluate(gamestate, plr);
     }
@@ -35,8 +34,7 @@ class MiniMax extends Agent {
     for (var i = 0; i < candidateMoves.length; i++) {
       var move = candidateMoves[i];
       var newGameState = applyMove(gamestate, plr, move);
-      // var v = 0.0;
-      var v = minimax(newGameState, !maximizer, depth - 1);
+      var v = minimax(newGameState, !maximizer, plr == 1 ? 2 : 1, depth - 1);
 
       if (maximizer) {
         score = (v > score) ? v : score;
@@ -57,7 +55,7 @@ class MiniMax extends Agent {
     for (var i = 0; i < candidateMoves.length; i++) {
       var move = candidateMoves[i];
       var newGameState = applyMove(gamestate, plr, move);
-      var v = minimax(newGameState, !maximizer, Config.depth - 1);
+      var v = minimax(newGameState, !maximizer, plr, Config.depth - 1);
       if (v > score) {
         score = v;
         bestMove = move;
