@@ -47,15 +47,15 @@ class MiniMax extends Agent {
 
   @override
   Map calcBestMove(Map gamestate, int plr) {
-    bool maximizer = true;
     double score = 0;
     Map bestMove = {};
+    int nextPlr = plr == 1 ? 2 : 1;
     List<dynamic> candidateMoves = genMoves(plr, gamestate);
 
     for (var i = 0; i < candidateMoves.length; i++) {
       var move = candidateMoves[i];
       var newGameState = applyMove(gamestate, plr, move);
-      var v = minimax(newGameState, !maximizer, plr, Config.depth - 1);
+      var v = minimax(newGameState, false, nextPlr, Config.miniMaxDepth - 1);
       if (v > score) {
         score = v;
         bestMove = move;
@@ -66,55 +66,3 @@ class MiniMax extends Agent {
     return bestMove;
   }
 }
-
-void main(List<String> args) {
-  final p1 = [
-    [1, 2, 3, 4],
-    [1, 2, 3, 4],
-    [1, 2, 3, 4],
-  ];
-  final p2 = [
-    [-1, -2, -3, -4],
-    [-1, -2, -3, -4],
-    [-1, -2, -3, -4],
-  ];
-  final board = [
-    [
-      [0, -4],
-      [0, -1],
-      [0, -3],
-      [0]
-    ],
-    [
-      [0],
-      [0],
-      [0],
-      [0]
-    ],
-    [
-      [0],
-      [0],
-      [0],
-      [0]
-    ],
-    [
-      [0],
-      [0],
-      [0],
-      [0, -4]
-    ]
-  ];
-  kprint(DateTime.now());
-  Map<String, dynamic> gamestate = getGameState(board, p1, p2);
-  MiniMax miniMax = MiniMax();
-  kprint(miniMax.calcBestMove(gamestate, 1));
-  kprint(DateTime.now());
-  return;
-}
-
-// final board = [
-//   [ [0, -4], [0], [0], [0, -2] ],
-//   [ [0], [0,-2], [0], [0] ],
-//   [ [0], [0], [0,-3], [0] ],
-//   [ [0], [0, -4], [0], [0, -1] ]
-// ];

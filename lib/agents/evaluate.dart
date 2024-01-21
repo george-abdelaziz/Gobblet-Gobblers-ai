@@ -1,48 +1,28 @@
 import 'dart:math';
 
+import 'package:ai_project/agents/config.dart';
+import 'package:ai_project/agents/utils.dart';
+
+int weight = 1;
 double evaluate(Map gametstate, int player) {
   List<List<List>> board = gametstate["board"];
   var score = 0.0;
 
-  score += evaluateRows(board, player);
-  score += evaluateDiagonals(board, player);
+  if (isWinningPos(board)) {
+    return Config.winning;
+  }
 
+  score += evaluateRows(board, player);
+  score += evaluateColumns(board, player);
+  // score += evaluateDiagonals(board, player);
   return score;
 }
 
 int evaluateRows(List<List<List>> board, int player) {
   int finalScore = 0;
-  evalRow(row) {
-    int localScore = 0;
-    int emptyBoxScore = 0;
-    int posPieces = 0;
-    int negPieces = 0;
-    int maxPieces = 0;
-    int minPieces = 0;
-    for (int i = 0; i < 4; i++) {
-      int piece = row[i].last;
-      if (piece == 0) {
-        emptyBoxScore++;
-      } else if (piece > 0) {
-        posPieces += piece;
-        maxPieces = max(piece, maxPieces);
-      } else {
-        negPieces += piece.abs();
-        minPieces = max(piece, minPieces.abs());
-      }
-    }
-    if (player == 1) {
-      if (minPieces > maxPieces) return 0;
-      localScore = posPieces * 10 + emptyBoxScore;
-    } else {
-      if (minPieces < maxPieces) return 0;
-      localScore = negPieces * 10 + emptyBoxScore;
-    }
-    return localScore;
-  }
 
   for (var row in board) {
-    finalScore += evalRow(row);
+    finalScore += evalRow(row, player);
   }
 
   return finalScore;
@@ -52,37 +32,30 @@ int evaluateColumns(List<List<List>> board, int player) {
   int finalScore = 0;
 
   for (int col = 0; col < 4; col++) {
-    int emptyBoxScore = 0;
-    int posPieces = 0;
-    int negPieces = 0;
-    int maxPieces = 0;
-    int minPieces = 0;
+    int empty = 0;
+    int sumPos = 0;
+    int sumNeg = 0;
+    int maxP = 0;
+    int maxN = 0;
+    int nPos = 0;
+    int nNeg = 0;
 
     for (int row = 0; row < 4; row++) {
       int piece = board[row][col].last;
 
       if (piece == 0) {
-        emptyBoxScore++;
+        empty++;
       } else if (piece > 0) {
-        posPieces += piece;
-        maxPieces = (piece > maxPieces) ? piece : maxPieces;
+        nPos++;
+        sumPos += piece;
+        maxP = max(piece, maxP);
       } else {
-        negPieces += piece.abs();
-        minPieces = (piece.abs() > minPieces) ? piece.abs() : minPieces;
+        sumNeg += piece.abs();
+        maxN = max(maxN, piece.abs());
       }
     }
-
-    if (player == 1) {
-      if (minPieces > maxPieces) {
-        return 0;
-      }
-      finalScore += posPieces * 10 + emptyBoxScore;
-    } else {
-      if (minPieces < maxPieces) {
-        return 0;
-      }
-      finalScore += negPieces * 10 + emptyBoxScore;
-    }
+    finalScore +=
+        analysis(player, nNeg, nPos, maxN, maxP, empty, sumPos, sumNeg);
   }
 
   return finalScore;
@@ -119,12 +92,12 @@ int evaluateDiagonals(List<List<List>> board, int player) {
     if (mainDiagonalMinPieces > mainDiagonalMaxPieces) {
       return 0;
     }
-    finalScore += mainDiagonalPosPieces * 10 + mainDiagonalEmptyBoxScore;
+    finalScore += mainDiagonalPosPieces * weight + mainDiagonalEmptyBoxScore;
   } else {
     if (mainDiagonalMinPieces < mainDiagonalMaxPieces) {
       return 0;
     }
-    finalScore += mainDiagonalNegPieces * 10 + mainDiagonalEmptyBoxScore;
+    finalScore += mainDiagonalNegPieces * weight + mainDiagonalEmptyBoxScore;
   }
 
   // Other diagonal
@@ -155,13 +128,52 @@ int evaluateDiagonals(List<List<List>> board, int player) {
     if (otherDiagonalMinPieces > otherDiagonalMaxPieces) {
       return 0;
     }
-    finalScore += otherDiagonalPosPieces * 10 + otherDiagonalEmptyBoxScore;
+    finalScore += otherDiagonalPosPieces * weight + otherDiagonalEmptyBoxScore;
   } else {
     if (otherDiagonalMinPieces < otherDiagonalMaxPieces) {
       return 0;
     }
-    finalScore += otherDiagonalNegPieces * 10 + otherDiagonalEmptyBoxScore;
+    finalScore += otherDiagonalNegPieces * weight + otherDiagonalEmptyBoxScore;
   }
 
   return finalScore;
+}
+
+int evalRow(row, int player) {
+  int empty = 0;
+  int sumPos = 0;
+  int sumNeg = 0;
+  int nPos = 0;
+  int nNeg = 0;
+  int maxP = 0;
+  int maxN = 0;
+
+  for (int i = 0; i < 4; i++) {
+    int piece = row[i].last;
+    if (piece == 0) {
+      empty++;
+    } else if (piece > 0) {
+      sumPos += piece;
+      maxP = max(piece, maxP);
+      nPos++;
+    } else {
+      sumNeg += piece.abs();
+      maxN = max(piece.abs(), maxN);
+      nNeg++;
+    }
+  }
+  return analysis(player, nNeg, nPos, maxN, maxP, empty, sumPos, sumNeg);
+}
+
+int analysis(int player, int nNeg, int nPos, int maxN, int maxP, int empty,
+    int sumPos, int sumNeg) {
+  if (player == 1) {
+    if (nNeg == 3) return Config.danger;
+    if (maxN >= maxP) return 20;
+    return sumPos * weight + empty;
+  } else {
+    if (nPos == 3) return Config.danger;
+    if (maxN <= maxP) return 20;
+    return sumNeg * weight + empty;
+  }
 }

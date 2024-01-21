@@ -90,7 +90,6 @@ bool isWinningPos(List<List<List>> board) {
     if (board.every((row) =>
             row[col].last > 0) || // All elements in the column are positive
         board.every((row) => row[col].last < 0)) {
-      // All elements in the column are negative
       return true;
     }
   }
@@ -159,11 +158,9 @@ kprint(v) {
 
 void printBoard(List<List<List>> board) {
   for (int row = 0; row < 4; row++) {
-    for (int col = 0; col < 4; col++) {
-      int piece = board[row][col].last;
-      kprint('$piece');
-    }
-    kprint('\n');
+    var piece = board[row];
+    kprint(
+        '${piece[0].last}, ${piece[1].last}, ${piece[2].last}, ${piece[3].last}');
   }
 }
 
