@@ -23,6 +23,17 @@ class WinScreen extends StatelessWidget {
                     fontSize: 30,
                   ),
                 ),
+                const SizedBox(height: 20,),
+                MaterialButton(
+                  color: Colors.deepPurpleAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Text('Restart'),
+                  onPressed: (){
+                    cubit.restart();
+                  },
+                ),
               ],
             )
         );
