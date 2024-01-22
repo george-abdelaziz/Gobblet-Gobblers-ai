@@ -55,7 +55,7 @@ class MiniMax extends Agent {
     for (var i = 0; i < candidateMoves.length; i++) {
       var move = candidateMoves[i];
       var newGameState = applyMove(gamestate, plr, move);
-      var v = minimax(newGameState, false, nextPlr, Config.miniMaxDepth - 1);
+      var v = minimax(newGameState, true, nextPlr, Config.miniMaxDepth - 1);
       move["score"] = v;
 
       if (v > score) {
