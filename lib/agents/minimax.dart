@@ -1,3 +1,5 @@
+import 'package:logger/logger.dart';
+
 import 'agent.dart';
 import 'config.dart';
 import 'evaluate.dart';
@@ -55,6 +57,10 @@ class MiniMax extends Agent {
     for (var i = 0; i < candidateMoves.length; i++) {
       var move = candidateMoves[i];
       var newGameState = applyMove(gamestate, plr, move);
+      if (isWinningPos(newGameState['board'])) {
+        move['score'] = Config.winning;
+        return move;
+      }
       var v = minimax(newGameState, true, nextPlr, Config.miniMaxDepth - 1);
       move["score"] = v;
 
@@ -63,6 +69,7 @@ class MiniMax extends Agent {
         bestMove = move;
       }
     }
+    Logger().d(candidateMoves);
     return bestMove;
   }
 }

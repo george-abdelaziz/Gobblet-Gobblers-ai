@@ -6,7 +6,7 @@ import 'package:ai_project/agents/utils.dart';
 int weight = 1;
 double evaluate(Map gametstate, int player) {
   List<List<List>> board = gametstate["board"];
-  return isWinningPos(board) ? Config.winning : 0;
+  if (isWinningPos(board)) Config.winning;
   var score = 0.0;
 
   if (isWinningPos(board)) {
@@ -15,7 +15,7 @@ double evaluate(Map gametstate, int player) {
 
   score += evaluateRows(board, player);
   score += evaluateColumns(board, player);
-  // score += evaluateDiagonals(board, player);
+  score += evaluateDiagonals(board, player);
   return score;
 }
 
@@ -170,14 +170,10 @@ int evalRow(row, int player) {
 int analysis(int player, int nNeg, int nPos, int maxN, int maxP, int empty,
     int sumPos, int sumNeg) {
   if (player == 1) {
-    if (nNeg == 3) return 0;
-    if (maxN >= maxP) return 0;
+    if (maxN > maxP) return 0;
     return sumPos + empty;
   } else {
-    if (nNeg == 3) return 0;
-    if (maxN >= maxP) return 0;
-    // if (nPos == 3) return Config.danger;
-    // if (maxN <= maxP) return 50;
+    if (maxN > maxP) return 0;
     return sumNeg + empty;
   }
 }
