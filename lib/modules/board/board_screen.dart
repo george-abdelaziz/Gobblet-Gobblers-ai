@@ -10,7 +10,7 @@ class BoardScreen extends StatelessWidget {
     return BlocConsumer<GameCubit, GameStates>(
       listener: (context, state) {},
       builder: (context, state) {
-        var cubit=GameCubit.get(context);
+        var cubit = GameCubit.get(context);
         return SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: SingleChildScrollView(
@@ -18,9 +18,15 @@ class BoardScreen extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  player1(context,),
-                  board(context,),
-                  player2(context,),
+                  player1(
+                    context,
+                  ),
+                  board(
+                    context,
+                  ),
+                  player2(
+                    context,
+                  ),
                 ],
               ),
             ),

@@ -86,23 +86,27 @@ List genMoves(int player, gamestate) {
   return candidateMoves;
 }
 
-bool isWinningPos(List<List<List>> board) {
+int isWinningPos(List<List<List>> board) {
   // Check rows
   for (int row = 0; row < 4; row++) {
-    if (board[row].every(
-            (element) => element.last > 0) || // All elements are positive
-        board[row].every((element) => element.last < 0)) {
+    if (board[row].every((element) => element.last > 0)) {
+      // All elements are positive
+      return 1;
+    }
+    if (board[row].every((element) => element.last < 0)) {
       // All elements are negative
-      return true;
+      return 2;
     }
   }
 
   // Check columns
   for (int col = 0; col < 4; col++) {
-    if (board.every((row) =>
-            row[col].last > 0) || // All elements in the column are positive
-        board.every((row) => row[col].last < 0)) {
-      return true;
+    if (board.every((row) => row[col].last > 0)) {
+      // All elements in the column are positive
+      return 1;
+    }
+    if (board.every((row) => row[col].last < 0)) {
+      return 2;
     }
   }
 // Check diagonals
@@ -113,8 +117,10 @@ bool isWinningPos(List<List<List>> board) {
       (board[0][3].last > 0 &&
           board[1][2].last > 0 &&
           board[2][1].last > 0 &&
-          board[3][0].last > 0) ||
-      (board[0][0].last < 0 &&
+          board[3][0].last > 0)) {
+    return 1;
+  }
+  if ((board[0][0].last < 0 &&
           board[1][1].last < 0 &&
           board[2][2].last < 0 &&
           board[3][3].last < 0) ||
@@ -122,10 +128,10 @@ bool isWinningPos(List<List<List>> board) {
           board[1][2].last < 0 &&
           board[2][1].last < 0 &&
           board[3][0].last < 0)) {
-    return true;
+    return 2;
   }
 
-  return false;
+  return 0;
 }
 
 Map<String, List> getGameState(

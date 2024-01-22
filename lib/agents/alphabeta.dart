@@ -19,7 +19,7 @@ class AlphaBeta extends Agent {
       return evaluate(gamestate, plr);
     }
 
-    if (isWinningPos(gamestate['board'])) {
+    if (isWinningPos(gamestate['board']) == plr) {
       return Config.winning;
     }
 

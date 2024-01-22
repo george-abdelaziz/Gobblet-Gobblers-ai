@@ -6,16 +6,15 @@ import 'package:ai_project/agents/utils.dart';
 int weight = 1;
 double evaluate(Map gametstate, int player) {
   List<List<List>> board = gametstate["board"];
-  if (isWinningPos(board)) Config.winning;
   var score = 0.0;
 
-  if (isWinningPos(board)) {
+  if (isWinningPos(board) != 0) {
     return Config.winning;
   }
 
   score += evaluateRows(board, player);
   score += evaluateColumns(board, player);
-  score += evaluateDiagonals(board, player);
+  // score += evaluateDiagonals(board, player);
   return score;
 }
 

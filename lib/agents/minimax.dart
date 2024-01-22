@@ -21,7 +21,7 @@ class MiniMax extends Agent {
       return evaluate(gamestate, plr);
     }
 
-    if (isWinningPos(gamestate['board'])) {
+    if (isWinningPos(gamestate['board']) != 0) {
       return Config.winning;
     }
 
@@ -57,7 +57,7 @@ class MiniMax extends Agent {
     for (var i = 0; i < candidateMoves.length; i++) {
       var move = candidateMoves[i];
       var newGameState = applyMove(gamestate, plr, move);
-      if (isWinningPos(newGameState['board'])) {
+      if (isWinningPos(newGameState['board']) == plr) {
         move['score'] = Config.winning;
         return move;
       }
@@ -69,7 +69,7 @@ class MiniMax extends Agent {
         bestMove = move;
       }
     }
-    Logger().d(candidateMoves);
+    // Logger().d(candidateMoves);
     return bestMove;
   }
 }
