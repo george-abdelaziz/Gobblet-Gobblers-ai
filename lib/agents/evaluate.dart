@@ -19,7 +19,7 @@ double evaluate(Map gametstate, int player) {
 }
 
 int evaluateRows(List<List<List>> board, int player) {
-  return 0;
+  // return 0;
   int finalScore = 0;
 
   for (var row in board) {

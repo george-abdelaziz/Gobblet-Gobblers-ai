@@ -1,3 +1,5 @@
+import 'package:ai_project/agents/agent.dart';
+import 'package:ai_project/agents/utils.dart';
 import 'package:ai_project/layout/gobblet/cubit/states.dart';
 import 'package:ai_project/models/my_classes.dart';
 import 'package:ai_project/modules/board/board_screen.dart';
@@ -6,17 +8,12 @@ import 'package:ai_project/modules/win/win.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-/*
-rulezzzzzzzzzzzzzzzzzz
+import '../../../agents/minimax.dart';
 
-startup code
-edit plays
-play12
-play21
-*/
 
 class GameCubit extends Cubit<GameStates> {
   GameCubit() : super(GameInitialState());
+
   static GameCubit get(context) {
     return BlocProvider.of(context);
   }
@@ -114,7 +111,7 @@ class GameCubit extends Cubit<GameStates> {
       ],
     ],
   ];
-  //boardz[which board][vertical height of the board][horizontal width of the board][n/height of the stack]=double;
+  //board[which board][vertical height of the board][horizontal width of the board][n/height of the stack]=double;
 
   void playerSelectionDone() {
     if (player1Type != '' && player2Type != '!') {
@@ -144,10 +141,98 @@ class GameCubit extends Cubit<GameStates> {
     }
   }
 
+  List<List<List<double>>> convertToIntToDouble(List<List<List>> inputList) {
+    List<List<List<double>>> result = [];
+
+    for (List<List> outerList in inputList) {
+      List<List<double>> outerResult = [];
+
+      for (List innerList in outerList) {
+        List<double> innerResult = [];
+
+        for (int value in innerList) {
+          innerResult.add(value.toDouble());
+        }
+
+        outerResult.add(innerResult);
+      }
+
+      result.add(outerResult);
+    }
+
+    return result;
+  }
+
+  List<List<double>> convertListIntToDouble(List<List> inputList) {
+    List<List<double>> result = [];
+
+    for (List innerList in inputList) {
+      List<double> innerResult = [];
+
+      for (int value in innerList) {
+        innerResult.add(value.toDouble());
+      }
+
+      result.add(innerResult);
+    }
+
+    return result;
+  }
+
+  List<List> ctd(List<List<double>> inputList) {
+    List<List> result = [];
+
+    for (List<double> innerList in inputList) {
+      List<int> innerResult = [];
+
+      for (double value in innerList) {
+        innerResult.add(value.toInt());
+      }
+
+      result.add(innerResult);
+    }
+
+    return result;
+  }
+
+  List<List<List>> bti(List<List<List<double>>> inputList) {
+    List<List<List>> result = [];
+
+    for (List<List<double>> outerList in inputList) {
+      List<List<int>> outerResult = [];
+
+      for (List<double> innerList in outerList) {
+        List<int> innerResult = [];
+
+        for (double value in innerList) {
+          innerResult.add(value.toInt());
+        }
+
+        outerResult.add(innerResult);
+      }
+
+      result.add(outerResult);
+    }
+
+    return result;
+  }
+
+
   void ai() {
     //for(int i=0;i<10000000000;i++){}
     //print('qqqqqqqqqqqqqqqqqqqqqqqqqqqqqq');
     //some logic for the ai
+    Agent player = MiniMax();
+
+    var x=getGameState(bti(board[0]), ctd(board[1][0]), ctd(board[2][0]));
+    var move=player.calcBestMove(x, 2);
+    //play from outside
+    // if(move['type']=='play'){from.x=2;}
+    // else{from.x=0;}
+    var y=applyMove(x, 2, move);
+    board[0]=convertToIntToDouble(y['board']);
+    board[1][0]=convertListIntToDouble(y['p1']);
+    board[2][0]=convertListIntToDouble(y['p2']);
     changePlayer();
     emit(AIPlayed());
   }
