@@ -27,6 +27,7 @@ class SomeoneMove extends GameStates {}
 //for hoomanz
 //for player 1
 class Player1Turn extends GameStates {}
+class Restart extends GameStates {}
 
 class Player1Frist extends GameStates {}
 

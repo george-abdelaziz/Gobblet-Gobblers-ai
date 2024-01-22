@@ -223,11 +223,11 @@ class GameCubit extends Cubit<GameStates> {
     Agent player = MiniMax();
 
     var x = getGameState(bti(board[0]), ctd(board[1][0]), ctd(board[2][0]));
-    var move = player.calcBestMove(x, 2);
+    var move = player.calcBestMove(x, whosturn-2);
     //play from outside
     // if(move['type']=='play'){from.x=2;}
     // else{from.x=0;}
-    var y = applyMove(x, 2, move);
+    var y = applyMove(x, whosturn-2, move);
     board[0] = convertToIntToDouble(y['board']);
     board[1][0] = convertListIntToDouble(y['p1']);
     board[2][0] = convertListIntToDouble(y['p2']);
@@ -619,6 +619,7 @@ class GameCubit extends Cubit<GameStates> {
         ],
       ],
     ];
+    emit(Restart());
   }
 //////////////////// useless functions for now at least
   void movePieceFromTo({
