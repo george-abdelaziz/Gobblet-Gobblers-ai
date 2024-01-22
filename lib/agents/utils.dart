@@ -39,10 +39,20 @@ List genMoves(int player, gamestate) {
   List<Map> candidateMoves = [];
 
   for (int i = 0; i < 3; i++) {
+    if (i > 0 && pset[i - 1].isNotEmpty && pset[i - 1].last == pset[i].last) {
+      continue;
+    }
+
     if (pset[i].isNotEmpty) {
       for (int row = 0; row < 4; row++) {
         for (int col = 0; col < 4; col++) {
-          final move = {"type": "play", "index": i, "toRow": row, "toCol": col};
+          final move = {
+            "type": "play",
+            "val": pset[i].last,
+            "index": i,
+            "toRow": row,
+            "toCol": col
+          };
           if (validateMove(move, player, gamestate)) {
             candidateMoves.add(move);
           }
@@ -50,6 +60,7 @@ List genMoves(int player, gamestate) {
       }
     }
   }
+
   for (int row = 0; row < 4; row++) {
     for (int col = 0; col < 4; col++) {
       if (checkCondition(player, row, col)) {
@@ -57,6 +68,7 @@ List genMoves(int player, gamestate) {
           for (int col2 = 0; col2 < 4; col2++) {
             var move = {
               "type": "move",
+              "val": gamestate['board'][row][col].last,
               "fromRow": row,
               "fromCol": col,
               "toRow": row2,

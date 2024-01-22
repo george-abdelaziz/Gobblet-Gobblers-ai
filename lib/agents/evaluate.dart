@@ -19,6 +19,7 @@ double evaluate(Map gametstate, int player) {
 }
 
 int evaluateRows(List<List<List>> board, int player) {
+  return 0;
   int finalScore = 0;
 
   for (var row in board) {
@@ -168,12 +169,14 @@ int evalRow(row, int player) {
 int analysis(int player, int nNeg, int nPos, int maxN, int maxP, int empty,
     int sumPos, int sumNeg) {
   if (player == 1) {
-    if (nNeg == 3) return Config.danger;
-    if (maxN >= maxP) return 20;
-    return sumPos * weight + empty;
+    if (nNeg == 3) return 0;
+    if (maxN >= maxP) return 0;
+    return sumPos + empty;
   } else {
-    if (nPos == 3) return Config.danger;
-    if (maxN <= maxP) return 20;
-    return sumNeg * weight + empty;
+    if (nNeg == 3) return 0;
+    if (maxN >= maxP) return 0;
+    // if (nPos == 3) return Config.danger;
+    // if (maxN <= maxP) return 50;
+    return sumNeg + empty;
   }
 }

@@ -1,33 +1,50 @@
-import 'package:ai_project/agents/config.dart';
-import 'package:ai_project/agents/minimax.dart';
-import 'package:ai_project/agents/utils.dart';
+import 'agent.dart';
+import 'config.dart';
+import 'minimax.dart';
+import 'utils.dart';
 
-void main(List<String> args) {
-  // Agent player1 = MiniMax();
-  // Agent player2 = AlphaBeta();
-  kprint(DateTime.now());
-  Map<String, dynamic> gamestate =
-      getGameState(Config.board, Config.set1, Config.set2);
+Agent player1 = MiniMax();
+Agent player2 = MiniMax();
 
-  for (var i = 1; i < 100; i++) {
-    kprint("($i)===================");
-    var move = MiniMax().calcBestMove(gamestate, 1);
+test(Agent player, int plr, gameState) {
+  Map<String, dynamic> gamestate = Config.initialgame;
+  var move = player.calcBestMove(gameState, plr);
+  kprint(move);
+  gameState = applyMove(gamestate, plr, move);
+  printBoard(gamestate["board"]);
+}
+
+play() {
+  Map<String, dynamic> gamestate = Config.initialgame;
+  for (var i = 0; i < 20; i++) {
+    kprint("($i)==================");
+    var move = player1.calcBestMove(gamestate, 1);
+    kprint(move);
     gamestate = applyMove(gamestate, 1, move);
     if (isWinningPos(gamestate["board"])) {
       kprint("p1 won");
-      kprint(move);
       printBoard(gamestate["board"]);
       break;
     }
-
-    move = MiniMax().calcBestMove(gamestate, 2);
+    move = player2.calcBestMove(gamestate, 1);
+    kprint(move);
     gamestate = applyMove(gamestate, 2, move);
     if (isWinningPos(gamestate["board"])) {
-      kprint("p2 won");
+      kprint("p1 won");
       printBoard(gamestate["board"]);
       break;
     }
     printBoard(gamestate["board"]);
   }
-  kprint(DateTime.now());
 }
+
+void main(List<String> args) {
+  play();
+}
+
+// var board = [
+//   [ [0], [0], [0], [0] ],
+//   [ [0], [0], [0], [0] ],
+//   [ [0], [0], [0], [0] ],
+//   [ [0], [0], [0], [0] ]
+// ];
