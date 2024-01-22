@@ -6,19 +6,39 @@ import 'utils.dart';
 Agent player1 = MiniMax();
 Agent player2 = MiniMax();
 
-test(Agent player, int plr, gameState) {
-  Map<String, dynamic> gamestate = Config.initialgame;
-  var move = player.calcBestMove(gameState, plr);
-  kprint(move);
-  gameState = applyMove(gamestate, plr, move);
-  printBoard(gamestate["board"]);
-}
-
 play() {
   Map<String, dynamic> gamestate = Config.initialgame;
+  var board = [
+    [
+      [0, 3],
+      [0],
+      [0],
+      [0, 1]
+    ],
+    [
+      [0],
+      [0, 4],
+      [0],
+      [0]
+    ],
+    [
+      [0],
+      [0],
+      [0],
+      [0]
+    ],
+    [
+      [0],
+      [0],
+      [0],
+      [0]
+    ]
+  ];
+  gamestate['board'] = board;
   for (var i = 0; i < 20; i++) {
     kprint("($i)==================");
     var move = player1.calcBestMove(gamestate, 1);
+    kprint('---------------------------------------');
     kprint(move);
     gamestate = applyMove(gamestate, 1, move);
     if (isWinningPos(gamestate["board"])) {
@@ -26,7 +46,8 @@ play() {
       printBoard(gamestate["board"]);
       break;
     }
-    move = player2.calcBestMove(gamestate, 1);
+    move = player2.calcBestMove(gamestate, 2);
+    kprint('---------------------------------------');
     kprint(move);
     gamestate = applyMove(gamestate, 2, move);
     if (isWinningPos(gamestate["board"])) {
@@ -46,5 +67,12 @@ void main(List<String> args) {
 //   [ [0], [0], [0], [0] ],
 //   [ [0], [0], [0], [0] ],
 //   [ [0], [0], [0], [0] ],
+//   [ [0], [0], [0], [0] ]
+// ];
+
+// var board = [
+//   [ [0,3], [0], [0], [0,1] ],
+//   [ [0], [0,4], [0], [0] ],
+//   [ [0], [0], [0,3], [0] ],
 //   [ [0], [0], [0], [0] ]
 // ];

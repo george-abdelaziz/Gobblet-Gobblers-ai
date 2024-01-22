@@ -6,6 +6,7 @@ import 'package:ai_project/agents/utils.dart';
 int weight = 1;
 double evaluate(Map gametstate, int player) {
   List<List<List>> board = gametstate["board"];
+  return isWinningPos(board) ? Config.winning : 0;
   var score = 0.0;
 
   if (isWinningPos(board)) {

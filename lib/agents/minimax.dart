@@ -47,7 +47,7 @@ class MiniMax extends Agent {
 
   @override
   Map calcBestMove(Map gamestate, int plr) {
-    double score = 0;
+    double score = double.infinity;
     Map bestMove = {};
     int nextPlr = plr == 1 ? 2 : 1;
     List<dynamic> candidateMoves = genMoves(plr, gamestate);
@@ -58,12 +58,11 @@ class MiniMax extends Agent {
       var v = minimax(newGameState, true, nextPlr, Config.miniMaxDepth - 1);
       move["score"] = v;
 
-      if (v > score) {
+      if (v < score) {
         score = v;
         bestMove = move;
       }
     }
-
     return bestMove;
   }
 }

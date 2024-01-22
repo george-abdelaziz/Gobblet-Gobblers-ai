@@ -7,9 +7,9 @@ import 'package:ai_project/modules/player_selection/player_selection_screen.dart
 import 'package:ai_project/modules/win/win.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:logger/logger.dart';
 
 import '../../../agents/minimax.dart';
-
 
 class GameCubit extends Cubit<GameStates> {
   GameCubit() : super(GameInitialState());
@@ -31,7 +31,7 @@ class GameCubit extends Cubit<GameStates> {
   List<Widget> screens = [
     PlayerSelectionScreen(),
     BoardScreen(),
-    WinScreen(),
+    const WinScreen(),
   ];
   List<List<List<List<double>>>> board = [
     [
@@ -112,7 +112,7 @@ class GameCubit extends Cubit<GameStates> {
     ],
   ];
   //board[which board][vertical height of the board][horizontal width of the board][n/height of the stack]=double;
-// when ai wins
+
   void playerSelectionDone() {
     if (player1Type != '' && player2Type != '!') {
       if (player1Type != '0' && difficultyLevelForAI1 == '') {
@@ -217,20 +217,22 @@ class GameCubit extends Cubit<GameStates> {
     return result;
   }
 
-
   void ai() {
+    //for(int i=0;i<10000000000;i++){}
+    //print('qqqqqqqqqqqqqqqqqqqqqqqqqqqqqq');
+    //some logic for the ai
     Agent player = MiniMax();
 
-    var x=getGameState(bti(board[0]), ctd(board[1][0]), ctd(board[2][0]));
-    print('$whosturn');
-    var move=player.calcBestMove(x, whosturn-2);
+    var x = getGameState(bti(board[0]), ctd(board[1][0]), ctd(board[2][0]));
+    var move = player.calcBestMove(x, 2);
     //play from outside
     // if(move['type']=='play'){from.x=2;}
     // else{from.x=0;}
-    var y=applyMove(x, whosturn-2, move);
-    board[0]=convertToIntToDouble(y['board']);
-    board[1][0]=convertListIntToDouble(y['p1']);
-    board[2][0]=convertListIntToDouble(y['p2']);
+    var y = applyMove(x, 2, move);
+    board[0] = convertToIntToDouble(y['board']);
+    board[1][0] = convertListIntToDouble(y['p1']);
+    board[2][0] = convertListIntToDouble(y['p2']);
+    Logger().i(move);
     changePlayer();
     emit(AIPlayed());
   }
@@ -261,13 +263,10 @@ class GameCubit extends Cubit<GameStates> {
         whosturn = 3;
       }
     } else {
-      print(
+      kprint(
           'qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq');
     }
     aPieceIsToushed = 0;
-    from.nagOne();
-    to.nagOne();
-
   }
 
   void plays({required MyPoint point}) {
