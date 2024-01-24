@@ -69,7 +69,7 @@ class MiniMax extends Agent {
         bestMove = move;
       }
     }
-    // Logger().d(candidateMoves);
+    Logger().d(bestMove);
     return bestMove;
   }
 }

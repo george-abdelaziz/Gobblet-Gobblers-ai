@@ -14,7 +14,7 @@ double evaluate(Map gametstate, int player) {
 
   score += evaluateRows(board, player);
   score += evaluateColumns(board, player);
-  // score += evaluateDiagonals(board, player);
+  score += evaluateDiagonals(board, player);
   return score;
 }
 
@@ -65,78 +65,54 @@ int evaluateColumns(List<List<List>> board, int player) {
 int evaluateDiagonals(List<List<List>> board, int player) {
   int finalScore = 0;
 
-  // Main diagonal
-  int mainDiagonalEmptyBoxScore = 0;
-  int mainDiagonalPosPieces = 0;
-  int mainDiagonalNegPieces = 0;
-  int mainDiagonalMaxPieces = 0;
-  int mainDiagonalMinPieces = 0;
+  // // Main diagonal
+  int empty = 0;
+  int sumPos = 0;
+  int sumNeg = 0;
+  int maxP = 0;
+  int maxN = 0;
+  int nPos = 0;
+  int nNeg = 0;
 
   for (int i = 0; i < 4; i++) {
-    int piece = board[i][i][0];
-
+    int piece = board[i][i].last;
     if (piece == 0) {
-      mainDiagonalEmptyBoxScore++;
+      empty++;
     } else if (piece > 0) {
-      mainDiagonalPosPieces += piece;
-      mainDiagonalMaxPieces =
-          (piece > mainDiagonalMaxPieces) ? piece : mainDiagonalMaxPieces;
+      sumPos += piece;
+      nPos++;
+      maxP = max(maxP, piece);
     } else {
-      mainDiagonalNegPieces += piece.abs();
-      mainDiagonalMinPieces = (piece.abs() > mainDiagonalMinPieces)
-          ? piece.abs()
-          : mainDiagonalMinPieces;
+      sumNeg += piece.abs();
+      nNeg++;
+      maxN = max(piece.abs(), maxN);
     }
   }
-
-  if (player == 1) {
-    if (mainDiagonalMinPieces > mainDiagonalMaxPieces) {
-      return 0;
-    }
-    finalScore += mainDiagonalPosPieces * weight + mainDiagonalEmptyBoxScore;
-  } else {
-    if (mainDiagonalMinPieces < mainDiagonalMaxPieces) {
-      return 0;
-    }
-    finalScore += mainDiagonalNegPieces * weight + mainDiagonalEmptyBoxScore;
-  }
+  finalScore += analysis(player, nNeg, nPos, maxN, maxP, empty, sumPos, sumNeg);
 
   // Other diagonal
-  int otherDiagonalEmptyBoxScore = 0;
-  int otherDiagonalPosPieces = 0;
-  int otherDiagonalNegPieces = 0;
-  int otherDiagonalMaxPieces = 0;
-  int otherDiagonalMinPieces = 0;
+  empty = 0;
+  sumPos = 0;
+  sumNeg = 0;
+  maxP = 0;
+  maxN = 0;
+  nPos = 0;
+  nNeg = 0;
 
   for (int i = 0; i < 4; i++) {
     int piece = board[i][3 - i][0];
 
     if (piece == 0) {
-      otherDiagonalEmptyBoxScore++;
+      empty++;
     } else if (piece > 0) {
-      otherDiagonalPosPieces += piece;
-      otherDiagonalMaxPieces =
-          (piece > otherDiagonalMaxPieces) ? piece : otherDiagonalMaxPieces;
+      sumPos += piece;
+      maxP = (piece > maxP) ? piece : maxP;
     } else {
-      otherDiagonalNegPieces += piece.abs();
-      otherDiagonalMinPieces = (piece.abs() > otherDiagonalMinPieces)
-          ? piece.abs()
-          : otherDiagonalMinPieces;
+      sumNeg += piece.abs();
+      maxN = (piece.abs() > maxN) ? piece.abs() : maxN;
     }
   }
-
-  if (player == 1) {
-    if (otherDiagonalMinPieces > otherDiagonalMaxPieces) {
-      return 0;
-    }
-    finalScore += otherDiagonalPosPieces * weight + otherDiagonalEmptyBoxScore;
-  } else {
-    if (otherDiagonalMinPieces < otherDiagonalMaxPieces) {
-      return 0;
-    }
-    finalScore += otherDiagonalNegPieces * weight + otherDiagonalEmptyBoxScore;
-  }
-
+  finalScore += analysis(player, nNeg, nPos, maxN, maxP, empty, sumPos, sumNeg);
   return finalScore;
 }
 

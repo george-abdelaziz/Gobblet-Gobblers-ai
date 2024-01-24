@@ -8,6 +8,7 @@ import 'package:ai_project/modules/win/win.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
+
 import '../../../agents/minimax.dart';
 
 class GameCubit extends Cubit<GameStates> {
@@ -27,7 +28,7 @@ class GameCubit extends Cubit<GameStates> {
   String difficultyLevelForAI2 = '';
   MyPoint from = MyPoint(x: 0);
   MyPoint to = MyPoint(x: 0);
-  List<Widget> screens = [
+  final List<Widget> screens = [
     PlayerSelectionScreen(),
     BoardScreen(),
     const WinScreen(),
@@ -223,11 +224,11 @@ class GameCubit extends Cubit<GameStates> {
     Agent player = MiniMax();
 
     var x = getGameState(bti(board[0]), ctd(board[1][0]), ctd(board[2][0]));
-    var move = player.calcBestMove(x, whosturn-2);
+    var move = player.calcBestMove(x, whosturn - 2);
     //play from outside
     // if(move['type']=='play'){from.x=2;}
     // else{from.x=0;}
-    var y = applyMove(x, whosturn-2, move);
+    var y = applyMove(x, whosturn - 2, move);
     board[0] = convertToIntToDouble(y['board']);
     board[1][0] = convertListIntToDouble(y['p1']);
     board[2][0] = convertListIntToDouble(y['p2']);
@@ -292,8 +293,10 @@ class GameCubit extends Cubit<GameStates> {
       )) {
         to = point;
         movePiece();
-        player2wins();
-        player1wins();
+        playerWins(whosturn);
+        playerWins(whosturn);
+        // player2wins();
+        // player1wins();
         changePlayer();
         emit(Player2Turn());
         if (player2Type != '0') {
@@ -323,8 +326,10 @@ class GameCubit extends Cubit<GameStates> {
       )) {
         to = point;
         movePiece();
-        player1wins();
-        player2wins();
+        // @greybeast
+        playerWins(whosturn);
+        // player1wins();
+        // player2wins();
         changePlayer();
         emit(Player1Turn());
         if (player1Type != '0') {
@@ -419,97 +424,53 @@ class GameCubit extends Cubit<GameStates> {
     }
   }
 
-  void player1wins() {
-    if (getLastItemInTheBoard(y: 0, z: 0) > 0 &&
-            getLastItemInTheBoard(y: 1, z: 0) > 0 &&
-            getLastItemInTheBoard(y: 2, z: 0) > 0 &&
-            getLastItemInTheBoard(y: 3, z: 0) > 0 ||
-        getLastItemInTheBoard(y: 0, z: 1) > 0 &&
-            getLastItemInTheBoard(y: 1, z: 1) > 0 &&
-            getLastItemInTheBoard(y: 2, z: 1) > 0 &&
-            getLastItemInTheBoard(y: 3, z: 1) > 0 ||
-        getLastItemInTheBoard(y: 0, z: 2) > 0 &&
-            getLastItemInTheBoard(y: 1, z: 2) > 0 &&
-            getLastItemInTheBoard(y: 2, z: 2) > 0 &&
-            getLastItemInTheBoard(y: 3, z: 2) > 0 ||
-        getLastItemInTheBoard(y: 0, z: 3) > 0 &&
-            getLastItemInTheBoard(y: 1, z: 3) > 0 &&
-            getLastItemInTheBoard(y: 2, z: 3) > 0 &&
-            getLastItemInTheBoard(y: 3, z: 3) > 0 ||
-        getLastItemInTheBoard(y: 0, z: 0) > 0 &&
-            getLastItemInTheBoard(y: 0, z: 1) > 0 &&
-            getLastItemInTheBoard(y: 0, z: 2) > 0 &&
-            getLastItemInTheBoard(y: 0, z: 3) > 0 ||
-        getLastItemInTheBoard(y: 1, z: 0) > 0 &&
-            getLastItemInTheBoard(y: 1, z: 1) > 0 &&
-            getLastItemInTheBoard(y: 1, z: 2) > 0 &&
-            getLastItemInTheBoard(y: 1, z: 3) > 0 ||
-        getLastItemInTheBoard(y: 2, z: 0) > 0 &&
-            getLastItemInTheBoard(y: 2, z: 1) > 0 &&
-            getLastItemInTheBoard(y: 2, z: 2) > 0 &&
-            getLastItemInTheBoard(y: 2, z: 3) > 0 ||
-        getLastItemInTheBoard(y: 3, z: 0) > 0 &&
-            getLastItemInTheBoard(y: 3, z: 1) > 0 &&
-            getLastItemInTheBoard(y: 3, z: 2) > 0 &&
-            getLastItemInTheBoard(y: 3, z: 3) > 0 ||
-        getLastItemInTheBoard(y: 0, z: 0) > 0 &&
-            getLastItemInTheBoard(y: 1, z: 1) > 0 &&
-            getLastItemInTheBoard(y: 2, z: 2) > 0 &&
-            getLastItemInTheBoard(y: 3, z: 3) > 0 ||
-        getLastItemInTheBoard(y: 0, z: 3) > 0 &&
-            getLastItemInTheBoard(y: 1, z: 2) > 0 &&
-            getLastItemInTheBoard(y: 2, z: 1) > 0 &&
-            getLastItemInTheBoard(y: 3, z: 0) > 0) {
-      winner = 1;
+// @greybeast
+// refactoring the next two methods
+  void playerWins(int player) {
+    bool checker(plr, x) => plr == 1 ? x > 0 : x < 0;
+    if (checker(player, getLastItemInTheBoard(y: 0, z: 0)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 0)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 0)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 0)) ||
+        checker(player, getLastItemInTheBoard(y: 0, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 1)) ||
+        checker(player, getLastItemInTheBoard(y: 0, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 2)) ||
+        checker(player, getLastItemInTheBoard(y: 0, z: 3)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 3)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 3)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 3)) ||
+        checker(player, getLastItemInTheBoard(y: 0, z: 0)) &&
+            checker(player, getLastItemInTheBoard(y: 0, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 0, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 0, z: 3)) ||
+        checker(player, getLastItemInTheBoard(y: 1, z: 0)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 3)) ||
+        checker(player, getLastItemInTheBoard(y: 2, z: 0)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 3)) ||
+        checker(player, getLastItemInTheBoard(y: 3, z: 0)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 3)) ||
+        checker(player, getLastItemInTheBoard(y: 0, z: 0)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 3)) ||
+        checker(player, getLastItemInTheBoard(y: 0, z: 3)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 0))) {
+      winner = player;
       currentScreenIndex = 2;
-      emit(Player1Win());
-    }
-  }
-
-  void player2wins() {
-    if (getLastItemInTheBoard(y: 0, z: 0) < 0 &&
-            getLastItemInTheBoard(y: 1, z: 0) < 0 &&
-            getLastItemInTheBoard(y: 2, z: 0) < 0 &&
-            getLastItemInTheBoard(y: 3, z: 0) < 0 ||
-        getLastItemInTheBoard(y: 0, z: 1) < 0 &&
-            getLastItemInTheBoard(y: 1, z: 1) < 0 &&
-            getLastItemInTheBoard(y: 2, z: 1) < 0 &&
-            getLastItemInTheBoard(y: 3, z: 1) < 0 ||
-        getLastItemInTheBoard(y: 0, z: 2) < 0 &&
-            getLastItemInTheBoard(y: 1, z: 2) < 0 &&
-            getLastItemInTheBoard(y: 2, z: 2) < 0 &&
-            getLastItemInTheBoard(y: 3, z: 2) < 0 ||
-        getLastItemInTheBoard(y: 0, z: 3) < 0 &&
-            getLastItemInTheBoard(y: 1, z: 3) < 0 &&
-            getLastItemInTheBoard(y: 2, z: 3) < 0 &&
-            getLastItemInTheBoard(y: 3, z: 3) < 0 ||
-        getLastItemInTheBoard(y: 0, z: 0) < 0 &&
-            getLastItemInTheBoard(y: 0, z: 1) < 0 &&
-            getLastItemInTheBoard(y: 0, z: 2) < 0 &&
-            getLastItemInTheBoard(y: 0, z: 3) < 0 ||
-        getLastItemInTheBoard(y: 1, z: 0) < 0 &&
-            getLastItemInTheBoard(y: 1, z: 1) < 0 &&
-            getLastItemInTheBoard(y: 1, z: 2) < 0 &&
-            getLastItemInTheBoard(y: 1, z: 3) < 0 ||
-        getLastItemInTheBoard(y: 2, z: 0) < 0 &&
-            getLastItemInTheBoard(y: 2, z: 1) < 0 &&
-            getLastItemInTheBoard(y: 2, z: 2) < 0 &&
-            getLastItemInTheBoard(y: 2, z: 3) < 0 ||
-        getLastItemInTheBoard(y: 3, z: 0) < 0 &&
-            getLastItemInTheBoard(y: 3, z: 1) < 0 &&
-            getLastItemInTheBoard(y: 3, z: 2) < 0 &&
-            getLastItemInTheBoard(y: 3, z: 3) < 0 ||
-        getLastItemInTheBoard(y: 0, z: 0) < 0 &&
-            getLastItemInTheBoard(y: 1, z: 1) < 0 &&
-            getLastItemInTheBoard(y: 2, z: 2) < 0 &&
-            getLastItemInTheBoard(y: 3, z: 3) < 0 ||
-        getLastItemInTheBoard(y: 0, z: 3) < 0 &&
-            getLastItemInTheBoard(y: 1, z: 2) < 0 &&
-            getLastItemInTheBoard(y: 2, z: 1) < 0 &&
-            getLastItemInTheBoard(y: 3, z: 0) < 0) {
-      winner = 2;
-      currentScreenIndex = 2;
-      emit(Player2Win());
+      emit(player == 1 ? Player1Win() : Player2Win());
     }
   }
 
@@ -529,8 +490,7 @@ class GameCubit extends Cubit<GameStates> {
     player2Type = value;
   }
 
-
-  void restart(){
+  void restart() {
     whosturn = 1;
     aPieceIsToushed = 0;
     currentScreenIndex = 0;
@@ -621,6 +581,7 @@ class GameCubit extends Cubit<GameStates> {
     ];
     emit(Restart());
   }
+
 //////////////////// useless functions for now at least
   void movePieceFromTo({
     required MyPoint start,
@@ -1298,5 +1259,99 @@ class GameCubit extends Cubit<GameStates> {
     board[point.x][point.y][point.z].add(num);
   }
 }
+
+  // void pplayer1wins() {
+  //   if (getLastItemInTheBoard(y: 0, z: 0) > 0 &&
+  //           getLastItemInTheBoard(y: 1, z: 0) > 0 &&
+  //           getLastItemInTheBoard(y: 2, z: 0) > 0 &&
+  //           getLastItemInTheBoard(y: 3, z: 0) > 0 ||
+  //       getLastItemInTheBoard(y: 0, z: 1) > 0 &&
+  //           getLastItemInTheBoard(y: 1, z: 1) > 0 &&
+  //           getLastItemInTheBoard(y: 2, z: 1) > 0 &&
+  //           getLastItemInTheBoard(y: 3, z: 1) > 0 ||
+  //       getLastItemInTheBoard(y: 0, z: 2) > 0 &&
+  //           getLastItemInTheBoard(y: 1, z: 2) > 0 &&
+  //           getLastItemInTheBoard(y: 2, z: 2) > 0 &&
+  //           getLastItemInTheBoard(y: 3, z: 2) > 0 ||
+  //       getLastItemInTheBoard(y: 0, z: 3) > 0 &&
+  //           getLastItemInTheBoard(y: 1, z: 3) > 0 &&
+  //           getLastItemInTheBoard(y: 2, z: 3) > 0 &&
+  //           getLastItemInTheBoard(y: 3, z: 3) > 0 ||
+  //       getLastItemInTheBoard(y: 0, z: 0) > 0 &&
+  //           getLastItemInTheBoard(y: 0, z: 1) > 0 &&
+  //           getLastItemInTheBoard(y: 0, z: 2) > 0 &&
+  //           getLastItemInTheBoard(y: 0, z: 3) > 0 ||
+  //       getLastItemInTheBoard(y: 1, z: 0) > 0 &&
+  //           getLastItemInTheBoard(y: 1, z: 1) > 0 &&
+  //           getLastItemInTheBoard(y: 1, z: 2) > 0 &&
+  //           getLastItemInTheBoard(y: 1, z: 3) > 0 ||
+  //       getLastItemInTheBoard(y: 2, z: 0) > 0 &&
+  //           getLastItemInTheBoard(y: 2, z: 1) > 0 &&
+  //           getLastItemInTheBoard(y: 2, z: 2) > 0 &&
+  //           getLastItemInTheBoard(y: 2, z: 3) > 0 ||
+  //       getLastItemInTheBoard(y: 3, z: 0) > 0 &&
+  //           getLastItemInTheBoard(y: 3, z: 1) > 0 &&
+  //           getLastItemInTheBoard(y: 3, z: 2) > 0 &&
+  //           getLastItemInTheBoard(y: 3, z: 3) > 0 ||
+  //       getLastItemInTheBoard(y: 0, z: 0) > 0 &&
+  //           getLastItemInTheBoard(y: 1, z: 1) > 0 &&
+  //           getLastItemInTheBoard(y: 2, z: 2) > 0 &&
+  //           getLastItemInTheBoard(y: 3, z: 3) > 0 ||
+  //       getLastItemInTheBoard(y: 0, z: 3) > 0 &&
+  //           getLastItemInTheBoard(y: 1, z: 2) > 0 &&
+  //           getLastItemInTheBoard(y: 2, z: 1) > 0 &&
+  //           getLastItemInTheBoard(y: 3, z: 0) > 0) {
+  //     winner = 1;
+  //     currentScreenIndex = 2;
+  //     emit(Player1Win());
+  //   }
+  // }
+
+  // void player2wins() {
+  //   if (getLastItemInTheBoard(y: 0, z: 0) < 0 &&
+  //           getLastItemInTheBoard(y: 1, z: 0) < 0 &&
+  //           getLastItemInTheBoard(y: 2, z: 0) < 0 &&
+  //           getLastItemInTheBoard(y: 3, z: 0) < 0 ||
+  //       getLastItemInTheBoard(y: 0, z: 1) < 0 &&
+  //           getLastItemInTheBoard(y: 1, z: 1) < 0 &&
+  //           getLastItemInTheBoard(y: 2, z: 1) < 0 &&
+  //           getLastItemInTheBoard(y: 3, z: 1) < 0 ||
+  //       getLastItemInTheBoard(y: 0, z: 2) < 0 &&
+  //           getLastItemInTheBoard(y: 1, z: 2) < 0 &&
+  //           getLastItemInTheBoard(y: 2, z: 2) < 0 &&
+  //           getLastItemInTheBoard(y: 3, z: 2) < 0 ||
+  //       getLastItemInTheBoard(y: 0, z: 3) < 0 &&
+  //           getLastItemInTheBoard(y: 1, z: 3) < 0 &&
+  //           getLastItemInTheBoard(y: 2, z: 3) < 0 &&
+  //           getLastItemInTheBoard(y: 3, z: 3) < 0 ||
+  //       getLastItemInTheBoard(y: 0, z: 0) < 0 &&
+  //           getLastItemInTheBoard(y: 0, z: 1) < 0 &&
+  //           getLastItemInTheBoard(y: 0, z: 2) < 0 &&
+  //           getLastItemInTheBoard(y: 0, z: 3) < 0 ||
+  //       getLastItemInTheBoard(y: 1, z: 0) < 0 &&
+  //           getLastItemInTheBoard(y: 1, z: 1) < 0 &&
+  //           getLastItemInTheBoard(y: 1, z: 2) < 0 &&
+  //           getLastItemInTheBoard(y: 1, z: 3) < 0 ||
+  //       getLastItemInTheBoard(y: 2, z: 0) < 0 &&
+  //           getLastItemInTheBoard(y: 2, z: 1) < 0 &&
+  //           getLastItemInTheBoard(y: 2, z: 2) < 0 &&
+  //           getLastItemInTheBoard(y: 2, z: 3) < 0 ||
+  //       getLastItemInTheBoard(y: 3, z: 0) < 0 &&
+  //           getLastItemInTheBoard(y: 3, z: 1) < 0 &&
+  //           getLastItemInTheBoard(y: 3, z: 2) < 0 &&
+  //           getLastItemInTheBoard(y: 3, z: 3) < 0 ||
+  //       getLastItemInTheBoard(y: 0, z: 0) < 0 &&
+  //           getLastItemInTheBoard(y: 1, z: 1) < 0 &&
+  //           getLastItemInTheBoard(y: 2, z: 2) < 0 &&
+  //           getLastItemInTheBoard(y: 3, z: 3) < 0 ||
+  //       getLastItemInTheBoard(y: 0, z: 3) < 0 &&
+  //           getLastItemInTheBoard(y: 1, z: 2) < 0 &&
+  //           getLastItemInTheBoard(y: 2, z: 1) < 0 &&
+  //           getLastItemInTheBoard(y: 3, z: 0) < 0) {
+  //     winner = 2;
+  //     currentScreenIndex = 2;
+  //     emit(Player2Win());
+  //   }
+  // }
 
 *  */

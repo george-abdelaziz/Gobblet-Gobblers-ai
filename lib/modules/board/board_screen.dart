@@ -5,30 +5,27 @@ import '../../layout/gobblet/cubit/cubit.dart';
 import '../../layout/gobblet/cubit/states.dart';
 
 class BoardScreen extends StatelessWidget {
+  const BoardScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<GameCubit, GameStates>(
       listener: (context, state) {},
       builder: (context, state) {
-        var cubit = GameCubit.get(context);
+        final cubit = GameCubit.get(context);
+        //@greybeast
         return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: SingleChildScrollView(
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  player1(
-                    context,
-                  ),
-                  board(
-                    context,
-                  ),
-                  player2(
-                    context,
-                  ),
-                ],
-              ),
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                player(context, 1),
+                board(context),
+                player(context, 2),
+
+                // player1(context, 2),
+                // player2(context),
+              ],
             ),
           ),
         );

@@ -51,7 +51,7 @@ class AlphaBeta extends Agent {
 
   @override
   Map calcBestMove(Map gamestate, int plr) {
-    double score = 0;
+    double score = -double.infinity;
     Map bestMove = {};
     int nextplr = plr == 1 ? 2 : 1;
     List<dynamic> candidateMoves = genMoves(plr, gamestate);
@@ -59,8 +59,8 @@ class AlphaBeta extends Agent {
     for (var i = 0; i < candidateMoves.length; i++) {
       var move = candidateMoves[i];
       var newGameState = applyMove(gamestate, plr, move);
-      var v = alphabeta(newGameState, false, nextplr, Config.alphaBetaDepth,
-          double.negativeInfinity, double.infinity);
+      var v = alphabeta(newGameState, true, nextplr, Config.alphaBetaDepth,
+          -double.infinity, double.infinity);
       if (v > score) {
         score = v;
         bestMove = move;
