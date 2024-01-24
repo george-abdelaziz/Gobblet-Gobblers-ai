@@ -28,6 +28,7 @@ class MyPoint {
   }
 
   double getLastNumber({required List<List<List<List<double>>>> arr}) {
+    if(arr[x][y][z].length==0)return 0;
     return arr[x][y][z].last;
   }
 
