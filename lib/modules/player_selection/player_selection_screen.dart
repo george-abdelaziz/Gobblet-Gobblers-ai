@@ -58,15 +58,15 @@ class PlayerSelectionScreen extends StatelessWidget {
                   visible: cubit.playerType1 != PlayerType.human,
                   child: DropdownMenu(
                     dropdownMenuEntries: const [
-                      DropdownMenuEntry<String>(label: 'Easy', value: '1'),
-                      DropdownMenuEntry<String>(label: 'Normal', value: '2'),
-                      DropdownMenuEntry<String>(label: 'Difficult', value: '3'),
+                      DropdownMenuEntry<String>(label: 'Easy', value: 'Easy'),
+                      DropdownMenuEntry<String>(label: 'Normal', value: 'Normal'),
+                      DropdownMenuEntry<String>(label: 'Difficult', value: 'Difficult'),
                     ],
                     hintText: 'Player 1',
                     onSelected: (String? s) {
-                      if(s=='1'){cubit.difficultyLevelForAI1 = 2;}
-                      else if(s=='2'){cubit.difficultyLevelForAI1 = 3;}
-                      else if(s=='3'){cubit.difficultyLevelForAI1 = 4;}
+                      if(s=='Easy'){cubit.difficultyLevelForAI1 = 2;}
+                      else if(s=='Normal'){cubit.difficultyLevelForAI1 = 3;}
+                      else if(s=='Difficult'){cubit.difficultyLevelForAI1 = 4;}
                       cubit.level1=Selected.selected;
                       cubit.emit(Player1DifficultySelected());
                     },
@@ -105,15 +105,15 @@ class PlayerSelectionScreen extends StatelessWidget {
                   visible: cubit.playerType2 != PlayerType.human,
                   child: DropdownMenu(
                     dropdownMenuEntries: const [
-                      DropdownMenuEntry<String>(label: 'Easy', value: '1'),
-                      DropdownMenuEntry<String>(label: 'Normal', value: '2'),
-                      DropdownMenuEntry<String>(label: 'Difficult', value: '3'),
+                      DropdownMenuEntry<String>(label: 'Easy', value: 'Easy'),
+                      DropdownMenuEntry<String>(label: 'Normal', value: 'Normal'),
+                      DropdownMenuEntry<String>(label: 'Difficult', value: 'Difficult'),
                     ],
-                    hintText: 'Player 1',
+                    hintText: 'Player 2',
                     onSelected: (String? s) {
-                      if(s=='1'){cubit.difficultyLevelForAI2 = 2;}
-                      else if(s=='2'){cubit.difficultyLevelForAI2 = 3;}
-                      else if(s=='3'){cubit.difficultyLevelForAI2 = 4;}
+                      if(s=='Easy'){cubit.difficultyLevelForAI2 = 2;}
+                      else if(s=='Normal'){cubit.difficultyLevelForAI2 = 3;}
+                      else if(s=='Difficult'){cubit.difficultyLevelForAI2 = 4;}
                       cubit.level2=Selected.selected;
                       cubit.emit(Player2DifficultySelected());
                     },

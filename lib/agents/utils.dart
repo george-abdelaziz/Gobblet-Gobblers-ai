@@ -82,7 +82,7 @@ List genMoves(int player, gamestate) {
       }
     }
   }
-
+  // candidateMoves.shuffle();
   return candidateMoves;
 }
 

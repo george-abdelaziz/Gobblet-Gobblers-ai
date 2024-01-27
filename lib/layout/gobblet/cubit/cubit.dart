@@ -56,12 +56,16 @@ class GameCubit extends Cubit<GameStates> {
   }
 
   Future<void> startup() async {
+    print('${playerType1}');
+    print('${playerType2}');
+    print('${difficultyLevelForAI1}');
+    print('${difficultyLevelForAI2}');
     if(playerType1==PlayerType.minmax){ai1=MiniMax(difficultyLevelForAI1);}
     else if(playerType1==PlayerType.alpa){ai1=AlphaBeta(difficultyLevelForAI1);}
     else if(playerType1==PlayerType.iter){ai1=MiniMax(difficultyLevelForAI1);}
-    if(playerType2==PlayerType.minmax){ai1=MiniMax(difficultyLevelForAI2);}
-    else if(playerType2==PlayerType.alpa){ai1=AlphaBeta(difficultyLevelForAI2);}
-    else if(playerType2==PlayerType.iter){ai1=MiniMax(difficultyLevelForAI2);}
+    if(playerType2==PlayerType.minmax){ai2=MiniMax(difficultyLevelForAI2);}
+    else if(playerType2==PlayerType.alpa){ai2=AlphaBeta(difficultyLevelForAI2);}
+    else if(playerType2==PlayerType.iter){ai2=MiniMax(difficultyLevelForAI2);}
     await Future.delayed(const Duration(milliseconds: 50));
     if (playerType1 != PlayerType.human && playerType2 != PlayerType.human) {
       aiai=true;
@@ -336,7 +340,7 @@ class GameCubit extends Cubit<GameStates> {
             checker(player, getLastItemInTheBoard(y: 2, z: 1)) &&
             checker(player, getLastItemInTheBoard(y: 3, z: 0))) {
       winner = player;
-      currentScreenIndex = 2;
+      currentScreenIndex = 1;
       aiai=false;
       emit(GameFinished());
     }

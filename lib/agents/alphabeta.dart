@@ -65,7 +65,7 @@ class AlphaBeta extends Agent {
           alphaBeta(newGameState, true, nextPlr, super.depth - 1, alpha, beta);
       move["score"] = v;
 
-      if (v <= score) {
+      if (v < score) {
         score = v;
         bestMove = move;
       }
