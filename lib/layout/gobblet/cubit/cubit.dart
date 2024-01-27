@@ -20,6 +20,7 @@ class GameCubit extends Cubit<GameStates> {
     return BlocProvider.of(context);
   }
 
+  bool aiai=false;
   int whosturn = 1;
   int aPieceIsToushed = 0;
   int currentScreenIndex = 0;
@@ -36,8 +37,8 @@ class GameCubit extends Cubit<GameStates> {
     const BoardScreen(),
     const WinScreen(),
   ];
-  void playerSelectionDone() {
-    // if(PlayerType.)
+
+  Future<void> playerSelectionDone() async {
     if (player1Type != '' && player2Type != '!') {
       if (player1Type != '0' && difficultyLevelForAI1 == '') {
         return;
@@ -48,11 +49,15 @@ class GameCubit extends Cubit<GameStates> {
       currentScreenIndex = 1;
       //start up code
       emit(GameStarted());
+      await Future.delayed(const Duration(milliseconds: 250));
       if (player1Type != '0' && player2Type != '0') {
+        aiai=true;
         whosturn = 3;
-        while (true) {
+        while (aiai) {
           ai();
+          await Future.delayed(const Duration(milliseconds: 250));
           ai();
+          await Future.delayed(const Duration(milliseconds: 250));
         }
       } else if (player1Type != '0') {
         whosturn = 3;
@@ -65,9 +70,10 @@ class GameCubit extends Cubit<GameStates> {
     }
   }
 
-  void ai() {
+  Future<void> ai() async {
     emit(AI1Played());
     logger.d('message');
+
     // add depth  ya georg
     Agent player = MiniMax(3);
     var x = getGameState(bti(board[0]), ctd(board[1][0]), ctd(board[2][0]));
@@ -88,6 +94,8 @@ class GameCubit extends Cubit<GameStates> {
   }
 
   void changePlayer() {
+    from.nagOne();
+    to.nagOne();
     if (whosturn == 1) {
       if (player2Type == '0') {
         whosturn = 2;
@@ -113,8 +121,7 @@ class GameCubit extends Cubit<GameStates> {
         whosturn = 3;
       }
     } else {
-      kprint(
-          'qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq');
+      logger.e('change player');
     }
     aPieceIsToushed = 0;
   }
@@ -127,7 +134,7 @@ class GameCubit extends Cubit<GameStates> {
     } else {}
   }
 
-  void player1Turn({required MyPoint point}) {
+  Future<void> player1Turn({required MyPoint point}) async {
     if (aPieceIsToushed == 0) {
       if (getLastNumber(point: point) <= 0) {
         return;
@@ -150,6 +157,7 @@ class GameCubit extends Cubit<GameStates> {
         changePlayer();
         emit(Player2Turn());
         if (player2Type != '0') {
+          await Future.delayed(const Duration(milliseconds: 250));
           ai();
         }
       } else {
@@ -160,7 +168,7 @@ class GameCubit extends Cubit<GameStates> {
     }
   }
 
-  void player2Turn({required MyPoint point}) {
+  Future<void> player2Turn({required MyPoint point}) async {
     if (aPieceIsToushed == 0) {
       if (getLastNumber(point: point) >= 0) {
         return;
@@ -181,8 +189,11 @@ class GameCubit extends Cubit<GameStates> {
         // player1wins();
         // player2wins();
         changePlayer();
+        from.nagOne();
+        to.nagOne();
         emit(Player1Turn());
         if (player1Type != '0') {
+          await Future.delayed(const Duration(milliseconds: 250));
           ai();
         }
       } else {
@@ -442,6 +453,7 @@ class GameCubit extends Cubit<GameStates> {
   ///////////////////////// useful
 
   void restart() {
+    aiai=false;
     whosturn = 1;
     aPieceIsToushed = 0;
     currentScreenIndex = 0;
