@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:ai_project/models/my_classes.dart';
+import 'package:ai_project/modules/adapter.dart';
+import 'package:logger/logger.dart';
 
 Map<String, dynamic> applyMove(gamestate, player, move) {
   Map<String, dynamic> newGameState =
@@ -160,7 +162,9 @@ bool validateMove(Map move, int player, Map<String, dynamic> gamestate) {
     default:
       s = MyPoint(x: player, y: move['fromCol'], z: move['fromRow']);
   }
-  return isValidMove(start: s, end: e, board: gamestate['board']);
+  b = Adapter().b2f(gamestate, b);
+  Logger().d(b);
+  return isValidMove(start: s, end: e, board: b);
   // final board = gamestate["board"];
   // final p = player == 1 ? "p1" : "p2";
   // // check if is landing on a blank square
@@ -289,3 +293,82 @@ bool isValidMove(
   }
   return true;
 }
+
+List<List<List<List<double>>>> b = [
+  [
+    [
+      [0],
+      [0],
+      [0],
+      [0],
+    ],
+    [
+      [0],
+      [0],
+      [0],
+      [0],
+    ],
+    [
+      [0],
+      [0],
+      [0],
+      [0],
+    ],
+    [
+      [0],
+      [0],
+      [0],
+      [0],
+    ],
+  ],
+  [
+    [
+      [
+        0,
+        1,
+        2,
+        3,
+        4,
+      ],
+      [
+        0,
+        1,
+        2,
+        3,
+        4,
+      ],
+      [
+        0,
+        1,
+        2,
+        3,
+        4,
+      ],
+    ],
+  ],
+  [
+    [
+      [
+        0,
+        -1,
+        -2,
+        -3,
+        -4,
+      ],
+      [
+        0,
+        -1,
+        -2,
+        -3,
+        -4,
+      ],
+      [
+        0,
+        -1,
+        -2,
+        -3,
+        -4,
+      ],
+    ],
+  ],
+];

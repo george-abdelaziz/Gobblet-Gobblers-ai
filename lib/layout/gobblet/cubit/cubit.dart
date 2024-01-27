@@ -358,7 +358,7 @@ class GameCubit extends Cubit<GameStates> {
   }
 
   double getLastNumber({required MyPoint point}) {
-    if (board[point.x][point.y][point.z].length == 0) return 0;
+    if (board[point.x][point.y][point.z].isEmpty) return 0;
     return board[point.x][point.y][point.z].last;
   }
 
@@ -541,7 +541,7 @@ class GameCubit extends Cubit<GameStates> {
   ];
   //board[which board][vertical height of the board][horizontal width of the board][n/height of the stack]=double;
 
-  //////////////////// useless functions for now at least
+  // useless functions for now at least
   void movePieceFromTo({
     required MyPoint start,
     required MyPoint end,
