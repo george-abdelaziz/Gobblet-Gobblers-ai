@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../cubit/cubit.dart';
+import '../cubit/game_cubit.dart';
 import '/models/my_classes.dart';
 
 Widget piece({required BuildContext context, required MyPoint point}) {

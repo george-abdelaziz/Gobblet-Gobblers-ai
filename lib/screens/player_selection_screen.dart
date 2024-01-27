@@ -1,18 +1,24 @@
+import 'package:ai_project/agents/utils.dart';
+import 'package:ai_project/cubit/player_selection_cubit.dart';
+import 'package:ai_project/cubit/player_selection_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../cubit/cubit.dart';
-import '../../cubit/states.dart';
+import '../cubit/game_cubit.dart';
+import '../cubit/game_states.dart';
 
 class PlayerSelectionScreen extends StatelessWidget {
   const PlayerSelectionScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<GameCubit, GameState>(
-      listener: (context, state) {},
+    return BlocConsumer<PlayerSlectionCubit, PlayerSelectionState>(
+      listener: (context, state) {
+        kprint(state);
+      },
       builder: (context, state) {
         var cubit = GameCubit.get(context);
+        var psCubit = BlocProvider.of<PlayerSlectionCubit>(context);
         return SingleChildScrollView(
           child: Center(
             child: Column(
@@ -24,9 +30,7 @@ class PlayerSelectionScreen extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
+                const SizedBox(height: 20),
                 DropdownMenu(
                   dropdownMenuEntries: const [
                     DropdownMenuEntry<String>(label: 'Human', value: '0'),
@@ -39,13 +43,11 @@ class PlayerSelectionScreen extends StatelessWidget {
                   ],
                   hintText: 'Player 1',
                   onSelected: (String? value) {
-                    cubit.player1Type = value!;
-                    cubit.emit(Player1Selected());
+                    // cubit.player1Type = value!;
+                    // cubit.emit(Player1Selected());
                   },
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
+                const SizedBox(height: 20),
                 Visibility(
                   maintainSize: false,
                   maintainAnimation: true,
@@ -55,7 +57,7 @@ class PlayerSelectionScreen extends StatelessWidget {
                     dropdownMenuEntries: const [
                       DropdownMenuEntry<String>(label: 'Easy', value: '1'),
                       DropdownMenuEntry<String>(label: 'Medium', value: '2'),
-                      DropdownMenuEntry<String>(label: 'Hard', value: '2'),
+                      DropdownMenuEntry<String>(label: 'Hard', value: '3'),
                     ],
                     hintText: 'Player 1',
                     onSelected: (String? value) {
@@ -79,8 +81,8 @@ class PlayerSelectionScreen extends StatelessWidget {
                   ],
                   hintText: 'Player 2',
                   onSelected: (String? value) {
-                    cubit.player2Type = value!;
-                    cubit.emit(Player2Selected());
+                    // cubit.player2Type = value!;
+                    // cubit.emit(Player2Selected());
                   },
                 ),
                 const SizedBox(
@@ -95,7 +97,7 @@ class PlayerSelectionScreen extends StatelessWidget {
                     dropdownMenuEntries: const [
                       DropdownMenuEntry<String>(label: 'Easy', value: '1'),
                       DropdownMenuEntry<String>(label: 'Medium', value: '2'),
-                      DropdownMenuEntry<String>(label: 'Hard', value: '2'),
+                      DropdownMenuEntry<String>(label: 'Hard', value: '3'),
                     ],
                     hintText: 'Player 1',
                     onSelected: (String? value) {

@@ -1,10 +1,10 @@
-import 'package:ai_project/cubit/cubit.dart';
+import 'package:ai_project/cubit/game_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '/shared/bloc_observer.dart';
 import 'package:flutter/material.dart';
 
-import 'layout/gobblet/gobblet.dart';
+import 'screens/home_screen.dart';
 
 void main() {
   Bloc.observer = MyBlocObserver();
@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
       create: (context) => GameCubit(),
       child: const MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: Gobblet(),
+        home: HomeScreen(),
       ),
     );
   }

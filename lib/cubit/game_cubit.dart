@@ -1,3 +1,4 @@
+import 'package:ai_project/agents/alphabeta.dart';
 import 'package:ai_project/models/adapter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,11 +7,11 @@ import 'package:logger/logger.dart';
 import '../agents/minimax.dart';
 import '/agents/agent.dart';
 import '/agents/utils.dart';
-import '/cubit/states.dart';
+import 'game_states.dart';
 import '/models/my_classes.dart';
-import '/modules/board/board_screen.dart';
-import '/modules/player_selection/player_selection_screen.dart';
-import '/modules/win/win.dart';
+import '../screens/board_screen.dart';
+import '../screens/player_selection_screen.dart';
+import '../screens/win.dart';
 
 class GameCubit extends Cubit<GameState> {
   GameCubit() : super(GameInitialState());
@@ -22,8 +23,11 @@ class GameCubit extends Cubit<GameState> {
 
   int whosturn = 1;
   int aPieceIsToushed = 0;
-  int currentScreenIndex = 0;
   int winner = 0;
+  int screenIndex = 0;
+
+  Agent? player1;
+  Agent? player2;
   String player1Type = '';
   String player2Type = '';
   String difficultyLevelForAI1 = '';
@@ -33,10 +37,11 @@ class GameCubit extends Cubit<GameState> {
   MyPoint to = MyPoint()..nagOne();
 
   final Logger logger = Logger();
+  final Adapter adapter = Adapter();
 
   final List<Widget> screens = [
     const PlayerSelectionScreen(),
-    const BoardScreen(),
+    const GameScreen(),
     const WinScreen(),
   ];
 
@@ -48,14 +53,14 @@ class GameCubit extends Cubit<GameState> {
       if (player2Type != '0' && difficultyLevelForAI2 == '') {
         return;
       }
-      currentScreenIndex = 1;
+      screenIndex = 1;
       //start up code
       emit(GameStarted());
       if (player1Type != '0' && player2Type != '0') {
         whosturn = 3;
-        while (true) {
+        while (isWinningPos(adapter.f2b(board)['board']) == 0) {
           ai();
-          ai();
+          // ai();
         }
       } else if (player1Type != '0') {
         whosturn = 3;
@@ -71,12 +76,10 @@ class GameCubit extends Cubit<GameState> {
   void ai() {
     emit(AI1Played());
 
-    Agent player = MiniMax(3);
-
-    var x = Adapter().f2b(board);
-    var move = player.calcBestMove(x, whosturn - 2);
+    var x = adapter.f2b(board);
+    var move = player1!.calcBestMove(x, whosturn - 2);
     var y = applyMove(x, whosturn - 2, move);
-    board = Adapter().b2f(y, board);
+    board = adapter.b2f(y, board);
 
     Logger().i(move);
     changePlayer();
@@ -284,12 +287,40 @@ class GameCubit extends Cubit<GameState> {
     player2Type = value;
   }
 
-  ///////
+  // greyBeast defines:
+  Agent _createAgent(String agentType) {
+    switch (agentType) {
+      case 'MiniMax':
+        return MiniMax(3);
+      case 'AlphaBeta':
+        return AlphaBeta(3);
+      case 'AlphaBetaPruning':
+        // TODO: not implemented
+        throw Exception("not implemented");
+      // return AlphaBetaPruning(3);
+      default:
+        throw Exception('Invalid agent type: $agentType');
+    }
+  }
+
+  void setAgent(String agentType, int player) {
+    switch (player) {
+      case 1:
+        player1 = _createAgent(agentType);
+        break;
+      case 2:
+        player2 = _createAgent(agentType);
+        break;
+      default:
+        throw Exception('Invalid player: $player');
+    }
+  }
+
   // useful
   void restart() {
     whosturn = 1;
     aPieceIsToushed = 0;
-    currentScreenIndex = 0;
+    screenIndex = 0;
     winner = 0;
     player1Type = '';
     player2Type = '';
@@ -422,7 +453,7 @@ class GameCubit extends Cubit<GameState> {
             checker(player, getLastItemInTheBoard(y: 2, z: 1)) &&
             checker(player, getLastItemInTheBoard(y: 3, z: 0))) {
       winner = player;
-      currentScreenIndex = 2;
+      screenIndex = 2;
       emit(player == 1 ? Player1Win() : Player2Win());
     }
   }

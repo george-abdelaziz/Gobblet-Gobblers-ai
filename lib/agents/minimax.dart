@@ -1,5 +1,3 @@
-import 'package:logger/logger.dart';
-
 import 'agent.dart';
 import 'config.dart';
 import 'evaluate.dart';
@@ -70,7 +68,6 @@ class MiniMax extends Agent {
         bestMove = move;
       }
     }
-    Logger().d(bestMove);
     return bestMove;
   }
 }

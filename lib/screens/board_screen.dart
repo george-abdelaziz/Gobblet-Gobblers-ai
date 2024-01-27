@@ -2,11 +2,11 @@ import 'package:ai_project/shared/components.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../cubit/cubit.dart';
-import '../../cubit/states.dart';
+import '../cubit/game_cubit.dart';
+import '../cubit/game_states.dart';
 
-class BoardScreen extends StatelessWidget {
-  const BoardScreen({super.key});
+class GameScreen extends StatelessWidget {
+  const GameScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

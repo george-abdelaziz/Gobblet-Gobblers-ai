@@ -1,24 +1,25 @@
+import 'package:ai_project/agents/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:logger/logger.dart';
 
-import '../../cubit/cubit.dart';
-import '../../cubit/states.dart';
+import '../cubit/game_cubit.dart';
+import '../cubit/game_states.dart';
 
-class Gobblet extends StatelessWidget {
-  const Gobblet({super.key});
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<GameCubit, GameState>(
       listener: (BuildContext context, GameState state) {
-        Logger().i(state);
+        kprint(state);
       },
       builder: (BuildContext context, GameState state) {
-        var cubit = GameCubit.get(context);
+        final cubit = BlocProvider.of<GameCubit>(context);
+
         return Scaffold(
           appBar: AppBar(title: const Text('Gobblet')),
-          body: cubit.screens[cubit.currentScreenIndex],
+          body: cubit.screens[cubit.screenIndex],
         );
       },
     );
