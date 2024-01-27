@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:ai_project/models/my_classes.dart';
+
 Map<String, dynamic> applyMove(gamestate, player, move) {
   Map<String, dynamic> newGameState =
       getGameState(gamestate["board"], gamestate["p1"], gamestate["p2"]);
@@ -144,20 +146,43 @@ Map<String, List> getGameState(
 }
 
 bool validateMove(Map move, int player, Map<String, dynamic> gamestate) {
-  final board = gamestate["board"];
-  final p = player == 1 ? "p1" : "p2";
-  // check if is landing on a blank square
-  if (board[move["toRow"]][move["toCol"]].last == 0) return true;
-  // in case of a filled square:
-  //  - check if it's greater
-  //  - if it is greater check if the square have two neighbours
-  int toBeMoved = move["type"] == "play"
-      ? gamestate[p][move["index"]].last
-      : board[move["fromRow"]][move["fromCol"]].last;
-  int toBeCovered = board[move["toRow"]][move["toCol"]].last;
-  if (toBeCovered.abs() >= toBeMoved.abs()) return false;
-  //TODO: handle the neighbours case
-  return true;
+  // board n, col , row
+  // -ve  2
+  // +ve 1
+  //     int toBeMoved = gamestate[p][move["index"]].last;
+  // int toBeCovered = board[move["toRow"]][move["toCol"]].last;
+  MyPoint s;
+  MyPoint e = MyPoint(x: 0, y: move['toCol'], z: move['toRow']);
+  switch (move['type']) {
+    case 'play':
+      s = MyPoint(x: player, y: 0, z: move['index']);
+      break;
+    default:
+      s = MyPoint(x: player, y: move['fromCol'], z: move['fromRow']);
+  }
+  return isValidMove(start: s, end: e, board: gamestate['board']);
+  // final board = gamestate["board"];
+  // final p = player == 1 ? "p1" : "p2";
+  // // check if is landing on a blank square
+  // if (board[move["toRow"]][move["toCol"]].last == 0) return true;
+  // // in case of a filled square:
+  // //  - check if it's greater
+  // //  - if it is greater check if the square have two neighbours
+  // int toBeCovered = board[move["toRow"]][move["toCol"]].last;
+  // switch (move["type"]) {
+  //   case "play":
+  //     int toBeMoved = gamestate[p][move["index"]].last;
+  //     if (toBeCovered.abs() >= toBeMoved.abs()) return false;
+  //     // check neighboors
+  //     int r = move['toRow'];
+  //     int c = move['toCol'];
+  //   case "move":
+  //     int toBeMoved = board[move["fromRow"]][move["fromCol"]].last;
+  //     if (toBeCovered.abs() >= toBeMoved.abs()) return false;
+  //   default:
+  //     break;
+  // }
+  // return true;
 }
 
 List<List> copyPlayer(List<List> original) {
@@ -191,4 +216,76 @@ printToFile(board) async {
     }
     await file.writeAsString("\n", mode: FileMode.append);
   }
+}
+
+bool isValidMove(
+    {required MyPoint start, required MyPoint end, required board}) {
+  int row = 0;
+  int col = 0;
+  int dia = 0;
+  if (end.x != 0 ||
+      abs(start.getLastNumber(arr: board)) <=
+          abs(end.getLastNumber(arr: board))) {
+    return false;
+  }
+  if (start.x == 1 && end.getLastNumber(arr: board) < 0) {
+    for (int i = 0; i < 4; i++) {
+      if (board[0][end.y][i].last < 0) {
+        row++;
+      }
+    }
+    for (int i = 0; i < 4; i++) {
+      if (board[0][i][end.z].last < 0) {
+        col++;
+      }
+    }
+    if (end.y == end.z) {
+      for (int i = 0; i < 4; i++) {
+        if (board[0][i][i].last < 0) {
+          dia++;
+        }
+      }
+    } else if (end.y + end.z == 3) {
+      for (int i = 0; i < 4; i++) {
+        if (board[0][i][3 - i].last < 0) {
+          dia++;
+        }
+      }
+    }
+    if (row == 3 || col == 3 || dia == 3) {
+      return true;
+    } else {
+      return false;
+    }
+  } else if (start.x == 2 && end.getLastNumber(arr: board) > 0) {
+    for (int i = 0; i < 4; i++) {
+      if (board[0][end.y][i].last > 0) {
+        row++;
+      }
+    }
+    for (int i = 0; i < 4; i++) {
+      if (board[0][i][end.z].last > 0) {
+        col++;
+      }
+    }
+    if (end.y == end.z) {
+      for (int i = 0; i < 4; i++) {
+        if (board[0][i][i].last > 0) {
+          dia++;
+        }
+      }
+    } else if (end.y + end.z == 3) {
+      for (int i = 0; i < 4; i++) {
+        if (board[0][i][3 - i].last > 0) {
+          dia++;
+        }
+      }
+    }
+    if (row == 3 || col == 3 || dia == 3) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  return true;
 }
