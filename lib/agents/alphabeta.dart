@@ -12,6 +12,7 @@ import 'utils.dart';
 
 // fromRow, fromCol, toRow, toCol
 class AlphaBeta extends Agent {
+  AlphaBeta(depth) : super(depth);
   double alphabeta(Map<String, dynamic> gamestate, bool maximizer, int plr,
       int depth, alpha, beta) {
     int nextplr = plr == 1 ? 2 : 1;
@@ -110,7 +111,7 @@ void main(List<String> args) {
   ];
   kprint(DateTime.now());
   Map<String, dynamic> gamestate = getGameState(board, p1, p2);
-  kprint(AlphaBeta().calcBestMove(gamestate, 1));
+  kprint(AlphaBeta(4).calcBestMove(gamestate, 1));
   kprint(DateTime.now());
   return;
 }

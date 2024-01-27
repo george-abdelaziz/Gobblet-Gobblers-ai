@@ -1,21 +1,17 @@
-import 'package:ai_project/agents/agent.dart';
-import 'package:ai_project/agents/config.dart';
-import 'package:ai_project/agents/utils.dart';
-import 'package:ai_project/layout/gobblet/cubit/states.dart';
-import 'package:ai_project/models/my_classes.dart';
-import 'package:ai_project/modules/board/board_screen.dart';
-import 'package:ai_project/modules/player_selection/player_selection_screen.dart';
-import 'package:ai_project/modules/win/win.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
 
 import '../../../agents/minimax.dart';
+import '/agents/agent.dart';
+import '/agents/utils.dart';
+import '/layout/gobblet/cubit/states.dart';
+import '/models/my_classes.dart';
+import '/modules/board/board_screen.dart';
+import '/modules/player_selection/player_selection_screen.dart';
+import '/modules/win/win.dart';
 
-enum PlayerType{
-  minmax,
-  minmax2
-}
+enum PlayerType { minmax, minmax2 }
 
 class GameCubit extends Cubit<GameStates> {
   GameCubit() : super(GameInitialState());
@@ -34,10 +30,10 @@ class GameCubit extends Cubit<GameStates> {
   String difficultyLevelForAI2 = '';
   MyPoint from = MyPoint()..nagOne();
   MyPoint to = MyPoint()..nagOne();
-  var logger=Logger();
+  var logger = Logger();
   final List<Widget> screens = [
-    PlayerSelectionScreen(),
-    BoardScreen(),
+    const PlayerSelectionScreen(),
+    const BoardScreen(),
     const WinScreen(),
   ];
   void playerSelectionDone() {
@@ -58,16 +54,13 @@ class GameCubit extends Cubit<GameStates> {
           ai();
           ai();
         }
-      }
-      else if (player1Type != '0') {
+      } else if (player1Type != '0') {
         whosturn = 3;
         ai();
-      }
-      else {
+      } else {
         whosturn = 1;
       }
-    }
-    else {
+    } else {
       emit(PlayersNotSelected());
     }
   }
@@ -75,7 +68,8 @@ class GameCubit extends Cubit<GameStates> {
   void ai() {
     emit(AI1Played());
     logger.d('message');
-    Agent player = MiniMax();
+    // add depth  ya georg
+    Agent player = MiniMax(3);
     var x = getGameState(bti(board[0]), ctd(board[1][0]), ctd(board[2][0]));
     var move = player.calcBestMove(x, whosturn - 2);
     /*
@@ -333,7 +327,7 @@ class GameCubit extends Cubit<GameStates> {
   }
 
   double getLastNumber({required MyPoint point}) {
-    if(board[point.x][point.y][point.z].length==0)return 0;
+    if (board[point.x][point.y][point.z].length == 0) return 0;
     return board[point.x][point.y][point.z].last;
   }
 
@@ -618,5 +612,4 @@ class GameCubit extends Cubit<GameStates> {
     ],
   ];
   //board[which board][vertical height of the board][horizontal width of the board][n/height of the stack]=double;
-
 }
