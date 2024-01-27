@@ -1,5 +1,5 @@
 class Config {
-  static const winning = 200000.0;
+  static const winning = 200000000.0;
   static const draw = 1500.0;
   static const danger = 500;
   static const alphaBetaDepth = 3;

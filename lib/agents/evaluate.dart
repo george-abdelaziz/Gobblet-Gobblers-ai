@@ -23,8 +23,8 @@ double evaluate(Map gametstate, int player) {
         nneg *= 10;
       }
     }
-    netPos = pos * npos + netPos;
-    netNeg = netNeg + neg * nneg;
+    netPos += pos * npos;
+    netNeg += neg * nneg;
     npos = 1;
     nneg = 1;
     pos = 0;
@@ -39,8 +39,8 @@ double evaluate(Map gametstate, int player) {
       nneg *= 10;
     }
   }
-  netPos = pos * npos + netPos;
-  netNeg = netNeg + neg * nneg;
+  netPos += pos * npos;
+  netNeg += neg * nneg;
   npos = 1;
   nneg = 1;
   pos = 0;
@@ -54,8 +54,8 @@ double evaluate(Map gametstate, int player) {
       nneg *= 10;
     }
   }
-  netPos = pos * npos + netPos;
-  netNeg = netNeg + neg * nneg;
+  netPos += pos * npos;
+  netNeg += neg * nneg;
   score = netPos + netNeg;
   return score;
 }

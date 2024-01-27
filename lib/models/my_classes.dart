@@ -1,3 +1,5 @@
+import 'package:logger/logger.dart';
+
 double abs(double a) {
   return a > 0 ? a : -a;
 }
@@ -32,8 +34,17 @@ class MyPoint {
   }
 
   double getLastNumber({required List<List<List<List<double>>>> arr}) {
-    if (arr[x][y][z].length == 0) return 0;
-    return arr[x][y][z].last;
+    try {
+      if (arr[x][y][z].isEmpty) return 0;
+      return arr[x][y][z].last;
+    }
+    catch(e){
+      Logger().e(x);
+      Logger().e(y);
+      Logger().e(z);
+      Logger().e(arr);
+    }
+    return 0;
   }
 
   void popNumber({required List<List<List<List<double>>>> arr}) {

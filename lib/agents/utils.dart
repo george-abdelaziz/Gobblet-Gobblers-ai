@@ -147,83 +147,11 @@ Map<String, List> getGameState(
   };
 }
 
-bool validateMove(Map move, int player, Map<String, dynamic> gamestate) {
-  // board n, col , row
-  // -ve  2
-  // +ve 1
-  //     int toBeMoved = gamestate[p][move["index"]].last;
-  // int toBeCovered = board[move["toRow"]][move["toCol"]].last;
-  MyPoint s;
-  MyPoint e = MyPoint(x: 0, y: move['toCol'], z: move['toRow']);
-  switch (move['type']) {
-    case 'play':
-      s = MyPoint(x: player, y: 0, z: move['index']);
-      break;
-    default:
-      s = MyPoint(x: player, y: move['fromCol'], z: move['fromRow']);
-  }
-  b = Adapter().b2f(gamestate, b);
-  Logger().d(b);
-  return isValidMove(start: s, end: e, board: b);
-  // final board = gamestate["board"];
-  // final p = player == 1 ? "p1" : "p2";
-  // // check if is landing on a blank square
-  // if (board[move["toRow"]][move["toCol"]].last == 0) return true;
-  // // in case of a filled square:
-  // //  - check if it's greater
-  // //  - if it is greater check if the square have two neighbours
-  // int toBeCovered = board[move["toRow"]][move["toCol"]].last;
-  // switch (move["type"]) {
-  //   case "play":
-  //     int toBeMoved = gamestate[p][move["index"]].last;
-  //     if (toBeCovered.abs() >= toBeMoved.abs()) return false;
-  //     // check neighboors
-  //     int r = move['toRow'];
-  //     int c = move['toCol'];
-  //   case "move":
-  //     int toBeMoved = board[move["fromRow"]][move["fromCol"]].last;
-  //     if (toBeCovered.abs() >= toBeMoved.abs()) return false;
-  //   default:
-  //     break;
-  // }
-  // return true;
-}
-
-List<List> copyPlayer(List<List> original) {
-  return original.map((row) => List<int>.from(row)).toList();
-}
-
-List<List<List>> copyBoard(List<List<List>> original) {
-  return original
-      .map((row) => row.map((col) => List.from(col)).toList())
-      .toList();
-}
-
-kprint(v) {
-  print(v);
-}
-
-void printBoard(List<List<List>> board) {
-  for (int row = 0; row < 4; row++) {
-    var piece = board[row];
-    kprint(
-        '${piece[0].last}, ${piece[1].last}, ${piece[2].last}, ${piece[3].last}');
-  }
-}
-
-printToFile(board) async {
-  final File file = File("temp.txt");
-  if (board == null) return;
-  for (var row in board) {
-    for (var col in row) {
-      await file.writeAsString("${col.last}, ", mode: FileMode.append);
-    }
-    await file.writeAsString("\n", mode: FileMode.append);
-  }
-}
-
-bool isValidMove(
-    {required MyPoint start, required MyPoint end, required board}) {
+bool isValidMove({
+  required MyPoint start,
+  required MyPoint end,
+  required board,
+}) {
   int row = 0;
   int col = 0;
   int dia = 0;
@@ -292,6 +220,81 @@ bool isValidMove(
     }
   }
   return true;
+}
+bool validateMove(Map move, int player, Map<String, dynamic> gamestate) {
+
+  // board n, col , row
+  // -ve  2
+  // +ve 1
+  //     int toBeMoved = gamestate[p][move["index"]].last;
+  // int toBeCovered = board[move["toRow"]][move["toCol"]].last;
+  // MyPoint s;
+  // MyPoint e = MyPoint(x: 0, y: move['toCol'], z: move['toRow']);
+  // switch (move['type']) {
+  //   case 'play':
+  //     s = MyPoint(x: player, y: 0, z: move['index']);
+  //     break;
+  //   default:
+  //     s = MyPoint(x: 0, y: move['fromCol'], z: move['fromRow']);
+  // }
+  // b = Adapter().b2f(gamestate, b);
+  // // Logger().d(b);
+  // return isValidMove(start: s, end: e, board: b);
+  final board = gamestate["board"];
+  final p = player == 1 ? "p1" : "p2";
+  // check if is landing on a blank square
+  if (board[move["toRow"]][move["toCol"]].last == 0) return true;
+  // in case of a filled square:
+  //  - check if it's greater
+  //  - if it is greater check if the square have two neighbours
+  int toBeCovered = board[move["toRow"]][move["toCol"]].last;
+  switch (move["type"]) {
+    case "play":
+      int toBeMoved = gamestate[p][move["index"]].last;
+      if (toBeCovered.abs() >= toBeMoved.abs()) return false;
+      // check neighboors
+      int r = move['toRow'];
+      int c = move['toCol'];
+    case "move":
+      int toBeMoved = board[move["fromRow"]][move["fromCol"]].last;
+      if (toBeCovered.abs() >= toBeMoved.abs()) return false;
+    default:
+      break;
+  }
+  return true;
+}
+
+List<List> copyPlayer(List<List> original) {
+  return original.map((row) => List<int>.from(row)).toList();
+}
+
+List<List<List>> copyBoard(List<List<List>> original) {
+  return original
+      .map((row) => row.map((col) => List.from(col)).toList())
+      .toList();
+}
+
+kprint(v) {
+  print(v);
+}
+
+void printBoard(List<List<List>> board) {
+  for (int row = 0; row < 4; row++) {
+    var piece = board[row];
+    kprint(
+        '${piece[0].last}, ${piece[1].last}, ${piece[2].last}, ${piece[3].last}');
+  }
+}
+
+printToFile(board) async {
+  final File file = File("temp.txt");
+  if (board == null) return;
+  for (var row in board) {
+    for (var col in row) {
+      await file.writeAsString("${col.last}, ", mode: FileMode.append);
+    }
+    await file.writeAsString("\n", mode: FileMode.append);
+  }
 }
 
 List<List<List<List<double>>>> b = [

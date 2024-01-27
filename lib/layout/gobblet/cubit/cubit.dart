@@ -72,7 +72,7 @@ class GameCubit extends Cubit<GameStates> {
     if (playerType1 == PlayerType.minmax) {
       ai1 = MiniMax(difficultyLevelForAI1);
     } else if (playerType1 == PlayerType.alpa) {
-      ai1 = AlphaBeta(difficultyLevelForAI1, 1);
+      ai1 = AlphaBeta(difficultyLevelForAI1, 2);
     } else if (playerType1 == PlayerType.iter) {
       ai1 = IteravieDeeping(difficultyLevelForAI1, 5);
     }
@@ -102,7 +102,7 @@ class GameCubit extends Cubit<GameStates> {
   }
 
   Future<void> ai() async {
-    logger.d('message');
+    // logger.d('message');
     Agent player = (whosturn == 3) ? ai1 : ai2;
     var x = adapter.f2b(board);
     var move = player!.calcBestMove(x, whosturn - 2);
