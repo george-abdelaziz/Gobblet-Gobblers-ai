@@ -2,19 +2,80 @@ import 'dart:math';
 
 import 'package:ai_project/agents/config.dart';
 import 'package:ai_project/agents/utils.dart';
-
+// row,col
 int weight = 1;
 double evaluate(Map gametstate, int player) {
-  List<List<List>> board = gametstate["board"];
-  var score = 0.0;
-
-  if (isWinningPos(board) != 0) {
-    return Config.winning;
+  double score=0;
+  double pos=0;
+  double neg=0;
+  double npos=1;
+  double nneg=1;
+  double netPos=0;
+  double netNeg=0;
+  for(int i=0;i<4;i++){
+    for(int ii=0;ii<4;ii++){
+      if(gametstate['board'][i][ii].isEmpty){continue;}
+      if(gametstate['board'][i][ii].last>0){
+        pos+=gametstate['board'][i][ii].last;
+        npos*=10;
+      }
+      else if(gametstate['board'][i][ii].last<0){
+        neg+=gametstate['board'][i][ii].last+neg*10;
+        nneg*=10;
+      }
+    }
+    netPos=pos*npos+netPos;
+    netNeg=netNeg+neg*nneg;
+    npos=1;
+    nneg=1;
+    pos=0;
+    neg=0;
   }
-
-  score += evaluateRows(board, player);
-  score += evaluateColumns(board, player);
-  score += evaluateDiagonals(board, player);
+  for(int i=0;i<4;i++){
+    if(gametstate['board'][i][i].isEmpty){continue;}
+    if(gametstate['board'][i][i].last>0){
+      pos+=gametstate['board'][i][i].last;
+      npos*=10;
+    }
+    else if(gametstate['board'][i][i].last<0){
+      neg+=gametstate['board'][i][i].last;
+      nneg*=10;
+    }
+  }
+  netPos=pos*npos+netPos;
+  netNeg=netNeg+neg*nneg;
+  npos=1;
+  nneg=1;
+  pos=0;
+  neg=0;
+  for(int i=0;i<4;i++){
+    if(gametstate['board'][i][3-i].isEmpty){continue;}
+    if(gametstate['board'][i][3-i].last>0){
+      pos+=gametstate['board'][i][3-i].last;
+      npos*=10;
+    }
+    else if(gametstate['board'][i][3-i].last<0){
+      neg+=gametstate['board'][i][3-i].last;
+      nneg*=10;
+    }
+  }
+  netPos=pos*npos+netPos;
+  netNeg=netNeg+neg*nneg;
+  npos=1;
+  nneg=1;
+  pos=0;
+  neg=0;
+  score=netPos+netNeg;
+  // List<List<List>> board = gametstate["board"];
+  // var score = 0.0;
+  //
+  // if (isWinningPos(board) != 0) {
+  //   return Config.winning;
+  // }
+  //
+  // score += evaluateRows(board, player);
+  // score += evaluateColumns(board, player);
+  // score += evaluateDiagonals(board, player);
   return score;
 }
 

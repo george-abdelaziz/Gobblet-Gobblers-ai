@@ -1,3 +1,5 @@
+import 'package:ai_project/agents/iterative_deeping.dart';
+import 'package:ai_project/modules/adapter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
@@ -18,7 +20,12 @@ class GameCubit extends Cubit<GameStates> {
   static GameCubit get(context) {
     return BlocProvider.of(context);
   }
-
+/*
+0000
+0000
+0000
+0000
+*/
   bool aiai=false;
   int whosturn = 1;
   int aPieceIsToushed = 0;
@@ -26,6 +33,7 @@ class GameCubit extends Cubit<GameStates> {
   int winner = 0;
   int difficultyLevelForAI1 = 1;
   int difficultyLevelForAI2 = 1;
+  Adapter adapter=Adapter();
   MyPoint from = MyPoint()..nagOne();
   MyPoint to = MyPoint()..nagOne();
   PlayerType playerType1 = PlayerType.human;
@@ -56,16 +64,12 @@ class GameCubit extends Cubit<GameStates> {
   }
 
   Future<void> startup() async {
-    print('${playerType1}');
-    print('${playerType2}');
-    print('${difficultyLevelForAI1}');
-    print('${difficultyLevelForAI2}');
     if(playerType1==PlayerType.minmax){ai1=MiniMax(difficultyLevelForAI1);}
     else if(playerType1==PlayerType.alpa){ai1=AlphaBeta(difficultyLevelForAI1);}
-    else if(playerType1==PlayerType.iter){ai1=MiniMax(difficultyLevelForAI1);}
+    else if(playerType1==PlayerType.iter){ai1=IteravieDeeping(difficultyLevelForAI1,5);}
     if(playerType2==PlayerType.minmax){ai2=MiniMax(difficultyLevelForAI2);}
     else if(playerType2==PlayerType.alpa){ai2=AlphaBeta(difficultyLevelForAI2);}
-    else if(playerType2==PlayerType.iter){ai2=MiniMax(difficultyLevelForAI2);}
+    else if(playerType2==PlayerType.iter){ai2=IteravieDeeping(difficultyLevelForAI2,5);}
     await Future.delayed(const Duration(milliseconds: 50));
     if (playerType1 != PlayerType.human && playerType2 != PlayerType.human) {
       aiai=true;
@@ -87,18 +91,15 @@ class GameCubit extends Cubit<GameStates> {
   }
 
   Future<void> ai() async {
-    emit(AI1Played());
     logger.d('message');
     Agent player = (whosturn==3)?ai1:ai2;
-    var x = getGameState(bti(board[0]), ctd(board[1][0]), ctd(board[2][0]));
-    var move = player.calcBestMove(x, whosturn - 2);
+    var x = adapter.f2b(board);
+    var move = player!.calcBestMove(x, whosturn - 2);
     var y = applyMove(x, whosturn - 2, move);
-    board[0] = convertToIntToDouble(y['board']);
-    board[1][0] = convertListIntToDouble(y['p1']);
-    board[2][0] = convertListIntToDouble(y['p2']);
+    board = adapter.b2f(y, board);
     Logger().i(move);
     changePlayer();
-    emit(AI2Played());
+    emit(AIPlayed());
   }
 
   void changePlayer() {
@@ -355,83 +356,6 @@ class GameCubit extends Cubit<GameStates> {
     return board[point.x][point.y][point.z].last;
   }
 
-  ///////////////////
-
-  List<List<List<double>>> convertToIntToDouble(List<List<List>> inputList) {
-    List<List<List<double>>> result = [];
-
-    for (List<List> outerList in inputList) {
-      List<List<double>> outerResult = [];
-
-      for (List innerList in outerList) {
-        List<double> innerResult = [];
-
-        for (int value in innerList) {
-          innerResult.add(value.toDouble());
-        }
-
-        outerResult.add(innerResult);
-      }
-
-      result.add(outerResult);
-    }
-
-    return result;
-  }
-
-  List<List<double>> convertListIntToDouble(List<List> inputList) {
-    List<List<double>> result = [];
-
-    for (List innerList in inputList) {
-      List<double> innerResult = [];
-
-      for (int value in innerList) {
-        innerResult.add(value.toDouble());
-      }
-
-      result.add(innerResult);
-    }
-
-    return result;
-  }
-
-  List<List> ctd(List<List<double>> inputList) {
-    List<List> result = [];
-
-    for (List<double> innerList in inputList) {
-      List<int> innerResult = [];
-
-      for (double value in innerList) {
-        innerResult.add(value.toInt());
-      }
-
-      result.add(innerResult);
-    }
-
-    return result;
-  }
-
-  List<List<List>> bti(List<List<List<double>>> inputList) {
-    List<List<List>> result = [];
-
-    for (List<List<double>> outerList in inputList) {
-      List<List<int>> outerResult = [];
-
-      for (List<double> innerList in outerList) {
-        List<int> innerResult = [];
-
-        for (double value in innerList) {
-          innerResult.add(value.toInt());
-        }
-
-        outerResult.add(innerResult);
-      }
-
-      result.add(outerResult);
-    }
-
-    return result;
-  }
 
   /////////////////////////
 
