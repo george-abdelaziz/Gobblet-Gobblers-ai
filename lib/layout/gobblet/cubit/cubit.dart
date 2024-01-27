@@ -1,4 +1,5 @@
 import 'package:ai_project/agents/agent.dart';
+import 'package:ai_project/agents/config.dart';
 import 'package:ai_project/agents/utils.dart';
 import 'package:ai_project/layout/gobblet/cubit/states.dart';
 import 'package:ai_project/models/my_classes.dart';
@@ -10,6 +11,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
 
 import '../../../agents/minimax.dart';
+
+enum PlayerType{
+  minmax,
+  minmax2
+}
 
 class GameCubit extends Cubit<GameStates> {
   GameCubit() : super(GameInitialState());
@@ -26,94 +32,16 @@ class GameCubit extends Cubit<GameStates> {
   String player2Type = '';
   String difficultyLevelForAI1 = '';
   String difficultyLevelForAI2 = '';
-  MyPoint from = MyPoint(x: 0);
-  MyPoint to = MyPoint(x: 0);
+  MyPoint from = MyPoint()..nagOne();
+  MyPoint to = MyPoint()..nagOne();
+  var logger=Logger();
   final List<Widget> screens = [
     PlayerSelectionScreen(),
     BoardScreen(),
     const WinScreen(),
   ];
-  List<List<List<List<double>>>> board = [
-    [
-      [
-        [0],
-        [0],
-        [0],
-        [0],
-      ],
-      [
-        [0],
-        [0],
-        [0],
-        [0],
-      ],
-      [
-        [0],
-        [0],
-        [0],
-        [0],
-      ],
-      [
-        [0],
-        [0],
-        [0],
-        [0],
-      ],
-    ],
-    [
-      [
-        [
-          0,
-          1,
-          2,
-          3,
-          4,
-        ],
-        [
-          0,
-          1,
-          2,
-          3,
-          4,
-        ],
-        [
-          0,
-          1,
-          2,
-          3,
-          4,
-        ],
-      ],
-    ],
-    [
-      [
-        [
-          0,
-          -1,
-          -2,
-          -3,
-          -4,
-        ],
-        [
-          0,
-          -1,
-          -2,
-          -3,
-          -4,
-        ],
-        [
-          0,
-          -1,
-          -2,
-          -3,
-          -4,
-        ],
-      ],
-    ],
-  ];
-  //board[which board][vertical height of the board][horizontal width of the board][n/height of the stack]=double;
-
   void playerSelectionDone() {
+    // if(PlayerType.)
     if (player1Type != '' && player2Type != '!') {
       if (player1Type != '0' && difficultyLevelForAI1 == '') {
         return;
@@ -130,101 +58,29 @@ class GameCubit extends Cubit<GameStates> {
           ai();
           ai();
         }
-      } else if (player1Type != '0') {
+      }
+      else if (player1Type != '0') {
         whosturn = 3;
         ai();
-      } else {
+      }
+      else {
         whosturn = 1;
       }
-    } else {
+    }
+    else {
       emit(PlayersNotSelected());
     }
   }
 
-  List<List<List<double>>> convertToIntToDouble(List<List<List>> inputList) {
-    List<List<List<double>>> result = [];
-
-    for (List<List> outerList in inputList) {
-      List<List<double>> outerResult = [];
-
-      for (List innerList in outerList) {
-        List<double> innerResult = [];
-
-        for (int value in innerList) {
-          innerResult.add(value.toDouble());
-        }
-
-        outerResult.add(innerResult);
-      }
-
-      result.add(outerResult);
-    }
-
-    return result;
-  }
-
-  List<List<double>> convertListIntToDouble(List<List> inputList) {
-    List<List<double>> result = [];
-
-    for (List innerList in inputList) {
-      List<double> innerResult = [];
-
-      for (int value in innerList) {
-        innerResult.add(value.toDouble());
-      }
-
-      result.add(innerResult);
-    }
-
-    return result;
-  }
-
-  List<List> ctd(List<List<double>> inputList) {
-    List<List> result = [];
-
-    for (List<double> innerList in inputList) {
-      List<int> innerResult = [];
-
-      for (double value in innerList) {
-        innerResult.add(value.toInt());
-      }
-
-      result.add(innerResult);
-    }
-
-    return result;
-  }
-
-  List<List<List>> bti(List<List<List<double>>> inputList) {
-    List<List<List>> result = [];
-
-    for (List<List<double>> outerList in inputList) {
-      List<List<int>> outerResult = [];
-
-      for (List<double> innerList in outerList) {
-        List<int> innerResult = [];
-
-        for (double value in innerList) {
-          innerResult.add(value.toInt());
-        }
-
-        outerResult.add(innerResult);
-      }
-
-      result.add(outerResult);
-    }
-
-    return result;
-  }
-
   void ai() {
-    //for(int i=0;i<10000000000;i++){}
-    //print('qqqqqqqqqqqqqqqqqqqqqqqqqqqqqq');
-    //some logic for the ai
+    emit(AI1Played());
+    logger.d('message');
     Agent player = MiniMax();
-
     var x = getGameState(bti(board[0]), ctd(board[1][0]), ctd(board[2][0]));
     var move = player.calcBestMove(x, whosturn - 2);
+    /*
+
+    */
     //play from outside
     // if(move['type']=='play'){from.x=2;}
     // else{from.x=0;}
@@ -234,7 +90,7 @@ class GameCubit extends Cubit<GameStates> {
     board[2][0] = convertListIntToDouble(y['p2']);
     Logger().i(move);
     changePlayer();
-    emit(AIPlayed());
+    emit(AI2Played());
   }
 
   void changePlayer() {
@@ -355,65 +211,65 @@ class GameCubit extends Cubit<GameStates> {
             abs(end.getLastNumber(arr: board))) {
       return false;
     }
-    // if (start.x == 1 && end.getLastNumber(arr: board) < 0) {
-    //   for (int i = 0; i < 4; i++) {
-    //     if (board[0][end.y][i].last < 0) {
-    //       row++;
-    //     }
-    //   }
-    //   for (int i = 0; i < 4; i++) {
-    //     if (board[0][i][end.z].last < 0) {
-    //       col++;
-    //     }
-    //   }
-    //   if (end.y == end.z) {
-    //     for (int i = 0; i < 4; i++) {
-    //       if (board[0][i][i].last < 0) {
-    //         dia++;
-    //       }
-    //     }
-    //   } else if (end.y + end.z == 3) {
-    //     for (int i = 0; i < 4; i++) {
-    //       if (board[0][i][3 - i].last < 0) {
-    //         dia++;
-    //       }
-    //     }
-    //   }
-    //   if (row == 3 || col == 3 || dia == 3) {
-    //     return true;
-    //   } else {
-    //     return false;
-    //   }
-    // } else if (start.x == 2 && end.getLastNumber(arr: board) > 0) {
-    //   for (int i = 0; i < 4; i++) {
-    //     if (board[0][end.y][i].last > 0) {
-    //       row++;
-    //     }
-    //   }
-    //   for (int i = 0; i < 4; i++) {
-    //     if (board[0][i][end.z].last > 0) {
-    //       col++;
-    //     }
-    //   }
-    //   if (end.y == end.z) {
-    //     for (int i = 0; i < 4; i++) {
-    //       if (board[0][i][i].last > 0) {
-    //         dia++;
-    //       }
-    //     }
-    //   } else if (end.y + end.z == 3) {
-    //     for (int i = 0; i < 4; i++) {
-    //       if (board[0][i][3 - i].last > 0) {
-    //         dia++;
-    //       }
-    //     }
-    //   }
-    //   if (row == 3 || col == 3 || dia == 3) {
-    //     return true;
-    //   } else {
-    //     return false;
-    //   }
-    // }
+    if (start.x == 1 && end.getLastNumber(arr: board) < 0) {
+      for (int i = 0; i < 4; i++) {
+        if (board[0][end.y][i].last < 0) {
+          row++;
+        }
+      }
+      for (int i = 0; i < 4; i++) {
+        if (board[0][i][end.z].last < 0) {
+          col++;
+        }
+      }
+      if (end.y == end.z) {
+        for (int i = 0; i < 4; i++) {
+          if (board[0][i][i].last < 0) {
+            dia++;
+          }
+        }
+      } else if (end.y + end.z == 3) {
+        for (int i = 0; i < 4; i++) {
+          if (board[0][i][3 - i].last < 0) {
+            dia++;
+          }
+        }
+      }
+      if (row == 3 || col == 3 || dia == 3) {
+        return true;
+      } else {
+        return false;
+      }
+    } else if (start.x == 2 && end.getLastNumber(arr: board) > 0) {
+      for (int i = 0; i < 4; i++) {
+        if (board[0][end.y][i].last > 0) {
+          row++;
+        }
+      }
+      for (int i = 0; i < 4; i++) {
+        if (board[0][i][end.z].last > 0) {
+          col++;
+        }
+      }
+      if (end.y == end.z) {
+        for (int i = 0; i < 4; i++) {
+          if (board[0][i][i].last > 0) {
+            dia++;
+          }
+        }
+      } else if (end.y + end.z == 3) {
+        for (int i = 0; i < 4; i++) {
+          if (board[0][i][3 - i].last > 0) {
+            dia++;
+          }
+        }
+      }
+      if (row == 3 || col == 3 || dia == 3) {
+        return true;
+      } else {
+        return false;
+      }
+    }
     return true;
   }
 
@@ -424,8 +280,6 @@ class GameCubit extends Cubit<GameStates> {
     }
   }
 
-// @greybeast
-// refactoring the next two methods
   void playerWins(int player) {
     bool checker(plr, x) => plr == 1 ? x > 0 : x < 0;
     if (checker(player, getLastItemInTheBoard(y: 0, z: 0)) &&
@@ -479,6 +333,7 @@ class GameCubit extends Cubit<GameStates> {
   }
 
   double getLastNumber({required MyPoint point}) {
+    if(board[point.x][point.y][point.z].length==0)return 0;
     return board[point.x][point.y][point.z].last;
   }
 
@@ -489,6 +344,108 @@ class GameCubit extends Cubit<GameStates> {
   void selectPlayer2(String value) {
     player2Type = value;
   }
+
+  ///////
+
+  List<List<List<double>>> convertToIntToDouble(List<List<List>> inputList) {
+    List<List<List<double>>> result = [];
+
+    for (List<List> outerList in inputList) {
+      List<List<double>> outerResult = [];
+
+      for (List innerList in outerList) {
+        List<double> innerResult = [];
+
+        for (int value in innerList) {
+          innerResult.add(value.toDouble());
+        }
+
+        outerResult.add(innerResult);
+      }
+
+      result.add(outerResult);
+    }
+
+    return result;
+  }
+
+  List<List<double>> convertListIntToDouble(List<List> inputList) {
+    List<List<double>> result = [];
+
+    for (List innerList in inputList) {
+      List<double> innerResult = [];
+
+      for (int value in innerList) {
+        innerResult.add(value.toDouble());
+      }
+
+      result.add(innerResult);
+    }
+
+    return result;
+  }
+
+  List<List> ctd(List<List<double>> inputList) {
+    List<List> result = [];
+
+    for (List<double> innerList in inputList) {
+      List<int> innerResult = [];
+
+      for (double value in innerList) {
+        innerResult.add(value.toInt());
+      }
+
+      result.add(innerResult);
+    }
+
+    return result;
+  }
+
+  List<List<List>> bti(List<List<List<double>>> inputList) {
+    List<List<List>> result = [];
+
+    for (List<List<double>> outerList in inputList) {
+      List<List<int>> outerResult = [];
+
+      for (List<double> innerList in outerList) {
+        List<int> innerResult = [];
+
+        for (double value in innerList) {
+          innerResult.add(value.toInt());
+        }
+
+        outerResult.add(innerResult);
+      }
+
+      result.add(outerResult);
+    }
+
+    return result;
+  }
+
+  //////////////////// useless functions for now at least
+  void movePieceFromTo({
+    required MyPoint start,
+    required MyPoint end,
+  }) {
+    if (isValidMove(start: start, end: end)) {
+      end.insertNumber(arr: board, num: start.getLastNumber(arr: board));
+      start.popNumber(arr: board);
+    }
+  }
+
+  void popNumber({required MyPoint point}) {
+    if (getLastNumber(point: point) == 0) {
+      return;
+    }
+    board[point.x][point.y][point.z].removeLast();
+  }
+
+  void insertNumber({required MyPoint point, required double num}) {
+    board[point.x][point.y][point.z].add(num);
+  }
+
+  ///////////////////////// useful
 
   void restart() {
     whosturn = 1;
@@ -582,25 +539,84 @@ class GameCubit extends Cubit<GameStates> {
     emit(Restart());
   }
 
-//////////////////// useless functions for now at least
-  void movePieceFromTo({
-    required MyPoint start,
-    required MyPoint end,
-  }) {
-    if (isValidMove(start: start, end: end)) {
-      end.insertNumber(arr: board, num: start.getLastNumber(arr: board));
-      start.popNumber(arr: board);
-    }
-  }
+  List<List<List<List<double>>>> board = [
+    [
+      [
+        [0],
+        [0],
+        [0],
+        [0],
+      ],
+      [
+        [0],
+        [0],
+        [0],
+        [0],
+      ],
+      [
+        [0],
+        [0],
+        [0],
+        [0],
+      ],
+      [
+        [0],
+        [0],
+        [0],
+        [0],
+      ],
+    ],
+    [
+      [
+        [
+          0,
+          1,
+          2,
+          3,
+          4,
+        ],
+        [
+          0,
+          1,
+          2,
+          3,
+          4,
+        ],
+        [
+          0,
+          1,
+          2,
+          3,
+          4,
+        ],
+      ],
+    ],
+    [
+      [
+        [
+          0,
+          -1,
+          -2,
+          -3,
+          -4,
+        ],
+        [
+          0,
+          -1,
+          -2,
+          -3,
+          -4,
+        ],
+        [
+          0,
+          -1,
+          -2,
+          -3,
+          -4,
+        ],
+      ],
+    ],
+  ];
+  //board[which board][vertical height of the board][horizontal width of the board][n/height of the stack]=double;
 
-  void popNumber({required MyPoint point}) {
-    if (getLastNumber(point: point) == 0) {
-      return;
-    }
-    board[point.x][point.y][point.z].removeLast();
-  }
-
-  void insertNumber({required MyPoint point, required double num}) {
-    board[point.x][point.y][point.z].add(num);
-  }
 }

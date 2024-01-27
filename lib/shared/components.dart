@@ -66,15 +66,57 @@ Widget square({
   );
 }
 
-Widget board(
-  BuildContext context,
-) {
+Widget player(BuildContext context, int player) {
+  return Center(
+    child: Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Player ${player == 1 ? 1 : 2}',
+            style: const TextStyle(fontSize: 30),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Container(
+            decoration: BoxDecoration(
+                border: Border.all(width: 1, color: Colors.black)),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                    decoration: BoxDecoration(
+                        border: Border.all(width: 1, color: Colors.black)),
+                    child: square(
+                        context: context, point: MyPoint(x: player, z: 0))),
+                Container(
+                    decoration: BoxDecoration(
+                        border: Border.all(width: 1, color: Colors.black)),
+                    child: square(
+                        context: context, point: MyPoint(x: player, z: 1))),
+                Container(
+                    decoration: BoxDecoration(
+                        border: Border.all(width: 1, color: Colors.black)),
+                    child: square(
+                        context: context, point: MyPoint(x: player, z: 2))),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget board(BuildContext context,) {
   return Center(
     child: Padding(
       padding: const EdgeInsets.all(0),
       child: Container(
         decoration:
-            BoxDecoration(border: Border.all(width: 2, color: Colors.black)),
+        BoxDecoration(border: Border.all(width: 2, color: Colors.black)),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -216,93 +258,3 @@ Widget board(
     ),
   );
 }
-
-Widget player(BuildContext context, int player) {
-  return Center(
-    child: Padding(
-      padding: const EdgeInsets.all(20),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'Player ${player == 1 ? 1 : 2}',
-            style: const TextStyle(fontSize: 30),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          Container(
-            decoration: BoxDecoration(
-                border: Border.all(width: 1, color: Colors.black)),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                    decoration: BoxDecoration(
-                        border: Border.all(width: 1, color: Colors.black)),
-                    child: square(
-                        context: context, point: MyPoint(x: player, z: 0))),
-                Container(
-                    decoration: BoxDecoration(
-                        border: Border.all(width: 1, color: Colors.black)),
-                    child: square(
-                        context: context, point: MyPoint(x: player, z: 1))),
-                Container(
-                    decoration: BoxDecoration(
-                        border: Border.all(width: 1, color: Colors.black)),
-                    child: square(
-                        context: context, point: MyPoint(x: player, z: 2))),
-              ],
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-// Widget player2(
-//   BuildContext context,
-// ) {
-//   return Center(
-//     child: Padding(
-//       padding: const EdgeInsets.all(20),
-//       child: Column(
-//         mainAxisSize: MainAxisSize.min,
-//         children: [
-//           Container(
-//             decoration: BoxDecoration(
-//                 border: Border.all(width: 1, color: Colors.black)),
-//             child: Row(
-//               mainAxisSize: MainAxisSize.min,
-//               children: [
-//                 Container(
-//                     decoration: BoxDecoration(
-//                         border: Border.all(width: 1, color: Colors.black)),
-//                     child:
-//                         square(context: context, point: MyPoint(x: 2, z: 0))),
-//                 Container(
-//                     decoration: BoxDecoration(
-//                         border: Border.all(width: 1, color: Colors.black)),
-//                     child:
-//                         square(context: context, point: MyPoint(x: 2, z: 1))),
-//                 Container(
-//                     decoration: BoxDecoration(
-//                         border: Border.all(width: 1, color: Colors.black)),
-//                     child:
-//                         square(context: context, point: MyPoint(x: 2, z: 2))),
-//               ],
-//             ),
-//           ),
-//           const SizedBox(
-//             height: 20,
-//           ),
-//           const Text(
-//             'Player 2',
-//             style: TextStyle(fontSize: 30),
-//           ),
-//         ],
-//       ),
-//     ),
-//   );
-// }

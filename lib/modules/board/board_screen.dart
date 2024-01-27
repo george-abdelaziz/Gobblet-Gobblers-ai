@@ -19,6 +19,16 @@ class BoardScreen extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                MaterialButton(
+                  color: Colors.deepPurpleAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Text('GET OUT'),
+                  onPressed: (){
+                    cubit.restart();
+                  },
+                ),
                 player(context, 1),
                 board(context),
                 player(context, 2),

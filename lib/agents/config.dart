@@ -3,7 +3,7 @@ class Config {
   static const draw = 1500.0;
   static const danger = 500;
   static const alphaBetaDepth = 3;
-  static const miniMaxDepth = 3;
+  static int miniMaxDepth = 3;
   static var initialgame = {"board": board, "p1": set1, "p2": set2};
 
   static const set1 = [
