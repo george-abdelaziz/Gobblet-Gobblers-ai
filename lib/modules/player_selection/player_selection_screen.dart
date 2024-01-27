@@ -64,9 +64,9 @@ class PlayerSelectionScreen extends StatelessWidget {
                     ],
                     hintText: 'Player 1',
                     onSelected: (String? s) {
-                      if(s=='1'){cubit.difficultyLevelForAI1 = 1;}
-                      else if(s=='2'){cubit.difficultyLevelForAI1 = 2;}
-                      else if(s=='3'){cubit.difficultyLevelForAI1 = 3;}
+                      if(s=='1'){cubit.difficultyLevelForAI1 = 2;}
+                      else if(s=='2'){cubit.difficultyLevelForAI1 = 3;}
+                      else if(s=='3'){cubit.difficultyLevelForAI1 = 4;}
                       cubit.level1=Selected.selected;
                       cubit.emit(Player1DifficultySelected());
                     },
@@ -111,9 +111,9 @@ class PlayerSelectionScreen extends StatelessWidget {
                     ],
                     hintText: 'Player 1',
                     onSelected: (String? s) {
-                      if(s=='1'){cubit.difficultyLevelForAI2 = 1;}
-                      else if(s=='2'){cubit.difficultyLevelForAI2 = 2;}
-                      else if(s=='3'){cubit.difficultyLevelForAI2 = 3;}
+                      if(s=='1'){cubit.difficultyLevelForAI2 = 2;}
+                      else if(s=='2'){cubit.difficultyLevelForAI2 = 3;}
+                      else if(s=='3'){cubit.difficultyLevelForAI2 = 4;}
                       cubit.level2=Selected.selected;
                       cubit.emit(Player2DifficultySelected());
                     },

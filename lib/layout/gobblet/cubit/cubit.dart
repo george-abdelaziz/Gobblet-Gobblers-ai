@@ -98,14 +98,6 @@ class GameCubit extends Cubit<GameStates> {
     board[2][0] = convertListIntToDouble(y['p2']);
     Logger().i(move);
     changePlayer();
-    if(whosturn==3){
-      playerWins(1);
-      playerWins(2);
-    }
-    else{
-      playerWins(2);
-      playerWins(1);
-    }
     emit(AI2Played());
   }
 
@@ -119,26 +111,38 @@ class GameCubit extends Cubit<GameStates> {
       } else {
         whosturn = 4;
       }
-    } else if (whosturn == 2) {
+    }
+    else if (whosturn == 2) {
       if (playerType1 == PlayerType.human) {
         whosturn = 1;
       } else {
         whosturn = 3;
       }
-    } else if (whosturn == 3) {
+    }
+    else if (whosturn == 3) {
       if (playerType2 == PlayerType.human) {
         whosturn = 2;
       } else {
         whosturn = 4;
       }
-    } else if (whosturn == 4) {
+    }
+    else if (whosturn == 4) {
       if (playerType1 == PlayerType.human) {
         whosturn = 1;
       } else {
         whosturn = 3;
       }
-    } else {
+    }
+    else {
       logger.e('change player');
+    }
+    if( whosturn == 1 || whosturn == 3 ){
+      playerWins(2);
+      playerWins(1);
+    }
+    else{
+      playerWins(1);
+      playerWins(2);
     }
   }
 
@@ -166,8 +170,6 @@ class GameCubit extends Cubit<GameStates> {
       )) {
         to = point;
         movePiece();
-        playerWins(1);
-        playerWins(2);
         changePlayer();
         emit(Player2Turn());
         if (playerType2 != PlayerType.human) {
@@ -198,8 +200,6 @@ class GameCubit extends Cubit<GameStates> {
       )) {
         to = point;
         movePiece();
-        playerWins(2);
-        playerWins(1);
         changePlayer();
         from.nagOne();
         to.nagOne();
