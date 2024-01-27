@@ -20,30 +20,31 @@ class GameCubit extends Cubit<GameStates> {
   static GameCubit get(context) {
     return BlocProvider.of(context);
   }
+
 /*
 0000
 0000
 0000
 0000
 */
-  bool aiai=false;
+  bool aiai = false;
   int whosturn = 1;
   int aPieceIsToushed = 0;
   int currentScreenIndex = 0;
   int winner = 0;
   int difficultyLevelForAI1 = 1;
   int difficultyLevelForAI2 = 1;
-  Adapter adapter=Adapter();
+  Adapter adapter = Adapter();
   MyPoint from = MyPoint()..nagOne();
   MyPoint to = MyPoint()..nagOne();
   PlayerType playerType1 = PlayerType.human;
   PlayerType playerType2 = PlayerType.human;
-  Selected type1=Selected.not;
-  Selected type2=Selected.not;
-  Selected level1=Selected.not;
-  Selected level2=Selected.not;
-  Agent ai1=MiniMax(1);
-  Agent ai2=MiniMax(1);
+  Selected type1 = Selected.not;
+  Selected type2 = Selected.not;
+  Selected level1 = Selected.not;
+  Selected level2 = Selected.not;
+  Agent ai1 = MiniMax(1);
+  Agent ai2 = MiniMax(1);
   var logger = Logger();
   final List<Widget> screens = [
     const PlayerSelectionScreen(),
@@ -52,9 +53,13 @@ class GameCubit extends Cubit<GameStates> {
   ];
 
   Future<void> playerSelectionDone() async {
-    if (type1 == Selected.selected && type2 == Selected.selected ) {
-      if (playerType1 != PlayerType.human && level1 == Selected.not) {return;}
-      if (playerType2 != PlayerType.human && level2 == Selected.not) {return;}
+    if (type1 == Selected.selected && type2 == Selected.selected) {
+      if (playerType1 != PlayerType.human && level1 == Selected.not) {
+        return;
+      }
+      if (playerType2 != PlayerType.human && level2 == Selected.not) {
+        return;
+      }
       currentScreenIndex = 1;
       startup();
       emit(GameStarted());
@@ -64,15 +69,23 @@ class GameCubit extends Cubit<GameStates> {
   }
 
   Future<void> startup() async {
-    if(playerType1==PlayerType.minmax){ai1=MiniMax(difficultyLevelForAI1);}
-    else if(playerType1==PlayerType.alpa){ai1=AlphaBeta(difficultyLevelForAI1);}
-    else if(playerType1==PlayerType.iter){ai1=IteravieDeeping(difficultyLevelForAI1,5);}
-    if(playerType2==PlayerType.minmax){ai2=MiniMax(difficultyLevelForAI2);}
-    else if(playerType2==PlayerType.alpa){ai2=AlphaBeta(difficultyLevelForAI2);}
-    else if(playerType2==PlayerType.iter){ai2=IteravieDeeping(difficultyLevelForAI2,5);}
+    if (playerType1 == PlayerType.minmax) {
+      ai1 = MiniMax(difficultyLevelForAI1);
+    } else if (playerType1 == PlayerType.alpa) {
+      ai1 = AlphaBeta(difficultyLevelForAI1, 1);
+    } else if (playerType1 == PlayerType.iter) {
+      ai1 = IteravieDeeping(difficultyLevelForAI1, 5);
+    }
+    if (playerType2 == PlayerType.minmax) {
+      ai2 = MiniMax(difficultyLevelForAI2);
+    } else if (playerType2 == PlayerType.alpa) {
+      ai2 = AlphaBeta(difficultyLevelForAI2, 2);
+    } else if (playerType2 == PlayerType.iter) {
+      ai2 = IteravieDeeping(difficultyLevelForAI2, 5);
+    }
     await Future.delayed(const Duration(milliseconds: 50));
     if (playerType1 != PlayerType.human && playerType2 != PlayerType.human) {
-      aiai=true;
+      aiai = true;
       whosturn = 3;
       while (aiai) {
         ai();
@@ -80,19 +93,17 @@ class GameCubit extends Cubit<GameStates> {
         ai();
         await Future.delayed(const Duration(milliseconds: 20));
       }
-    }
-    else if (playerType1 != PlayerType.human) {
+    } else if (playerType1 != PlayerType.human) {
       whosturn = 3;
       ai();
-    }
-    else {
+    } else {
       whosturn = 1;
     }
   }
 
   Future<void> ai() async {
     logger.d('message');
-    Agent player = (whosturn==3)?ai1:ai2;
+    Agent player = (whosturn == 3) ? ai1 : ai2;
     var x = adapter.f2b(board);
     var move = player!.calcBestMove(x, whosturn - 2);
     var y = applyMove(x, whosturn - 2, move);
@@ -112,36 +123,31 @@ class GameCubit extends Cubit<GameStates> {
       } else {
         whosturn = 4;
       }
-    }
-    else if (whosturn == 2) {
+    } else if (whosturn == 2) {
       if (playerType1 == PlayerType.human) {
         whosturn = 1;
       } else {
         whosturn = 3;
       }
-    }
-    else if (whosturn == 3) {
+    } else if (whosturn == 3) {
       if (playerType2 == PlayerType.human) {
         whosturn = 2;
       } else {
         whosturn = 4;
       }
-    }
-    else if (whosturn == 4) {
+    } else if (whosturn == 4) {
       if (playerType1 == PlayerType.human) {
         whosturn = 1;
       } else {
         whosturn = 3;
       }
-    }
-    else {
+    } else {
       logger.e('change player');
     }
-    if( whosturn == 1 || whosturn == 3 ){
+    if (whosturn == 1 || whosturn == 3) {
       playerWins(2);
       playerWins(1);
-    }
-    else{
+    } else {
       playerWins(1);
       playerWins(2);
     }
@@ -342,7 +348,7 @@ class GameCubit extends Cubit<GameStates> {
             checker(player, getLastItemInTheBoard(y: 3, z: 0))) {
       winner = player;
       currentScreenIndex = 1;
-      aiai=false;
+      aiai = false;
       emit(GameFinished());
     }
   }
@@ -356,21 +362,20 @@ class GameCubit extends Cubit<GameStates> {
     return board[point.x][point.y][point.z].last;
   }
 
-
   /////////////////////////
 
   void restart() {
-    aiai=false;
+    aiai = false;
     whosturn = 1;
     aPieceIsToushed = 0;
     currentScreenIndex = 0;
     winner = 0;
     playerType1 = PlayerType.human;
     playerType2 = PlayerType.human;
-    type1=Selected.not;
-    type2=Selected.not;
-    level1=Selected.not;
-    level2=Selected.not;
+    type1 = Selected.not;
+    type2 = Selected.not;
+    level1 = Selected.not;
+    level2 = Selected.not;
     difficultyLevelForAI1 = 1;
     difficultyLevelForAI2 = 1;
     from = MyPoint()..nagOne();
@@ -557,5 +562,4 @@ class GameCubit extends Cubit<GameStates> {
   void insertNumber({required MyPoint point, required double num}) {
     board[point.x][point.y][point.z].add(num);
   }
-
 }
