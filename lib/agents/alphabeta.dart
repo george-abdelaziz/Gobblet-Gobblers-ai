@@ -10,7 +10,7 @@ class AlphaBeta extends Agent {
   double alphaBeta(Map<String, dynamic> gamestate, bool maximizer, int plr,
       int depth, double alpha, double beta) {
     if (depth == 0) {
-      return evaluate(gamestate, plr);
+      return evo == 1 ? evaluate(gamestate, plr) : evaluate2(gamestate, plr);
     }
 
     if (isWinningPos(gamestate['board']) != 0) {
