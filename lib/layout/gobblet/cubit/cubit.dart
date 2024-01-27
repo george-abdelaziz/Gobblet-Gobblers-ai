@@ -68,12 +68,8 @@ class GameCubit extends Cubit<GameStates> {
       whosturn = 3;
       while (aiai) {
         ai();
-        playerWins(2);
-        playerWins(1);
         await Future.delayed(const Duration(milliseconds: 20));
         ai();
-        playerWins(1);
-        playerWins(2);
         await Future.delayed(const Duration(milliseconds: 20));
       }
     }

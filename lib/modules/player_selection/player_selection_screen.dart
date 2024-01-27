@@ -59,8 +59,8 @@ class PlayerSelectionScreen extends StatelessWidget {
                   child: DropdownMenu(
                     dropdownMenuEntries: const [
                       DropdownMenuEntry<String>(label: 'Easy', value: '1'),
-                      DropdownMenuEntry<String>(label: 'Medium', value: '2'),
-                      DropdownMenuEntry<String>(label: 'Hard', value: '3'),
+                      DropdownMenuEntry<String>(label: 'Normal', value: '2'),
+                      DropdownMenuEntry<String>(label: 'Difficult', value: '3'),
                     ],
                     hintText: 'Player 1',
                     onSelected: (String? s) {
@@ -106,8 +106,8 @@ class PlayerSelectionScreen extends StatelessWidget {
                   child: DropdownMenu(
                     dropdownMenuEntries: const [
                       DropdownMenuEntry<String>(label: 'Easy', value: '1'),
-                      DropdownMenuEntry<String>(label: 'Medium', value: '2'),
-                      DropdownMenuEntry<String>(label: 'Hard', value: '3'),
+                      DropdownMenuEntry<String>(label: 'Normal', value: '2'),
+                      DropdownMenuEntry<String>(label: 'Difficult', value: '3'),
                     ],
                     hintText: 'Player 1',
                     onSelected: (String? s) {
