@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../layout/gobblet/cubit/cubit.dart';
 import '../../layout/gobblet/cubit/states.dart';
+import '../../models/my_classes.dart';
 
 class PlayerSelectionScreen extends StatelessWidget {
   const PlayerSelectionScreen({super.key});
@@ -38,8 +39,12 @@ class PlayerSelectionScreen extends StatelessWidget {
                         value: '3'),
                   ],
                   hintText: 'Player 1',
-                  onSelected: (String? value) {
-                    cubit.player1Type = value!;
+                  onSelected: (String? s) {
+                    if(s=='0'){cubit.playerType1 = PlayerType.human;}
+                    else if(s=='1'){cubit.playerType1 = PlayerType.minmax;}
+                    else if(s=='2'){cubit.playerType1 = PlayerType.alpa;}
+                    else if(s=='3'){cubit.playerType1 = PlayerType.iter;}
+                    cubit.type1=Selected.selected;
                     cubit.emit(Player1Selected());
                   },
                 ),
@@ -50,16 +55,19 @@ class PlayerSelectionScreen extends StatelessWidget {
                   maintainSize: false,
                   maintainAnimation: true,
                   maintainState: true,
-                  visible: cubit.player1Type != '0' && cubit.player1Type != '',
+                  visible: cubit.playerType1 != PlayerType.human,
                   child: DropdownMenu(
                     dropdownMenuEntries: const [
                       DropdownMenuEntry<String>(label: 'Easy', value: '1'),
                       DropdownMenuEntry<String>(label: 'Medium', value: '2'),
-                      DropdownMenuEntry<String>(label: 'Hard', value: '2'),
+                      DropdownMenuEntry<String>(label: 'Hard', value: '3'),
                     ],
                     hintText: 'Player 1',
-                    onSelected: (String? value) {
-                      cubit.difficultyLevelForAI1 = value!;
+                    onSelected: (String? s) {
+                      if(s=='1'){cubit.difficultyLevelForAI1 = 1;}
+                      else if(s=='2'){cubit.difficultyLevelForAI1 = 2;}
+                      else if(s=='3'){cubit.difficultyLevelForAI1 = 3;}
+                      cubit.level1=Selected.selected;
                       cubit.emit(Player1DifficultySelected());
                     },
                   ),
@@ -78,8 +86,12 @@ class PlayerSelectionScreen extends StatelessWidget {
                         value: '3'),
                   ],
                   hintText: 'Player 2',
-                  onSelected: (String? value) {
-                    cubit.player2Type = value!;
+                  onSelected: (String? s) {
+                    if(s=='0'){cubit.playerType2 = PlayerType.human;}
+                    else if(s=='1'){cubit.playerType2 = PlayerType.minmax;}
+                    else if(s=='2'){cubit.playerType2 = PlayerType.alpa;}
+                    else if(s=='3'){cubit.playerType2 = PlayerType.iter;}
+                    cubit.type2=Selected.selected;
                     cubit.emit(Player2Selected());
                   },
                 ),
@@ -90,16 +102,19 @@ class PlayerSelectionScreen extends StatelessWidget {
                   maintainSize: false,
                   maintainAnimation: true,
                   maintainState: true,
-                  visible: cubit.player2Type != '0' && cubit.player2Type != '',
+                  visible: cubit.playerType2 != PlayerType.human,
                   child: DropdownMenu(
                     dropdownMenuEntries: const [
                       DropdownMenuEntry<String>(label: 'Easy', value: '1'),
                       DropdownMenuEntry<String>(label: 'Medium', value: '2'),
-                      DropdownMenuEntry<String>(label: 'Hard', value: '2'),
+                      DropdownMenuEntry<String>(label: 'Hard', value: '3'),
                     ],
                     hintText: 'Player 1',
-                    onSelected: (String? value) {
-                      cubit.difficultyLevelForAI2 = value!;
+                    onSelected: (String? s) {
+                      if(s=='1'){cubit.difficultyLevelForAI2 = 1;}
+                      else if(s=='2'){cubit.difficultyLevelForAI2 = 2;}
+                      else if(s=='3'){cubit.difficultyLevelForAI2 = 3;}
+                      cubit.level2=Selected.selected;
                       cubit.emit(Player2DifficultySelected());
                     },
                   ),

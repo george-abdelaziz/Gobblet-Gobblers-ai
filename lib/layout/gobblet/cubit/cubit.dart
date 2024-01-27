@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
 
+import '../../../agents/alphabeta.dart';
 import '../../../agents/minimax.dart';
 import '/agents/agent.dart';
 import '/agents/utils.dart';
@@ -10,8 +11,6 @@ import '/models/my_classes.dart';
 import '/modules/board/board_screen.dart';
 import '/modules/player_selection/player_selection_screen.dart';
 import '/modules/win/win.dart';
-
-enum PlayerType { minmax, minmax2 }
 
 class GameCubit extends Cubit<GameStates> {
   GameCubit() : super(GameInitialState());
@@ -25,12 +24,18 @@ class GameCubit extends Cubit<GameStates> {
   int aPieceIsToushed = 0;
   int currentScreenIndex = 0;
   int winner = 0;
-  String player1Type = '';
-  String player2Type = '';
-  String difficultyLevelForAI1 = '';
-  String difficultyLevelForAI2 = '';
+  int difficultyLevelForAI1 = 1;
+  int difficultyLevelForAI2 = 1;
   MyPoint from = MyPoint()..nagOne();
   MyPoint to = MyPoint()..nagOne();
+  PlayerType playerType1 = PlayerType.human;
+  PlayerType playerType2 = PlayerType.human;
+  Selected type1=Selected.not;
+  Selected type2=Selected.not;
+  Selected level1=Selected.not;
+  Selected level2=Selected.not;
+  Agent ai1=MiniMax(1);
+  Agent ai2=MiniMax(1);
   var logger = Logger();
   final List<Widget> screens = [
     const PlayerSelectionScreen(),
@@ -39,83 +44,95 @@ class GameCubit extends Cubit<GameStates> {
   ];
 
   Future<void> playerSelectionDone() async {
-    if (player1Type != '' && player2Type != '!') {
-      if (player1Type != '0' && difficultyLevelForAI1 == '') {
-        return;
-      }
-      if (player2Type != '0' && difficultyLevelForAI2 == '') {
-        return;
-      }
+    if (type1 == Selected.selected && type2 == Selected.selected ) {
+      if (playerType1 != PlayerType.human && level1 == Selected.not) {return;}
+      if (playerType2 != PlayerType.human && level2 == Selected.not) {return;}
       currentScreenIndex = 1;
-      //start up code
+      startup();
       emit(GameStarted());
-      await Future.delayed(const Duration(milliseconds: 250));
-      if (player1Type != '0' && player2Type != '0') {
-        aiai=true;
-        whosturn = 3;
-        while (aiai) {
-          ai();
-          await Future.delayed(const Duration(milliseconds: 250));
-          ai();
-          await Future.delayed(const Duration(milliseconds: 250));
-        }
-      } else if (player1Type != '0') {
-        whosturn = 3;
-        ai();
-      } else {
-        whosturn = 1;
-      }
     } else {
       emit(PlayersNotSelected());
+    }
+  }
+
+  Future<void> startup() async {
+    if(playerType1==PlayerType.minmax){ai1=MiniMax(difficultyLevelForAI1);}
+    else if(playerType1==PlayerType.alpa){ai1=AlphaBeta(difficultyLevelForAI1);}
+    else if(playerType1==PlayerType.iter){ai1=MiniMax(difficultyLevelForAI1);}
+    if(playerType2==PlayerType.minmax){ai1=MiniMax(difficultyLevelForAI2);}
+    else if(playerType2==PlayerType.alpa){ai1=AlphaBeta(difficultyLevelForAI2);}
+    else if(playerType2==PlayerType.iter){ai1=MiniMax(difficultyLevelForAI2);}
+    await Future.delayed(const Duration(milliseconds: 50));
+    if (playerType1 != PlayerType.human && playerType2 != PlayerType.human) {
+      aiai=true;
+      whosturn = 3;
+      while (aiai) {
+        ai();
+        playerWins(2);
+        playerWins(1);
+        await Future.delayed(const Duration(milliseconds: 20));
+        ai();
+        playerWins(1);
+        playerWins(2);
+        await Future.delayed(const Duration(milliseconds: 20));
+      }
+    }
+    else if (playerType1 != PlayerType.human) {
+      whosturn = 3;
+      ai();
+    }
+    else {
+      whosturn = 1;
     }
   }
 
   Future<void> ai() async {
     emit(AI1Played());
     logger.d('message');
-
-    // add depth  ya georg
-    Agent player = MiniMax(3);
+    Agent player = (whosturn==3)?ai1:ai2;
     var x = getGameState(bti(board[0]), ctd(board[1][0]), ctd(board[2][0]));
     var move = player.calcBestMove(x, whosturn - 2);
-    /*
-
-    */
-    //play from outside
-    // if(move['type']=='play'){from.x=2;}
-    // else{from.x=0;}
     var y = applyMove(x, whosturn - 2, move);
     board[0] = convertToIntToDouble(y['board']);
     board[1][0] = convertListIntToDouble(y['p1']);
     board[2][0] = convertListIntToDouble(y['p2']);
     Logger().i(move);
     changePlayer();
+    if(whosturn==3){
+      playerWins(1);
+      playerWins(2);
+    }
+    else{
+      playerWins(2);
+      playerWins(1);
+    }
     emit(AI2Played());
   }
 
   void changePlayer() {
+    aPieceIsToushed = 0;
     from.nagOne();
     to.nagOne();
     if (whosturn == 1) {
-      if (player2Type == '0') {
+      if (playerType2 == PlayerType.human) {
         whosturn = 2;
       } else {
         whosturn = 4;
       }
     } else if (whosturn == 2) {
-      if (player1Type == '0') {
+      if (playerType1 == PlayerType.human) {
         whosturn = 1;
       } else {
         whosturn = 3;
       }
     } else if (whosturn == 3) {
-      if (player2Type == '0') {
+      if (playerType2 == PlayerType.human) {
         whosturn = 2;
       } else {
         whosturn = 4;
       }
     } else if (whosturn == 4) {
-      if (player1Type == '0') {
+      if (playerType1 == PlayerType.human) {
         whosturn = 1;
       } else {
         whosturn = 3;
@@ -123,7 +140,6 @@ class GameCubit extends Cubit<GameStates> {
     } else {
       logger.e('change player');
     }
-    aPieceIsToushed = 0;
   }
 
   void plays({required MyPoint point}) {
@@ -150,14 +166,12 @@ class GameCubit extends Cubit<GameStates> {
       )) {
         to = point;
         movePiece();
-        playerWins(whosturn);
-        playerWins(whosturn);
-        // player2wins();
-        // player1wins();
+        playerWins(1);
+        playerWins(2);
         changePlayer();
         emit(Player2Turn());
-        if (player2Type != '0') {
-          await Future.delayed(const Duration(milliseconds: 250));
+        if (playerType2 != PlayerType.human) {
+          await Future.delayed(const Duration(milliseconds: 50));
           ai();
         }
       } else {
@@ -184,16 +198,14 @@ class GameCubit extends Cubit<GameStates> {
       )) {
         to = point;
         movePiece();
-        // @greybeast
-        playerWins(whosturn);
-        // player1wins();
-        // player2wins();
+        playerWins(2);
+        playerWins(1);
         changePlayer();
         from.nagOne();
         to.nagOne();
         emit(Player1Turn());
-        if (player1Type != '0') {
-          await Future.delayed(const Duration(milliseconds: 250));
+        if (playerType1 != PlayerType.human) {
+          await Future.delayed(const Duration(milliseconds: 50));
           ai();
         }
       } else {
@@ -329,7 +341,8 @@ class GameCubit extends Cubit<GameStates> {
             checker(player, getLastItemInTheBoard(y: 3, z: 0))) {
       winner = player;
       currentScreenIndex = 2;
-      emit(player == 1 ? Player1Win() : Player2Win());
+      aiai=false;
+      emit(GameFinished());
     }
   }
 
@@ -342,15 +355,7 @@ class GameCubit extends Cubit<GameStates> {
     return board[point.x][point.y][point.z].last;
   }
 
-  void selectPlayer1(String value) {
-    player1Type = value;
-  }
-
-  void selectPlayer2(String value) {
-    player2Type = value;
-  }
-
-  ///////
+  ///////////////////
 
   List<List<List<double>>> convertToIntToDouble(List<List<List>> inputList) {
     List<List<List<double>>> result = [];
@@ -428,29 +433,7 @@ class GameCubit extends Cubit<GameStates> {
     return result;
   }
 
-  //////////////////// useless functions for now at least
-  void movePieceFromTo({
-    required MyPoint start,
-    required MyPoint end,
-  }) {
-    if (isValidMove(start: start, end: end)) {
-      end.insertNumber(arr: board, num: start.getLastNumber(arr: board));
-      start.popNumber(arr: board);
-    }
-  }
-
-  void popNumber({required MyPoint point}) {
-    if (getLastNumber(point: point) == 0) {
-      return;
-    }
-    board[point.x][point.y][point.z].removeLast();
-  }
-
-  void insertNumber({required MyPoint point, required double num}) {
-    board[point.x][point.y][point.z].add(num);
-  }
-
-  ///////////////////////// useful
+  /////////////////////////
 
   void restart() {
     aiai=false;
@@ -458,12 +441,16 @@ class GameCubit extends Cubit<GameStates> {
     aPieceIsToushed = 0;
     currentScreenIndex = 0;
     winner = 0;
-    player1Type = '';
-    player2Type = '';
-    difficultyLevelForAI1 = '';
-    difficultyLevelForAI2 = '';
-    from = MyPoint(x: 0);
-    to = MyPoint(x: 0);
+    playerType1 = PlayerType.human;
+    playerType2 = PlayerType.human;
+    type1=Selected.not;
+    type2=Selected.not;
+    level1=Selected.not;
+    level2=Selected.not;
+    difficultyLevelForAI1 = 1;
+    difficultyLevelForAI2 = 1;
+    from = MyPoint()..nagOne();
+    to = MyPoint()..nagOne();
     board = [
       [
         [
@@ -624,4 +611,27 @@ class GameCubit extends Cubit<GameStates> {
     ],
   ];
   //board[which board][vertical height of the board][horizontal width of the board][n/height of the stack]=double;
+
+  //////////////////// useless functions for now at least
+  void movePieceFromTo({
+    required MyPoint start,
+    required MyPoint end,
+  }) {
+    if (isValidMove(start: start, end: end)) {
+      end.insertNumber(arr: board, num: start.getLastNumber(arr: board));
+      start.popNumber(arr: board);
+    }
+  }
+
+  void popNumber({required MyPoint point}) {
+    if (getLastNumber(point: point) == 0) {
+      return;
+    }
+    board[point.x][point.y][point.z].removeLast();
+  }
+
+  void insertNumber({required MyPoint point, required double num}) {
+    board[point.x][point.y][point.z].add(num);
+  }
+
 }

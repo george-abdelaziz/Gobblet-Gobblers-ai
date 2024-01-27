@@ -15,27 +15,27 @@ class BoardScreen extends StatelessWidget {
         final cubit = GameCubit.get(context);
         //@greybeast
         return SingleChildScrollView(
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                MaterialButton(
-                  color: Colors.deepPurpleAccent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+          scrollDirection : Axis.horizontal,
+          child: SingleChildScrollView(
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  MaterialButton(
+                    color: Colors.deepPurpleAccent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Text('GET OUT'),
+                    onPressed: (){
+                      cubit.restart();
+                    },
                   ),
-                  child: const Text('GET OUT'),
-                  onPressed: (){
-                    cubit.restart();
-                  },
-                ),
-                player(context, 1),
-                board(context),
-                player(context, 2),
-
-                // player1(context, 2),
-                // player2(context),
-              ],
+                  player(context, 1),
+                  board(context),
+                  player(context, 2),
+                ],
+              ),
             ),
           ),
         );

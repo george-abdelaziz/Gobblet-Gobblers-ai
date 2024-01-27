@@ -1,7 +1,8 @@
 double abs(double a) {
   return a > 0 ? a : -a;
 }
-
+enum PlayerType { human,minmax, alpa,iter }
+enum Selected{selected,not}
 class MyPoint {
   //qwerty[which board][vertical height of the board][horizontal width of the board][n/height of the stack]=double;
   //qwerty[x][y][z][n]=double;

@@ -2,6 +2,7 @@ abstract class GameStates {}
 
 class GameInitialState extends GameStates {}
 
+class GameFinished extends GameStates{}
 /////
 class Player1Selected extends GameStates {}
 
