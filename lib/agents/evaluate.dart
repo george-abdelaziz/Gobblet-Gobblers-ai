@@ -14,13 +14,12 @@ double evaluate(Map gametstate, int player) {
   double netNeg=0;
   for(int i=0;i<4;i++){
     for(int ii=0;ii<4;ii++){
-      if(gametstate['board'][i][ii].isEmpty){continue;}
       if(gametstate['board'][i][ii].last>0){
         pos+=gametstate['board'][i][ii].last;
         npos*=10;
       }
       else if(gametstate['board'][i][ii].last<0){
-        neg+=gametstate['board'][i][ii].last+neg*10;
+        neg+=gametstate['board'][i][ii].last;
         nneg*=10;
       }
     }
@@ -32,7 +31,6 @@ double evaluate(Map gametstate, int player) {
     neg=0;
   }
   for(int i=0;i<4;i++){
-    if(gametstate['board'][i][i].isEmpty){continue;}
     if(gametstate['board'][i][i].last>0){
       pos+=gametstate['board'][i][i].last;
       npos*=10;
@@ -49,7 +47,6 @@ double evaluate(Map gametstate, int player) {
   pos=0;
   neg=0;
   for(int i=0;i<4;i++){
-    if(gametstate['board'][i][3-i].isEmpty){continue;}
     if(gametstate['board'][i][3-i].last>0){
       pos+=gametstate['board'][i][3-i].last;
       npos*=10;
@@ -61,10 +58,6 @@ double evaluate(Map gametstate, int player) {
   }
   netPos=pos*npos+netPos;
   netNeg=netNeg+neg*nneg;
-  npos=1;
-  nneg=1;
-  pos=0;
-  neg=0;
   score=netPos+netNeg;
   // List<List<List>> board = gametstate["board"];
   // var score = 0.0;
