@@ -16,8 +16,10 @@ import 'utils.dart';
 
 class MiniMax extends Agent {
   MiniMax(depth) : super(depth);
+  int count = 0;
   double minimax(
       Map<String, dynamic> gamestate, bool maximizer, int plr, int depth) {
+    count++;
     if (depth == 0) {
       return evaluate(gamestate, plr);
     }
@@ -55,6 +57,7 @@ class MiniMax extends Agent {
     int nextPlr = plr == 1 ? 2 : 1;
     List<dynamic> candidateMoves = genMoves(plr, gamestate);
 
+    count = 0;
     for (var i = 0; i < candidateMoves.length; i++) {
       var move = candidateMoves[i];
       var newGameState = applyMove(gamestate, plr, move);
@@ -70,7 +73,7 @@ class MiniMax extends Agent {
         bestMove = move;
       }
     }
-    Logger().d(bestMove);
+    bestMove["count"] = count;
     return bestMove;
   }
 }

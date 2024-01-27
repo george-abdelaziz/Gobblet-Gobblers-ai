@@ -5,9 +5,11 @@ import '/agents/utils.dart';
 
 class AlphaBeta extends Agent {
   AlphaBeta(depth) : super(depth);
+  int count = 0;
 
   double alphaBeta(Map<String, dynamic> gamestate, bool maximizer, int plr,
       int depth, double alpha, double beta) {
+    count++;
     if (depth == 0) {
       return evaluate(gamestate, plr);
     }
@@ -51,6 +53,7 @@ class AlphaBeta extends Agent {
     int nextPlr = plr == 1 ? 2 : 1;
     List<dynamic> candidateMoves = genMoves(plr, gamestate);
 
+    count = 0;
     for (var i = 0; i < candidateMoves.length; i++) {
       var move = candidateMoves[i];
       var newGameState = applyMove(gamestate, plr, move);
@@ -67,6 +70,7 @@ class AlphaBeta extends Agent {
         bestMove = move;
       }
     }
+    bestMove['count'] = count;
     return bestMove;
   }
 }
