@@ -1,5 +1,7 @@
-import 'package:ai_project/shared/bloc_observer.dart';
-import 'package:bloc/bloc.dart';
+import 'package:ai_project/cubit/cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '/shared/bloc_observer.dart';
 import 'package:flutter/material.dart';
 
 import 'layout/gobblet/gobblet.dart';
@@ -15,9 +17,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Gobblet(),
+    return BlocProvider(
+      create: (context) => GameCubit(),
+      child: const MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Gobblet(),
+      ),
     );
   }
 }

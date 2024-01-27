@@ -1,21 +1,21 @@
+import 'package:ai_project/models/adapter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
 
-import '../../../agents/minimax.dart';
+import '../agents/minimax.dart';
 import '/agents/agent.dart';
 import '/agents/utils.dart';
-import '/layout/gobblet/cubit/states.dart';
+import '/cubit/states.dart';
 import '/models/my_classes.dart';
 import '/modules/board/board_screen.dart';
 import '/modules/player_selection/player_selection_screen.dart';
 import '/modules/win/win.dart';
 
-enum PlayerType { minmax, minmax2 }
-
-class GameCubit extends Cubit<GameStates> {
+class GameCubit extends Cubit<GameState> {
   GameCubit() : super(GameInitialState());
 
+  // carefull
   static GameCubit get(context) {
     return BlocProvider.of(context);
   }
@@ -28,16 +28,19 @@ class GameCubit extends Cubit<GameStates> {
   String player2Type = '';
   String difficultyLevelForAI1 = '';
   String difficultyLevelForAI2 = '';
+
   MyPoint from = MyPoint()..nagOne();
   MyPoint to = MyPoint()..nagOne();
-  var logger = Logger();
+
+  final Logger logger = Logger();
+
   final List<Widget> screens = [
     const PlayerSelectionScreen(),
     const BoardScreen(),
     const WinScreen(),
   ];
+
   void playerSelectionDone() {
-    // if(PlayerType.)
     if (player1Type != '' && player2Type != '!') {
       if (player1Type != '0' && difficultyLevelForAI1 == '') {
         return;
@@ -67,21 +70,14 @@ class GameCubit extends Cubit<GameStates> {
 
   void ai() {
     emit(AI1Played());
-    logger.d('message');
-    // add depth  ya georg
-    Agent player = MiniMax(3);
-    var x = getGameState(bti(board[0]), ctd(board[1][0]), ctd(board[2][0]));
-    var move = player.calcBestMove(x, whosturn - 2);
-    /*
 
-    */
-    //play from outside
-    // if(move['type']=='play'){from.x=2;}
-    // else{from.x=0;}
+    Agent player = MiniMax(3);
+
+    var x = Adapter().f2b(board);
+    var move = player.calcBestMove(x, whosturn - 2);
     var y = applyMove(x, whosturn - 2, move);
-    board[0] = convertToIntToDouble(y['board']);
-    board[1][0] = convertListIntToDouble(y['p1']);
-    board[2][0] = convertListIntToDouble(y['p2']);
+    board = Adapter().b2f(y, board);
+
     Logger().i(move);
     changePlayer();
     emit(AI2Played());
@@ -113,8 +109,7 @@ class GameCubit extends Cubit<GameStates> {
         whosturn = 3;
       }
     } else {
-      kprint(
-          'qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq');
+      kprint('qqqqq');
     }
     aPieceIsToushed = 0;
   }
@@ -193,16 +188,14 @@ class GameCubit extends Cubit<GameStates> {
     }
   }
 
-  bool isValidMove({
-    required MyPoint start,
-    required MyPoint end,
-  }) {
+  bool isValidMove({required MyPoint start, required MyPoint end}) {
     int row = 0;
     int col = 0;
     int dia = 0;
+    // greybeast
     if (end.x != 0 ||
-        abs(start.getLastNumber(arr: board)) <=
-            abs(end.getLastNumber(arr: board))) {
+        start.getLastNumber(arr: board).abs() <=
+            end.getLastNumber(arr: board).abs()) {
       return false;
     }
     if (start.x == 1 && end.getLastNumber(arr: board) < 0) {
@@ -274,60 +267,12 @@ class GameCubit extends Cubit<GameStates> {
     }
   }
 
-  void playerWins(int player) {
-    bool checker(plr, x) => plr == 1 ? x > 0 : x < 0;
-    if (checker(player, getLastItemInTheBoard(y: 0, z: 0)) &&
-            checker(player, getLastItemInTheBoard(y: 1, z: 0)) &&
-            checker(player, getLastItemInTheBoard(y: 2, z: 0)) &&
-            checker(player, getLastItemInTheBoard(y: 3, z: 0)) ||
-        checker(player, getLastItemInTheBoard(y: 0, z: 1)) &&
-            checker(player, getLastItemInTheBoard(y: 1, z: 1)) &&
-            checker(player, getLastItemInTheBoard(y: 2, z: 1)) &&
-            checker(player, getLastItemInTheBoard(y: 3, z: 1)) ||
-        checker(player, getLastItemInTheBoard(y: 0, z: 2)) &&
-            checker(player, getLastItemInTheBoard(y: 1, z: 2)) &&
-            checker(player, getLastItemInTheBoard(y: 2, z: 2)) &&
-            checker(player, getLastItemInTheBoard(y: 3, z: 2)) ||
-        checker(player, getLastItemInTheBoard(y: 0, z: 3)) &&
-            checker(player, getLastItemInTheBoard(y: 1, z: 3)) &&
-            checker(player, getLastItemInTheBoard(y: 2, z: 3)) &&
-            checker(player, getLastItemInTheBoard(y: 3, z: 3)) ||
-        checker(player, getLastItemInTheBoard(y: 0, z: 0)) &&
-            checker(player, getLastItemInTheBoard(y: 0, z: 1)) &&
-            checker(player, getLastItemInTheBoard(y: 0, z: 2)) &&
-            checker(player, getLastItemInTheBoard(y: 0, z: 3)) ||
-        checker(player, getLastItemInTheBoard(y: 1, z: 0)) &&
-            checker(player, getLastItemInTheBoard(y: 1, z: 1)) &&
-            checker(player, getLastItemInTheBoard(y: 1, z: 2)) &&
-            checker(player, getLastItemInTheBoard(y: 1, z: 3)) ||
-        checker(player, getLastItemInTheBoard(y: 2, z: 0)) &&
-            checker(player, getLastItemInTheBoard(y: 2, z: 1)) &&
-            checker(player, getLastItemInTheBoard(y: 2, z: 2)) &&
-            checker(player, getLastItemInTheBoard(y: 2, z: 3)) ||
-        checker(player, getLastItemInTheBoard(y: 3, z: 0)) &&
-            checker(player, getLastItemInTheBoard(y: 3, z: 1)) &&
-            checker(player, getLastItemInTheBoard(y: 3, z: 2)) &&
-            checker(player, getLastItemInTheBoard(y: 3, z: 3)) ||
-        checker(player, getLastItemInTheBoard(y: 0, z: 0)) &&
-            checker(player, getLastItemInTheBoard(y: 1, z: 1)) &&
-            checker(player, getLastItemInTheBoard(y: 2, z: 2)) &&
-            checker(player, getLastItemInTheBoard(y: 3, z: 3)) ||
-        checker(player, getLastItemInTheBoard(y: 0, z: 3)) &&
-            checker(player, getLastItemInTheBoard(y: 1, z: 2)) &&
-            checker(player, getLastItemInTheBoard(y: 2, z: 1)) &&
-            checker(player, getLastItemInTheBoard(y: 3, z: 0))) {
-      winner = player;
-      currentScreenIndex = 2;
-      emit(player == 1 ? Player1Win() : Player2Win());
-    }
-  }
-
   double getLastItemInTheBoard({required int y, required int z}) {
     return board[0][y][z].last;
   }
 
   double getLastNumber({required MyPoint point}) {
-    if (board[point.x][point.y][point.z].length == 0) return 0;
+    if (board[point.x][point.y][point.z].isEmpty) return 0;
     return board[point.x][point.y][point.z].last;
   }
 
@@ -340,107 +285,7 @@ class GameCubit extends Cubit<GameStates> {
   }
 
   ///////
-
-  List<List<List<double>>> convertToIntToDouble(List<List<List>> inputList) {
-    List<List<List<double>>> result = [];
-
-    for (List<List> outerList in inputList) {
-      List<List<double>> outerResult = [];
-
-      for (List innerList in outerList) {
-        List<double> innerResult = [];
-
-        for (int value in innerList) {
-          innerResult.add(value.toDouble());
-        }
-
-        outerResult.add(innerResult);
-      }
-
-      result.add(outerResult);
-    }
-
-    return result;
-  }
-
-  List<List<double>> convertListIntToDouble(List<List> inputList) {
-    List<List<double>> result = [];
-
-    for (List innerList in inputList) {
-      List<double> innerResult = [];
-
-      for (int value in innerList) {
-        innerResult.add(value.toDouble());
-      }
-
-      result.add(innerResult);
-    }
-
-    return result;
-  }
-
-  List<List> ctd(List<List<double>> inputList) {
-    List<List> result = [];
-
-    for (List<double> innerList in inputList) {
-      List<int> innerResult = [];
-
-      for (double value in innerList) {
-        innerResult.add(value.toInt());
-      }
-
-      result.add(innerResult);
-    }
-
-    return result;
-  }
-
-  List<List<List>> bti(List<List<List<double>>> inputList) {
-    List<List<List>> result = [];
-
-    for (List<List<double>> outerList in inputList) {
-      List<List<int>> outerResult = [];
-
-      for (List<double> innerList in outerList) {
-        List<int> innerResult = [];
-
-        for (double value in innerList) {
-          innerResult.add(value.toInt());
-        }
-
-        outerResult.add(innerResult);
-      }
-
-      result.add(outerResult);
-    }
-
-    return result;
-  }
-
-  //////////////////// useless functions for now at least
-  void movePieceFromTo({
-    required MyPoint start,
-    required MyPoint end,
-  }) {
-    if (isValidMove(start: start, end: end)) {
-      end.insertNumber(arr: board, num: start.getLastNumber(arr: board));
-      start.popNumber(arr: board);
-    }
-  }
-
-  void popNumber({required MyPoint point}) {
-    if (getLastNumber(point: point) == 0) {
-      return;
-    }
-    board[point.x][point.y][point.z].removeLast();
-  }
-
-  void insertNumber({required MyPoint point, required double num}) {
-    board[point.x][point.y][point.z].add(num);
-  }
-
-  ///////////////////////// useful
-
+  // useful
   void restart() {
     whosturn = 1;
     aPieceIsToushed = 0;
@@ -533,6 +378,55 @@ class GameCubit extends Cubit<GameStates> {
     emit(Restart());
   }
 
+  //board[which board][vertical height of the board][horizontal width of the board][n/height of the stack]=double;
+  void playerWins(int player) {
+    bool checker(plr, x) => plr == 1 ? x > 0 : x < 0;
+    if (checker(player, getLastItemInTheBoard(y: 0, z: 0)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 0)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 0)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 0)) ||
+        checker(player, getLastItemInTheBoard(y: 0, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 1)) ||
+        checker(player, getLastItemInTheBoard(y: 0, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 2)) ||
+        checker(player, getLastItemInTheBoard(y: 0, z: 3)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 3)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 3)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 3)) ||
+        checker(player, getLastItemInTheBoard(y: 0, z: 0)) &&
+            checker(player, getLastItemInTheBoard(y: 0, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 0, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 0, z: 3)) ||
+        checker(player, getLastItemInTheBoard(y: 1, z: 0)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 3)) ||
+        checker(player, getLastItemInTheBoard(y: 2, z: 0)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 3)) ||
+        checker(player, getLastItemInTheBoard(y: 3, z: 0)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 3)) ||
+        checker(player, getLastItemInTheBoard(y: 0, z: 0)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 3)) ||
+        checker(player, getLastItemInTheBoard(y: 0, z: 3)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 0))) {
+      winner = player;
+      currentScreenIndex = 2;
+      emit(player == 1 ? Player1Win() : Player2Win());
+    }
+  }
+
   List<List<List<List<double>>>> board = [
     [
       [
@@ -611,5 +505,4 @@ class GameCubit extends Cubit<GameStates> {
       ],
     ],
   ];
-  //board[which board][vertical height of the board][horizontal width of the board][n/height of the stack]=double;
 }

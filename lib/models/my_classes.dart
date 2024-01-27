@@ -1,6 +1,4 @@
-double abs(double a) {
-  return a > 0 ? a : -a;
-}
+import 'package:ai_project/agents/utils.dart';
 
 class MyPoint {
   //qwerty[which board][vertical height of the board][horizontal width of the board][n/height of the stack]=double;
@@ -24,11 +22,11 @@ class MyPoint {
   }
 
   void myPrint() {
-    print('$x,     $y,     $z');
+    kprint('$x, $y, $z');
   }
 
   double getLastNumber({required List<List<List<List<double>>>> arr}) {
-    if(arr[x][y][z].length==0)return 0;
+    if (arr[x][y][z].isEmpty) return 0;
     return arr[x][y][z].last;
   }
 

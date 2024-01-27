@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../layout/gobblet/cubit/cubit.dart';
-import '../../layout/gobblet/cubit/states.dart';
+import '../../cubit/cubit.dart';
+import '../../cubit/states.dart';
 
 class PlayerSelectionScreen extends StatelessWidget {
   const PlayerSelectionScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<GameCubit, GameStates>(
+    return BlocConsumer<GameCubit, GameState>(
       listener: (context, state) {},
       builder: (context, state) {
         var cubit = GameCubit.get(context);

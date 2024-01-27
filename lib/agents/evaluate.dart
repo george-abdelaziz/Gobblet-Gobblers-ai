@@ -1,7 +1,7 @@
 import 'dart:math';
 
-import 'package:ai_project/agents/config.dart';
-import 'package:ai_project/agents/utils.dart';
+import '/agents/utils.dart';
+import '/agents/config.dart';
 
 int weight = 1;
 double evaluate(Map gametstate, int player) {

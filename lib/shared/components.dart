@@ -1,29 +1,25 @@
-import 'package:ai_project/layout/gobblet/cubit/cubit.dart';
-import 'package:ai_project/models/my_classes.dart';
 import 'package:flutter/material.dart';
 
-Widget? piece({
-  required BuildContext context,
-  required MyPoint point,
-}) {
+import '../cubit/cubit.dart';
+import '/models/my_classes.dart';
+
+Widget piece({required BuildContext context, required MyPoint point}) {
   GameCubit cubit = GameCubit.get(context);
   double size = point.getLastNumber(arr: cubit.board);
   if (size == 0) {
-    return null;
+    return const SizedBox();
   }
   Color color;
   size = 20 * size;
-  if (size > 0) {
-    color = Colors.red;
-  } else {
-    size = -size;
-    color = Colors.lightBlueAccent;
-  }
+  color = (size > 0) ? Colors.red : Colors.lightBlue;
+  size = size.abs();
+
   if (point.x == cubit.from.x &&
       point.y == cubit.from.y &&
       point.z == cubit.from.z) {
     color = Colors.greenAccent;
   }
+
   return Center(
     child: MaterialButton(
       height: size,
@@ -38,10 +34,7 @@ Widget? piece({
   );
 }
 
-Widget square({
-  required BuildContext context,
-  required MyPoint point,
-}) {
+Widget square({required BuildContext context, required MyPoint point}) {
   Color color = Colors.black12;
   if (point.x == 0) {
     if ((point.y + point.z) % 2 == 0) {
@@ -66,7 +59,7 @@ Widget square({
   );
 }
 
-Widget player(BuildContext context, int player) {
+Widget playerRepo(BuildContext context, int player) {
   return Center(
     child: Padding(
       padding: const EdgeInsets.all(20),
@@ -110,146 +103,50 @@ Widget player(BuildContext context, int player) {
   );
 }
 
-Widget board(BuildContext context,) {
+Widget board(BuildContext context) {
   return Center(
     child: Padding(
       padding: const EdgeInsets.all(0),
       child: Container(
         decoration:
-        BoxDecoration(border: Border.all(width: 2, color: Colors.black)),
+            BoxDecoration(border: Border.all(width: 2, color: Colors.black)),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                square(
-                  context: context,
-                  point: MyPoint(
-                    y: 0,
-                    z: 0,
-                  ),
-                ),
-                square(
-                  context: context,
-                  point: MyPoint(
-                    y: 0,
-                    z: 1,
-                  ),
-                ),
-                square(
-                  context: context,
-                  point: MyPoint(
-                    y: 0,
-                    z: 2,
-                  ),
-                ),
-                square(
-                  context: context,
-                  point: MyPoint(
-                    y: 0,
-                    z: 3,
-                  ),
-                ),
+                square(context: context, point: MyPoint(y: 0, z: 0)),
+                square(context: context, point: MyPoint(y: 0, z: 1)),
+                square(context: context, point: MyPoint(y: 0, z: 2)),
+                square(context: context, point: MyPoint(y: 0, z: 3))
               ],
             ),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                square(
-                  context: context,
-                  point: MyPoint(
-                    y: 1,
-                    z: 0,
-                  ),
-                ),
-                square(
-                  context: context,
-                  point: MyPoint(
-                    y: 1,
-                    z: 1,
-                  ),
-                ),
-                square(
-                  context: context,
-                  point: MyPoint(
-                    y: 1,
-                    z: 2,
-                  ),
-                ),
-                square(
-                  context: context,
-                  point: MyPoint(
-                    y: 1,
-                    z: 3,
-                  ),
-                ),
+                square(context: context, point: MyPoint(y: 1, z: 0)),
+                square(context: context, point: MyPoint(y: 1, z: 1)),
+                square(context: context, point: MyPoint(y: 1, z: 2)),
+                square(context: context, point: MyPoint(y: 1, z: 3)),
               ],
             ),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                square(
-                  context: context,
-                  point: MyPoint(
-                    y: 2,
-                    z: 0,
-                  ),
-                ),
-                square(
-                  context: context,
-                  point: MyPoint(
-                    y: 2,
-                    z: 1,
-                  ),
-                ),
-                square(
-                  context: context,
-                  point: MyPoint(
-                    y: 2,
-                    z: 2,
-                  ),
-                ),
-                square(
-                  context: context,
-                  point: MyPoint(
-                    y: 2,
-                    z: 3,
-                  ),
-                ),
+                square(context: context, point: MyPoint(y: 2, z: 0)),
+                square(context: context, point: MyPoint(y: 2, z: 1)),
+                square(context: context, point: MyPoint(y: 2, z: 2)),
+                square(context: context, point: MyPoint(y: 2, z: 3)),
               ],
             ),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                square(
-                  context: context,
-                  point: MyPoint(
-                    y: 3,
-                    z: 0,
-                  ),
-                ),
-                square(
-                  context: context,
-                  point: MyPoint(
-                    y: 3,
-                    z: 1,
-                  ),
-                ),
-                square(
-                  context: context,
-                  point: MyPoint(
-                    y: 3,
-                    z: 2,
-                  ),
-                ),
-                square(
-                  context: context,
-                  point: MyPoint(
-                    y: 3,
-                    z: 3,
-                  ),
-                ),
+                square(context: context, point: MyPoint(y: 3, z: 0)),
+                square(context: context, point: MyPoint(y: 3, z: 1)),
+                square(context: context, point: MyPoint(y: 3, z: 2)),
+                square(context: context, point: MyPoint(y: 3, z: 3)),
               ],
             ),
           ],
