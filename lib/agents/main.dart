@@ -5,8 +5,8 @@ import 'config.dart';
 import 'minimax.dart';
 import 'utils.dart';
 
-Agent player1 = MiniMax();
-Agent player2 = MiniMax();
+Agent player1 = MiniMax(1);
+Agent player2 = MiniMax(2);
 
 play() {
   Map<String, dynamic> gamestate = Config.initialgame;
