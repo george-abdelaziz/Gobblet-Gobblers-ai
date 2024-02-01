@@ -20,7 +20,9 @@ class HomeScreen extends StatelessWidget {
             cubit.aiBattle();
           }
           if (state is AIPlayed) {
-            cubit.ai();
+            if (!cubit.playerWins(1) && !cubit.playerWins(2)) {
+              cubit.ai();
+            }
           }
         },
         builder: (BuildContext context, GameStates state) {

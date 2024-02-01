@@ -25,15 +25,8 @@ class GameCubit extends Cubit<GameStates> {
     return BlocProvider.of(context);
   }
 
-/*
-0000
-0000
-0000
-0000
-*/
   final logger = Logger();
   final adapter = Adapter();
-  bool aiai = false;
   int whosturn = 1;
   int aPieceIsToushed = 0;
   int screenIndex = 0;
@@ -102,7 +95,6 @@ class GameCubit extends Cubit<GameStates> {
   }
 
   void aiBattle() async {
-    aiai = true;
     whosturn = 3;
     ai();
   }
@@ -261,8 +253,8 @@ class GameCubit extends Cubit<GameStates> {
     int col = 0;
     int dia = 0;
     if (end.x != 0 ||
-        abs(start.getLastNumber(arr: board)) <=
-            abs(end.getLastNumber(arr: board))) {
+        start.getLastNumber(arr: board).abs() <=
+            end.getLastNumber(arr: board).abs()) {
       return false;
     }
     if (start.x == 1 && end.getLastNumber(arr: board) < 0) {
@@ -343,10 +335,7 @@ class GameCubit extends Cubit<GameStates> {
     return board[point.x][point.y][point.z].last;
   }
 
-  //
-
   void restart() {
-    aiai = false;
     whosturn = 1;
     aPieceIsToushed = 0;
     screenIndex = 0;
@@ -486,7 +475,6 @@ class GameCubit extends Cubit<GameStates> {
             checker(player, getLastItemInTheBoard(y: 3, z: 0))) {
       winner = player;
       screenIndex = 2;
-      aiai = false;
       emit(GameFinished());
       return true;
     }
@@ -576,8 +564,4 @@ class GameCubit extends Cubit<GameStates> {
       ],
     ],
   ];
-}
-
-complextTaxio(iputs) {
-  for (var i = 0; i < 10000; i++) {}
 }

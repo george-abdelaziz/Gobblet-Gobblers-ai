@@ -1,4 +1,4 @@
-import 'package:ai_project/cubit/cubit.dart';
+import 'package:ai_project/cubit/game_cubit.dart';
 import 'package:ai_project/models/board_point.dart';
 import 'package:flutter/material.dart';
 

@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:ai_project/models/my_classes.dart';
 import 'package:ai_project/models/adapter.dart';
 import 'package:ai_project/models/board_point.dart';
 
@@ -156,8 +155,8 @@ bool _validate({
   int col = 0;
   int dia = 0;
   if (end.x != 0 ||
-      abs(start.getLastNumber(arr: board)) <=
-          abs(end.getLastNumber(arr: board))) {
+      start.getLastNumber(arr: board).abs() <=
+          end.getLastNumber(arr: board).abs()) {
     return false;
   }
   if (start.x == 1 && end.getLastNumber(arr: board) < 0) {
