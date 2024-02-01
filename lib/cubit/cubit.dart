@@ -1,19 +1,21 @@
+import 'dart:isolate';
+
 import 'package:ai_project/cubit/states.dart';
 import 'package:ai_project/models/board_point.dart';
+import 'package:ai_project/view/board/board_screen.dart';
+import 'package:ai_project/view/player_selection/player_selection_screen.dart';
+import 'package:ai_project/view/win/win.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
 
 import '../agents/alphabeta.dart';
 import '../agents/minimax.dart';
+import '../models/adapter.dart';
 import '/agents/agent.dart';
 import '/agents/iterative_deeping.dart';
 import '/agents/utils.dart';
 import '/models/my_classes.dart';
-import '../models/adapter.dart';
-import '../screens/board/board_screen.dart';
-import '../screens/player_selection/player_selection_screen.dart';
-import '../screens/win/win.dart';
 
 // board[which board][vertical height of the board][horizontal width of the board][n/height of the stack]=double;
 class GameCubit extends Cubit<GameStates> {
@@ -90,8 +92,7 @@ class GameCubit extends Cubit<GameStates> {
     }
     await Future.delayed(const Duration(milliseconds: 50));
     if (playerType1 != PlayerType.human && playerType2 != PlayerType.human) {
-      aiBattle();
-      // emit(BattleOfTheAIs());
+      emit(BattleOfTheAIs());
     } else if (playerType1 != PlayerType.human) {
       whosturn = 3;
       ai();
@@ -103,10 +104,7 @@ class GameCubit extends Cubit<GameStates> {
   void aiBattle() async {
     aiai = true;
     whosturn = 3;
-    while (aiai) {
-      ai();
-      await Future.delayed(const Duration(milliseconds: 20));
-    }
+    ai();
   }
 
   Future<void> ai() async {
@@ -119,12 +117,30 @@ class GameCubit extends Cubit<GameStates> {
       return;
     }
     var x = adapter.f2b(board);
-    var move = player.calcBestMove(x, whosturn - 2);
-    var y = applyMove(x, whosturn - 2, move);
-    board = adapter.b2f(y, board);
-    logger.i(move);
-    changePlayer();
-    emit(AIPlayed());
+    // var move = player.calcBestMove(x, whosturn - 2);
+    ReceivePort receivePort = ReceivePort();
+    await Isolate.spawn((Map message) {
+      SendPort sendPort = message['sendport'];
+      Agent agent = message['bot'];
+      var move = agent.calcBestMove(message['i1'], message['i2']);
+      sendPort.send(move);
+    }, {
+      'sendport': receivePort.sendPort,
+      'bot': player,
+      'i1': x,
+      'i2': whosturn - 2
+    });
+
+    receivePort.listen((move) {
+      var y = applyMove(x, whosturn - 2, move);
+      board = adapter.b2f(y, board);
+      logger.i(move);
+      changePlayer();
+      kprint('1');
+      emit(AIPlayed());
+      kprint('2');
+      receivePort.close();
+    });
   }
 
   void changePlayer() {
@@ -426,7 +442,7 @@ class GameCubit extends Cubit<GameStates> {
     emit(Restart());
   }
 
-  void playerWins(int player) {
+  bool playerWins(int player) {
     bool checker(plr, x) => plr == 1 ? x > 0 : x < 0;
     if (checker(player, getLastItemInTheBoard(y: 0, z: 0)) &&
             checker(player, getLastItemInTheBoard(y: 1, z: 0)) &&
@@ -472,7 +488,9 @@ class GameCubit extends Cubit<GameStates> {
       screenIndex = 2;
       aiai = false;
       emit(GameFinished());
+      return true;
     }
+    return false;
   }
 
   void backToBoard() {
@@ -558,4 +576,8 @@ class GameCubit extends Cubit<GameStates> {
       ],
     ],
   ];
+}
+
+complextTaxio(iputs) {
+  for (var i = 0; i < 10000; i++) {}
 }

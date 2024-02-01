@@ -1,4 +1,3 @@
-import 'package:ai_project/agents/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -15,7 +14,15 @@ class HomeScreen extends StatelessWidget {
         return GameCubit();
       },
       child: BlocConsumer<GameCubit, GameStates>(
-        listener: (BuildContext context, GameStates state) async {},
+        listener: (BuildContext context, GameStates state) async {
+          var cubit = GameCubit.get(context);
+          if (state is BattleOfTheAIs) {
+            cubit.aiBattle();
+          }
+          if (state is AIPlayed) {
+            cubit.ai();
+          }
+        },
         builder: (BuildContext context, GameStates state) {
           var cubit = GameCubit.get(context);
           return Scaffold(

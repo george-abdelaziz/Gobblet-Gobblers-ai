@@ -1,8 +1,5 @@
-import 'package:ai_project/shared/bloc_observer.dart';
-import 'package:bloc/bloc.dart';
+import 'package:ai_project/view/home.dart';
 import 'package:flutter/material.dart';
-
-import 'screens/home.dart';
 
 void main() {
   // Bloc.observer = MyBlocObserver();
