@@ -2,7 +2,6 @@ import 'package:ai_project/agents/utils.dart';
 
 class Adapter {
   List<List<List<List<double>>>> b2f(Map<String, dynamic> game, board) {
-    List<List<List<List<double>>>> b=[[],[],[]];
     board[0] = _convInt2Double(game['board']);
     board[1][0] = _convListInt2Double(game['p1']);
     board[2][0] = _convListInt2Double(game['p2']);

@@ -1,4 +1,5 @@
 import 'package:ai_project/cubit/states.dart';
+import 'package:ai_project/models/board_point.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
@@ -14,6 +15,7 @@ import '../screens/board/board_screen.dart';
 import '../screens/player_selection/player_selection_screen.dart';
 import '../screens/win/win.dart';
 
+// board[which board][vertical height of the board][horizontal width of the board][n/height of the stack]=double;
 class GameCubit extends Cubit<GameStates> {
   GameCubit() : super(GameInitialState());
 
@@ -27,6 +29,8 @@ class GameCubit extends Cubit<GameStates> {
 0000
 0000
 */
+  final logger = Logger();
+  final adapter = Adapter();
   bool aiai = false;
   int whosturn = 1;
   int aPieceIsToushed = 0;
@@ -35,9 +39,8 @@ class GameCubit extends Cubit<GameStates> {
   int difficultyLevelForAI1 = 1;
   int difficultyLevelForAI2 = 1;
 
-  Adapter adapter = Adapter();
-  MyPoint from = MyPoint()..nagOne();
-  MyPoint to = MyPoint()..nagOne();
+  BoardPoint from = BoardPoint()..nagOne();
+  BoardPoint to = BoardPoint()..nagOne();
 
   PlayerType playerType1 = PlayerType.human;
   PlayerType playerType2 = PlayerType.human;
@@ -45,9 +48,8 @@ class GameCubit extends Cubit<GameStates> {
   Selected type2 = Selected.not;
   Selected level1 = Selected.not;
   Selected level2 = Selected.not;
-  Agent ai1 = MiniMax(1);
-  Agent ai2 = MiniMax(1);
-  var logger = Logger();
+  Agent agent1 = MiniMax(1);
+  Agent agent2 = MiniMax(1);
 
   final List<Widget> screens = [
     const PlayerSelectionScreen(),
@@ -55,7 +57,7 @@ class GameCubit extends Cubit<GameStates> {
     const WinScreen(),
   ];
 
-  Future<void> playerSelectionDone() async {
+  void playerSelectionDone() {
     if (type1 == Selected.selected && type2 == Selected.selected) {
       if (playerType1 != PlayerType.human && level1 == Selected.not) {
         return;
@@ -73,27 +75,24 @@ class GameCubit extends Cubit<GameStates> {
 
   Future<void> startup() async {
     if (playerType1 == PlayerType.minmax) {
-      ai1 = MiniMax(difficultyLevelForAI1);
+      agent1 = MiniMax(difficultyLevelForAI1);
     } else if (playerType1 == PlayerType.alpa) {
-      ai1 = AlphaBeta(difficultyLevelForAI1, 2);
+      agent1 = AlphaBeta(difficultyLevelForAI1, 2);
     } else if (playerType1 == PlayerType.iter) {
-      ai1 = IteravieDeeping(difficultyLevelForAI1, 5);
+      agent1 = IteravieDeeping(difficultyLevelForAI1, 5);
     }
     if (playerType2 == PlayerType.minmax) {
-      ai2 = MiniMax(difficultyLevelForAI2);
+      agent2 = MiniMax(difficultyLevelForAI2);
     } else if (playerType2 == PlayerType.alpa) {
-      ai2 = AlphaBeta(difficultyLevelForAI2, 2);
+      agent2 = AlphaBeta(difficultyLevelForAI2, 2);
     } else if (playerType2 == PlayerType.iter) {
-      ai2 = IteravieDeeping(difficultyLevelForAI2, 5);
+      agent2 = IteravieDeeping(difficultyLevelForAI2, 5);
     }
     await Future.delayed(const Duration(milliseconds: 50));
     if (playerType1 != PlayerType.human && playerType2 != PlayerType.human) {
-      aiai = true;
-      whosturn = 3;
-      while (aiai) {
-        ai();
-        await Future.delayed(const Duration(milliseconds: 20));
-      }
+      aiBattle();
+      emit(BattleOfTheAIs());
+      // TODO: add listen
     } else if (playerType1 != PlayerType.human) {
       whosturn = 3;
       ai();
@@ -102,20 +101,29 @@ class GameCubit extends Cubit<GameStates> {
     }
   }
 
+  void aiBattle() async {
+    aiai = true;
+    whosturn = 3;
+    while (aiai) {
+      ai();
+      await Future.delayed(const Duration(milliseconds: 20));
+    }
+  }
+
   Future<void> ai() async {
     Agent player;
     if (whosturn == 3) {
-      player = ai1;
+      player = agent1;
     } else if (whosturn == 4) {
-      player = ai2;
+      player = agent2;
     } else {
       return;
     }
     var x = adapter.f2b(board);
-    var move = player!.calcBestMove(x, whosturn - 2);
+    var move = player.calcBestMove(x, whosturn - 2);
     var y = applyMove(x, whosturn - 2, move);
     board = adapter.b2f(y, board);
-    Logger().i(move);
+    logger.i(move);
     changePlayer();
     emit(AIPlayed());
   }
@@ -160,7 +168,7 @@ class GameCubit extends Cubit<GameStates> {
     }
   }
 
-  void plays({required MyPoint point}) {
+  void plays({required BoardPoint point}) {
     if (whosturn == 1) {
       player1Turn(point: point);
     } else if (whosturn == 2) {
@@ -168,7 +176,7 @@ class GameCubit extends Cubit<GameStates> {
     } else {}
   }
 
-  Future<void> player1Turn({required MyPoint point}) async {
+  Future<void> player1Turn({required BoardPoint point}) async {
     if (aPieceIsToushed == 0) {
       if (getLastNumber(point: point) <= 0) {
         return;
@@ -198,7 +206,7 @@ class GameCubit extends Cubit<GameStates> {
     }
   }
 
-  Future<void> player2Turn({required MyPoint point}) async {
+  Future<void> player2Turn({required BoardPoint point}) async {
     if (aPieceIsToushed == 0) {
       if (getLastNumber(point: point) >= 0) {
         return;
@@ -231,8 +239,8 @@ class GameCubit extends Cubit<GameStates> {
   }
 
   bool isValidMove({
-    required MyPoint start,
-    required MyPoint end,
+    required BoardPoint start,
+    required BoardPoint end,
   }) {
     int row = 0;
     int col = 0;
@@ -311,61 +319,11 @@ class GameCubit extends Cubit<GameStates> {
     }
   }
 
-  Future<void> playerWins(int player) async {
-    bool checker(plr, x) => plr == 1 ? x > 0 : x < 0;
-    if (checker(player, getLastItemInTheBoard(y: 0, z: 0)) &&
-            checker(player, getLastItemInTheBoard(y: 1, z: 0)) &&
-            checker(player, getLastItemInTheBoard(y: 2, z: 0)) &&
-            checker(player, getLastItemInTheBoard(y: 3, z: 0)) ||
-        checker(player, getLastItemInTheBoard(y: 0, z: 1)) &&
-            checker(player, getLastItemInTheBoard(y: 1, z: 1)) &&
-            checker(player, getLastItemInTheBoard(y: 2, z: 1)) &&
-            checker(player, getLastItemInTheBoard(y: 3, z: 1)) ||
-        checker(player, getLastItemInTheBoard(y: 0, z: 2)) &&
-            checker(player, getLastItemInTheBoard(y: 1, z: 2)) &&
-            checker(player, getLastItemInTheBoard(y: 2, z: 2)) &&
-            checker(player, getLastItemInTheBoard(y: 3, z: 2)) ||
-        checker(player, getLastItemInTheBoard(y: 0, z: 3)) &&
-            checker(player, getLastItemInTheBoard(y: 1, z: 3)) &&
-            checker(player, getLastItemInTheBoard(y: 2, z: 3)) &&
-            checker(player, getLastItemInTheBoard(y: 3, z: 3)) ||
-        checker(player, getLastItemInTheBoard(y: 0, z: 0)) &&
-            checker(player, getLastItemInTheBoard(y: 0, z: 1)) &&
-            checker(player, getLastItemInTheBoard(y: 0, z: 2)) &&
-            checker(player, getLastItemInTheBoard(y: 0, z: 3)) ||
-        checker(player, getLastItemInTheBoard(y: 1, z: 0)) &&
-            checker(player, getLastItemInTheBoard(y: 1, z: 1)) &&
-            checker(player, getLastItemInTheBoard(y: 1, z: 2)) &&
-            checker(player, getLastItemInTheBoard(y: 1, z: 3)) ||
-        checker(player, getLastItemInTheBoard(y: 2, z: 0)) &&
-            checker(player, getLastItemInTheBoard(y: 2, z: 1)) &&
-            checker(player, getLastItemInTheBoard(y: 2, z: 2)) &&
-            checker(player, getLastItemInTheBoard(y: 2, z: 3)) ||
-        checker(player, getLastItemInTheBoard(y: 3, z: 0)) &&
-            checker(player, getLastItemInTheBoard(y: 3, z: 1)) &&
-            checker(player, getLastItemInTheBoard(y: 3, z: 2)) &&
-            checker(player, getLastItemInTheBoard(y: 3, z: 3)) ||
-        checker(player, getLastItemInTheBoard(y: 0, z: 0)) &&
-            checker(player, getLastItemInTheBoard(y: 1, z: 1)) &&
-            checker(player, getLastItemInTheBoard(y: 2, z: 2)) &&
-            checker(player, getLastItemInTheBoard(y: 3, z: 3)) ||
-        checker(player, getLastItemInTheBoard(y: 0, z: 3)) &&
-            checker(player, getLastItemInTheBoard(y: 1, z: 2)) &&
-            checker(player, getLastItemInTheBoard(y: 2, z: 1)) &&
-            checker(player, getLastItemInTheBoard(y: 3, z: 0))) {
-      winner = player;
-      screenIndex = 2;
-      aiai = false;
-      // for (int i = 0; i < 1000000000; i++) {}
-      emit(GameFinished());
-    }
-  }
-
   double getLastItemInTheBoard({required int y, required int z}) {
     return board[0][y][z].last;
   }
 
-  double getLastNumber({required MyPoint point}) {
+  double getLastNumber({required BoardPoint point}) {
     if (board[point.x][point.y][point.z].isEmpty) return 0;
     return board[point.x][point.y][point.z].last;
   }
@@ -386,8 +344,8 @@ class GameCubit extends Cubit<GameStates> {
     level2 = Selected.not;
     difficultyLevelForAI1 = 1;
     difficultyLevelForAI2 = 1;
-    from = MyPoint()..nagOne();
-    to = MyPoint()..nagOne();
+    from = BoardPoint()..nagOne();
+    to = BoardPoint()..nagOne();
     board = [
       [
         [
@@ -469,6 +427,60 @@ class GameCubit extends Cubit<GameStates> {
     emit(Restart());
   }
 
+  void playerWins(int player) {
+    bool checker(plr, x) => plr == 1 ? x > 0 : x < 0;
+    if (checker(player, getLastItemInTheBoard(y: 0, z: 0)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 0)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 0)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 0)) ||
+        checker(player, getLastItemInTheBoard(y: 0, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 1)) ||
+        checker(player, getLastItemInTheBoard(y: 0, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 2)) ||
+        checker(player, getLastItemInTheBoard(y: 0, z: 3)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 3)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 3)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 3)) ||
+        checker(player, getLastItemInTheBoard(y: 0, z: 0)) &&
+            checker(player, getLastItemInTheBoard(y: 0, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 0, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 0, z: 3)) ||
+        checker(player, getLastItemInTheBoard(y: 1, z: 0)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 3)) ||
+        checker(player, getLastItemInTheBoard(y: 2, z: 0)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 3)) ||
+        checker(player, getLastItemInTheBoard(y: 3, z: 0)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 3)) ||
+        checker(player, getLastItemInTheBoard(y: 0, z: 0)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 3)) ||
+        checker(player, getLastItemInTheBoard(y: 0, z: 3)) &&
+            checker(player, getLastItemInTheBoard(y: 1, z: 2)) &&
+            checker(player, getLastItemInTheBoard(y: 2, z: 1)) &&
+            checker(player, getLastItemInTheBoard(y: 3, z: 0))) {
+      winner = player;
+      screenIndex = 2;
+      aiai = false;
+      emit(GameFinished());
+    }
+  }
+
+  void backToBoard() {
+    screenIndex = 1;
+    emit(ShowBoard());
+  }
+
   List<List<List<List<double>>>> board = [
     [
       [
@@ -547,32 +559,4 @@ class GameCubit extends Cubit<GameStates> {
       ],
     ],
   ];
-  //board[which board][vertical height of the board][horizontal width of the board][n/height of the stack]=double;
-
-  // useless functions for now at least
-  void movePieceFromTo({
-    required MyPoint start,
-    required MyPoint end,
-  }) {
-    if (isValidMove(start: start, end: end)) {
-      end.insertNumber(arr: board, num: start.getLastNumber(arr: board));
-      start.popNumber(arr: board);
-    }
-  }
-
-  void popNumber({required MyPoint point}) {
-    if (getLastNumber(point: point) == 0) {
-      return;
-    }
-    board[point.x][point.y][point.z].removeLast();
-  }
-
-  void insertNumber({required MyPoint point, required double num}) {
-    board[point.x][point.y][point.z].add(num);
-  }
-
-  void backToBoard() {
-    screenIndex = 1;
-    emit(ShowBoard());
-  }
 }

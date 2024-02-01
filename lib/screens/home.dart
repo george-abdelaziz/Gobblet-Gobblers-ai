@@ -14,12 +14,14 @@ class HomeScreen extends StatelessWidget {
         return GameCubit();
       },
       child: BlocConsumer<GameCubit, GameStates>(
-        listener: (BuildContext context, GameStates state) {},
+        listener: (BuildContext context, GameStates state) {
+          // if (state is Player1Frist) {}
+        },
         builder: (BuildContext context, GameStates state) {
           var cubit = GameCubit.get(context);
           return Scaffold(
             appBar: AppBar(
-              title: const Text('Gobblet'),
+              title: const Text('Gobblet Gobblers'),
             ),
             body: cubit.screens[cubit.screenIndex],
           );

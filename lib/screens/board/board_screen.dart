@@ -1,6 +1,8 @@
 import 'package:ai_project/shared/components.dart';
+import 'package:ai_project/widgets/board.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../cubit/cubit.dart';
 import '../../cubit/states.dart';
 
@@ -13,28 +15,30 @@ class BoardScreen extends StatelessWidget {
       listener: (context, state) {},
       builder: (context, state) {
         final cubit = GameCubit.get(context);
-        //@greybeast
-        return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
+        return Center(
           child: SingleChildScrollView(
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  MaterialButton(
-                    color: Colors.deepPurpleAccent,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+            scrollDirection: Axis.horizontal,
+            child: SingleChildScrollView(
+              child: Center(
+                child: Column(
+                  // mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    MaterialButton(
+                      color: Colors.deepPurpleAccent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Text('End Game'),
+                      onPressed: () {
+                        cubit.restart();
+                      },
                     ),
-                    child: const Text('GET OUT'),
-                    onPressed: () {
-                      cubit.restart();
-                    },
-                  ),
-                  player(context, 1),
-                  board(context),
-                  player(context, 2),
-                ],
+                    player(context, 1),
+                    Board(),
+                    player(context, 2),
+                  ],
+                ),
               ),
             ),
           ),

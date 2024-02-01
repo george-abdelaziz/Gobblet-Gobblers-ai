@@ -1,46 +1,11 @@
 import 'package:ai_project/cubit/cubit.dart';
-import 'package:ai_project/models/my_classes.dart';
+import 'package:ai_project/models/board_point.dart';
+import 'package:ai_project/widgets/piece.dart';
 import 'package:flutter/material.dart';
-
-Widget? piece({
-  required BuildContext context,
-  required MyPoint point,
-}) {
-  GameCubit cubit = GameCubit.get(context);
-  double size = point.getLastNumber(arr: cubit.board);
-  if (size == 0) {
-    return null;
-  }
-  Color color;
-  size = 20 * size;
-  if (size > 0) {
-    color = Colors.red;
-  } else {
-    size = -size;
-    color = Colors.lightBlueAccent;
-  }
-  if (point.x == cubit.from.x &&
-      point.y == cubit.from.y &&
-      point.z == cubit.from.z) {
-    color = Colors.greenAccent;
-  }
-  return Center(
-    child: MaterialButton(
-      height: size,
-      color: color,
-      textColor: Colors.white,
-      shape: const CircleBorder(),
-      onPressed: () {
-        var cubit = GameCubit.get(context);
-        cubit.plays(point: point);
-      },
-    ),
-  );
-}
 
 Widget square({
   required BuildContext context,
-  required MyPoint point,
+  required BoardPoint point,
 }) {
   Color color = Colors.black12;
   if (point.x == 0) {
@@ -60,7 +25,7 @@ Widget square({
         height: 100,
         width: 100,
         color: color,
-        child: piece(context: context, point: point),
+        child: Piece(point: point),
       ),
     ),
   );
@@ -90,17 +55,17 @@ Widget player(BuildContext context, int player) {
                     decoration: BoxDecoration(
                         border: Border.all(width: 1, color: Colors.black)),
                     child: square(
-                        context: context, point: MyPoint(x: player, z: 0))),
+                        context: context, point: BoardPoint(x: player, z: 0))),
                 Container(
                     decoration: BoxDecoration(
                         border: Border.all(width: 1, color: Colors.black)),
                     child: square(
-                        context: context, point: MyPoint(x: player, z: 1))),
+                        context: context, point: BoardPoint(x: player, z: 1))),
                 Container(
                     decoration: BoxDecoration(
                         border: Border.all(width: 1, color: Colors.black)),
                     child: square(
-                        context: context, point: MyPoint(x: player, z: 2))),
+                        context: context, point: BoardPoint(x: player, z: 2))),
               ],
             ),
           ),
@@ -110,7 +75,7 @@ Widget player(BuildContext context, int player) {
   );
 }
 
-Widget board(
+Widget boardp(
   BuildContext context,
 ) {
   return Center(
@@ -127,28 +92,28 @@ Widget board(
               children: [
                 square(
                   context: context,
-                  point: MyPoint(
+                  point: BoardPoint(
                     y: 0,
                     z: 0,
                   ),
                 ),
                 square(
                   context: context,
-                  point: MyPoint(
+                  point: BoardPoint(
                     y: 0,
                     z: 1,
                   ),
                 ),
                 square(
                   context: context,
-                  point: MyPoint(
+                  point: BoardPoint(
                     y: 0,
                     z: 2,
                   ),
                 ),
                 square(
                   context: context,
-                  point: MyPoint(
+                  point: BoardPoint(
                     y: 0,
                     z: 3,
                   ),
@@ -160,28 +125,28 @@ Widget board(
               children: [
                 square(
                   context: context,
-                  point: MyPoint(
+                  point: BoardPoint(
                     y: 1,
                     z: 0,
                   ),
                 ),
                 square(
                   context: context,
-                  point: MyPoint(
+                  point: BoardPoint(
                     y: 1,
                     z: 1,
                   ),
                 ),
                 square(
                   context: context,
-                  point: MyPoint(
+                  point: BoardPoint(
                     y: 1,
                     z: 2,
                   ),
                 ),
                 square(
                   context: context,
-                  point: MyPoint(
+                  point: BoardPoint(
                     y: 1,
                     z: 3,
                   ),
@@ -193,28 +158,28 @@ Widget board(
               children: [
                 square(
                   context: context,
-                  point: MyPoint(
+                  point: BoardPoint(
                     y: 2,
                     z: 0,
                   ),
                 ),
                 square(
                   context: context,
-                  point: MyPoint(
+                  point: BoardPoint(
                     y: 2,
                     z: 1,
                   ),
                 ),
                 square(
                   context: context,
-                  point: MyPoint(
+                  point: BoardPoint(
                     y: 2,
                     z: 2,
                   ),
                 ),
                 square(
                   context: context,
-                  point: MyPoint(
+                  point: BoardPoint(
                     y: 2,
                     z: 3,
                   ),
@@ -226,28 +191,28 @@ Widget board(
               children: [
                 square(
                   context: context,
-                  point: MyPoint(
+                  point: BoardPoint(
                     y: 3,
                     z: 0,
                   ),
                 ),
                 square(
                   context: context,
-                  point: MyPoint(
+                  point: BoardPoint(
                     y: 3,
                     z: 1,
                   ),
                 ),
                 square(
                   context: context,
-                  point: MyPoint(
+                  point: BoardPoint(
                     y: 3,
                     z: 2,
                   ),
                 ),
                 square(
                   context: context,
-                  point: MyPoint(
+                  point: BoardPoint(
                     y: 3,
                     z: 3,
                   ),

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:ai_project/models/my_classes.dart';
 import 'package:ai_project/models/adapter.dart';
+import 'package:ai_project/models/board_point.dart';
 
 Map<String, dynamic> applyMove(gamestate, player, move) {
   Map<String, dynamic> newGameState =
@@ -56,7 +57,7 @@ List genMoves(int player, gamestate) {
             "toRow": row,
             "toCol": col
           };
-          if (validateMove(move, player, gamestate)) {
+          if (isValidMove(move, player, gamestate)) {
             candidateMoves.add(move);
           }
         }
@@ -77,7 +78,7 @@ List genMoves(int player, gamestate) {
               "toRow": row2,
               "toCol": col2
             };
-            if (validateMove(move, player, gamestate)) {
+            if (isValidMove(move, player, gamestate)) {
               candidateMoves.add(move);
             }
           }
@@ -146,9 +147,9 @@ Map<String, List> getGameState(
   };
 }
 
-bool isValidMove({
-  required MyPoint start,
-  required MyPoint end,
+bool _validate({
+  required BoardPoint start,
+  required BoardPoint end,
   required board,
 }) {
   int row = 0;
@@ -221,18 +222,23 @@ bool isValidMove({
   return true;
 }
 
-bool validateMove(Map move, int player, Map<String, dynamic> gamestate) {
-  MyPoint s;
-  MyPoint e = MyPoint(x: 0, z: move['toCol'], y: move['toRow']);
+bool isValidMove(Map move, int player, Map<String, dynamic> gamestate) {
+  BoardPoint s;
+  BoardPoint e = BoardPoint(x: 0, z: move['toCol'], y: move['toRow']);
   switch (move['type']) {
     case 'play':
-      s = MyPoint(x: player, y: 0, z: move['index']);
+      s = BoardPoint(x: player, y: 0, z: move['index']);
       break;
     default:
-      s = MyPoint(x: 0, z: move['fromCol'], y: move['fromRow']);
+      s = BoardPoint(x: 0, z: move['fromCol'], y: move['fromRow']);
   }
+  List<List<List<List<double>>>> b = [
+    [],
+    [[]],
+    [[]]
+  ];
   b = Adapter().b2f(gamestate, b);
-  return isValidMove(start: s, end: e, board: b);
+  return _validate(start: s, end: e, board: b);
 }
 
 List<List> copyPlayer(List<List> original) {
@@ -267,82 +273,3 @@ printToFile(board) async {
     await file.writeAsString("\n", mode: FileMode.append);
   }
 }
-
-List<List<List<List<double>>>> b = [
-  [
-    [
-      [0],
-      [0],
-      [0],
-      [0],
-    ],
-    [
-      [0],
-      [0],
-      [0],
-      [0],
-    ],
-    [
-      [0],
-      [0],
-      [0],
-      [0],
-    ],
-    [
-      [0],
-      [0],
-      [0],
-      [0],
-    ],
-  ],
-  [
-    [
-      [
-        0,
-        1,
-        2,
-        3,
-        4,
-      ],
-      [
-        0,
-        1,
-        2,
-        3,
-        4,
-      ],
-      [
-        0,
-        1,
-        2,
-        3,
-        4,
-      ],
-    ],
-  ],
-  [
-    [
-      [
-        0,
-        -1,
-        -2,
-        -3,
-        -4,
-      ],
-      [
-        0,
-        -1,
-        -2,
-        -3,
-        -4,
-      ],
-      [
-        0,
-        -1,
-        -2,
-        -3,
-        -4,
-      ],
-    ],
-  ],
-];

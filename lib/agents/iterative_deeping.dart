@@ -9,7 +9,7 @@ import 'package:logger/logger.dart';
 class IteravieDeeping extends Agent {
   final int timeout;
   late Timer temo;
-  IteravieDeeping(super.depth, this.timeout) {}
+  IteravieDeeping(super.depth, this.timeout);
 
   double alphaBeta(Map<String, dynamic> gamestate, bool maximizer, int plr,
       int depth, double alpha, double beta) {

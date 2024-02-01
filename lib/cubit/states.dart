@@ -55,3 +55,5 @@ class AIPlayed extends GameStates {}
 class AI1Played extends GameStates {}
 
 class AI2Played extends GameStates {}
+
+class BattleOfTheAIs extends GameStates {}

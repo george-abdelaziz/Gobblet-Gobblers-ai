@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'screens/home.dart';
 
 void main() {
-  Bloc.observer = MyBlocObserver();
+  // Bloc.observer = MyBlocObserver();
 
   runApp(const MyApp());
 }
