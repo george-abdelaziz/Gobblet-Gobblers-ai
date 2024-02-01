@@ -1,4 +1,4 @@
-import 'package:ai_project/layout/gobblet/cubit/cubit.dart';
+import 'package:ai_project/cubit/cubit.dart';
 import 'package:ai_project/models/my_classes.dart';
 import 'package:flutter/material.dart';
 
@@ -110,13 +110,15 @@ Widget player(BuildContext context, int player) {
   );
 }
 
-Widget board(BuildContext context,) {
+Widget board(
+  BuildContext context,
+) {
   return Center(
     child: Padding(
       padding: const EdgeInsets.all(0),
       child: Container(
         decoration:
-        BoxDecoration(border: Border.all(width: 2, color: Colors.black)),
+            BoxDecoration(border: Border.all(width: 2, color: Colors.black)),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

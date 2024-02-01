@@ -1,8 +1,7 @@
 import 'dart:io';
 
 import 'package:ai_project/models/my_classes.dart';
-import 'package:ai_project/modules/adapter.dart';
-import 'package:logger/logger.dart';
+import 'package:ai_project/models/adapter.dart';
 
 Map<String, dynamic> applyMove(gamestate, player, move) {
   Map<String, dynamic> newGameState =
@@ -221,47 +220,19 @@ bool isValidMove({
   }
   return true;
 }
-bool validateMove(Map move, int player, Map<String, dynamic> gamestate) {
 
-  // board n, col , row
-  // -ve  2
-  // +ve 1
-  //     int toBeMoved = gamestate[p][move["index"]].last;
-  // int toBeCovered = board[move["toRow"]][move["toCol"]].last;
-  // MyPoint s;
-  // MyPoint e = MyPoint(x: 0, y: move['toCol'], z: move['toRow']);
-  // switch (move['type']) {
-  //   case 'play':
-  //     s = MyPoint(x: player, y: 0, z: move['index']);
-  //     break;
-  //   default:
-  //     s = MyPoint(x: 0, y: move['fromCol'], z: move['fromRow']);
-  // }
-  // b = Adapter().b2f(gamestate, b);
-  // // Logger().d(b);
-  // return isValidMove(start: s, end: e, board: b);
-  final board = gamestate["board"];
-  final p = player == 1 ? "p1" : "p2";
-  // check if is landing on a blank square
-  if (board[move["toRow"]][move["toCol"]].last == 0) return true;
-  // in case of a filled square:
-  //  - check if it's greater
-  //  - if it is greater check if the square have two neighbours
-  int toBeCovered = board[move["toRow"]][move["toCol"]].last;
-  switch (move["type"]) {
-    case "play":
-      int toBeMoved = gamestate[p][move["index"]].last;
-      if (toBeCovered.abs() >= toBeMoved.abs()) return false;
-      // check neighboors
-      int r = move['toRow'];
-      int c = move['toCol'];
-    case "move":
-      int toBeMoved = board[move["fromRow"]][move["fromCol"]].last;
-      if (toBeCovered.abs() >= toBeMoved.abs()) return false;
-    default:
+bool validateMove(Map move, int player, Map<String, dynamic> gamestate) {
+  MyPoint s;
+  MyPoint e = MyPoint(x: 0, z: move['toCol'], y: move['toRow']);
+  switch (move['type']) {
+    case 'play':
+      s = MyPoint(x: player, y: 0, z: move['index']);
       break;
+    default:
+      s = MyPoint(x: 0, z: move['fromCol'], y: move['fromRow']);
   }
-  return true;
+  b = Adapter().b2f(gamestate, b);
+  return isValidMove(start: s, end: e, board: b);
 }
 
 List<List> copyPlayer(List<List> original) {

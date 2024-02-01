@@ -2,7 +2,7 @@ import 'package:ai_project/shared/bloc_observer.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 
-import 'layout/gobblet/gobblet.dart';
+import 'screens/home.dart';
 
 void main() {
   Bloc.observer = MyBlocObserver();
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Gobblet(),
+      home: HomeScreen(),
     );
   }
 }

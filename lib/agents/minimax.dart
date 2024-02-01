@@ -1,5 +1,3 @@
-import 'package:logger/logger.dart';
-
 import 'agent.dart';
 import 'config.dart';
 import 'evaluate.dart';

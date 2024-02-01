@@ -1,18 +1,18 @@
-import 'package:ai_project/agents/iterative_deeping.dart';
-import 'package:ai_project/modules/adapter.dart';
+import 'package:ai_project/cubit/states.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logger/logger.dart';
 
-import '../../../agents/alphabeta.dart';
-import '../../../agents/minimax.dart';
+import '../agents/alphabeta.dart';
+import '../agents/minimax.dart';
 import '/agents/agent.dart';
+import '/agents/iterative_deeping.dart';
 import '/agents/utils.dart';
-import '/layout/gobblet/cubit/states.dart';
 import '/models/my_classes.dart';
-import '/modules/board/board_screen.dart';
-import '/modules/player_selection/player_selection_screen.dart';
-import '/modules/win/win.dart';
+import '../models/adapter.dart';
+import '../screens/board/board_screen.dart';
+import '../screens/player_selection/player_selection_screen.dart';
+import '../screens/win/win.dart';
 
 class GameCubit extends Cubit<GameStates> {
   GameCubit() : super(GameInitialState());
@@ -30,13 +30,15 @@ class GameCubit extends Cubit<GameStates> {
   bool aiai = false;
   int whosturn = 1;
   int aPieceIsToushed = 0;
-  int currentScreenIndex = 0;
+  int screenIndex = 0;
   int winner = 0;
   int difficultyLevelForAI1 = 1;
   int difficultyLevelForAI2 = 1;
+
   Adapter adapter = Adapter();
   MyPoint from = MyPoint()..nagOne();
   MyPoint to = MyPoint()..nagOne();
+
   PlayerType playerType1 = PlayerType.human;
   PlayerType playerType2 = PlayerType.human;
   Selected type1 = Selected.not;
@@ -46,6 +48,7 @@ class GameCubit extends Cubit<GameStates> {
   Agent ai1 = MiniMax(1);
   Agent ai2 = MiniMax(1);
   var logger = Logger();
+
   final List<Widget> screens = [
     const PlayerSelectionScreen(),
     const BoardScreen(),
@@ -60,7 +63,7 @@ class GameCubit extends Cubit<GameStates> {
       if (playerType2 != PlayerType.human && level2 == Selected.not) {
         return;
       }
-      currentScreenIndex = 1;
+      screenIndex = 1;
       startup();
       emit(GameStarted());
     } else {
@@ -90,8 +93,6 @@ class GameCubit extends Cubit<GameStates> {
       while (aiai) {
         ai();
         await Future.delayed(const Duration(milliseconds: 20));
-        ai();
-        await Future.delayed(const Duration(milliseconds: 20));
       }
     } else if (playerType1 != PlayerType.human) {
       whosturn = 3;
@@ -102,8 +103,14 @@ class GameCubit extends Cubit<GameStates> {
   }
 
   Future<void> ai() async {
-    // logger.d('message');
-    Agent player = (whosturn == 3) ? ai1 : ai2;
+    Agent player;
+    if (whosturn == 3) {
+      player = ai1;
+    } else if (whosturn == 4) {
+      player = ai2;
+    } else {
+      return;
+    }
     var x = adapter.f2b(board);
     var move = player!.calcBestMove(x, whosturn - 2);
     var y = applyMove(x, whosturn - 2, move);
@@ -304,7 +311,7 @@ class GameCubit extends Cubit<GameStates> {
     }
   }
 
-  void playerWins(int player) {
+  Future<void> playerWins(int player) async {
     bool checker(plr, x) => plr == 1 ? x > 0 : x < 0;
     if (checker(player, getLastItemInTheBoard(y: 0, z: 0)) &&
             checker(player, getLastItemInTheBoard(y: 1, z: 0)) &&
@@ -347,8 +354,9 @@ class GameCubit extends Cubit<GameStates> {
             checker(player, getLastItemInTheBoard(y: 2, z: 1)) &&
             checker(player, getLastItemInTheBoard(y: 3, z: 0))) {
       winner = player;
-      currentScreenIndex = 1;
+      screenIndex = 2;
       aiai = false;
+      // for (int i = 0; i < 1000000000; i++) {}
       emit(GameFinished());
     }
   }
@@ -362,13 +370,13 @@ class GameCubit extends Cubit<GameStates> {
     return board[point.x][point.y][point.z].last;
   }
 
-  /////////////////////////
+  //
 
   void restart() {
     aiai = false;
     whosturn = 1;
     aPieceIsToushed = 0;
-    currentScreenIndex = 0;
+    screenIndex = 0;
     winner = 0;
     playerType1 = PlayerType.human;
     playerType2 = PlayerType.human;
@@ -561,5 +569,10 @@ class GameCubit extends Cubit<GameStates> {
 
   void insertNumber({required MyPoint point, required double num}) {
     board[point.x][point.y][point.z].add(num);
+  }
+
+  void backToBoard() {
+    screenIndex = 1;
+    emit(ShowBoard());
   }
 }
