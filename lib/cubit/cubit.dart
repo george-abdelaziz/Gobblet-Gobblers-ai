@@ -91,8 +91,7 @@ class GameCubit extends Cubit<GameStates> {
     await Future.delayed(const Duration(milliseconds: 50));
     if (playerType1 != PlayerType.human && playerType2 != PlayerType.human) {
       aiBattle();
-      emit(BattleOfTheAIs());
-      // TODO: add listen
+      // emit(BattleOfTheAIs());
     } else if (playerType1 != PlayerType.human) {
       whosturn = 3;
       ai();
