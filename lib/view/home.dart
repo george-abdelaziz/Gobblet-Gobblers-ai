@@ -1,7 +1,7 @@
+import 'package:ai_project/cubit/game_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../cubit/cubit.dart';
 import '../cubit/states.dart';
 
 class HomeScreen extends StatelessWidget {
